@@ -1,0 +1,241 @@
+.overlay-message {
+  background: white;
+  position: fixed;
+  display: flex;
+  z-index: 9999;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  color: #FFFFFF;
+  align-items: center;
+  justify-content: center;
+}
+
+#loading-content {
+    opacity: 1;
+}
+
+#waiter-message {
+    opacity: .8;
+}
+
+.inner-conent {
+  top:50%
+}
+
+.start_loader{
+  margin-left: 0px;
+  margin-right: 0px;
+  place-content:center;
+}
+    
+
+#loading {
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #32325d;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+
+    
+@keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); }
+}
+
+
+body, #my_sidebar {
+  overflow: hidden;  /*Hide scrollbars - this state is reset within the application. It is intended to smooth out the initial loading screen */
+}
+
+
+
+.container-fluid {
+  padding: 0px !important;
+}
+
+#census_explore_ui-config_table_div .shiny-input-container:not(.shiny-input-container-inline) {
+  width: 80px !important;
+}
+
+#census_explore_ui-config_table_div .form-group shiny-input-container {
+  display: block !important;
+}
+
+.centered .form-group {
+      display: inline !important;
+}
+
+.center_input .form-group {
+      display: flex !important;
+      margin-bottom: 0px !important;
+}
+
+.plots {
+  margin-left: 35px;
+  margin-right: 35px;
+  margin-top: 15px;
+}
+
+.center_input {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.center_image {
+  display: flex;
+  justify-content: center;
+}
+
+#census_explore_ui-tool_selection_nav {
+  justify-content: space-around !important;
+}
+
+#census_explore_ui-tool_selection_nav > li > a {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    padding-top: 15px !important;
+}
+
+#census_explore_ui-tool_selection_nav > li > a.active {
+  background-color: #5e72e4 !important;
+}
+
+#census_explore_ui-tool_selection_nav > li > a.active > h2 {
+  color: #fff;
+}
+
+#census_explore_ui-selector_data_nd {
+  justify-content: center;
+  display: contents;
+  line-height: 2rem;
+}
+
+#shiny-tab-welcome_tab > main > div > div > section > div > a {
+  display: none !important
+}
+
+#shiny-tab-welcome_tab > main > div > div {
+  display: 15px !important;
+}
+
+#summaryTable table tr td {word-wrap: break-word}
+
+.info_divs{
+  cursor: pointer !important;
+}
+
+body > div.container-fluid > div.main-content > div.container-fluid.mt--1, #shiny-tab-equity_background_tab > div > div {
+  padding-right: 0px !important;
+  padding-left: 0px !important; 
+}
+
+#sidenav-collapse-main {
+  padding-right: 10px !important;
+  padding-left: 10px !important;
+}
+
+#sidebar-menu {
+  padding-right: -10px !important;
+  padding-left: -10px !important;
+}
+
+#shiny-tab-census_explore_tab, #shiny-tab-equity_background_tab, #shiny-tab-welcome_tab, #shiny-tab-equity_background_tab {
+  padding-left: 25px !important;
+  padding-right: 25px !important;
+}
+
+#sum_table {
+  min-height: 233px !important;
+}
+
+#census_explore_ui-map_container > div > div > div {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: .5rem !important;
+  padding-bottom: .5rem !important;
+}
+
+.table td, .table th {
+  padding: .25rem !important;
+}
+
+.footer {
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+}
+
+hr {
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.form-group {
+  margin-bottom: .5rem !important;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(87deg,#16B8EF 0,#1487C6 100%) !important;
+}
+
+.nav-pills .nav-link:hover {
+  color: #1487C6 !important;
+}
+
+.nav-pills {
+  color: #32325d !important;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link, #census_explore_ui-tool_selection_nav > li > a.active, #census_explore_ui-tool_selection_nav > li > a.active {
+background-color: #16B8EF !important;
+  }
+
+body {
+  background-color: #f8fbfe !important;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+  color: white !important;
+}
+
+.nav-pills .nav-link {
+  border-radius: .22rem !important;
+  color: #32325d !important;
+}
+
+a.active {
+  color: #32325d !important;
+}
+
+#shiny-tab-contact_tab > div > div > div:nth-child(2) > div > div.card-body > a {
+  background-color: #32325d !important;
+  border-color: #32325d !important;
+  color: white !important;
+}
+
+#shiny-tab-contact_tab > div > div > div:nth-child(2) > div > div.card-header > div > div, #shiny-tab-contact_tab > div > div > div:nth-child(1) > div > div.card-header > div > div {
+  background-color: #cacaeb !important;
+}
+
+#shiny-tab-contact_tab > div > div > div:nth-child(2) > div > div.card-header > div > div > i, #shiny-tab-contact_tab > div > div > div:nth-child(1) > div > div.card-header > div > div > i {
+    color: #32325d !important;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+  color: #2c3e50 !important;; /* Change this color to any dark color you prefer for headings */
+}
+
+p {
+  color: #1a1d25 !important; /* Change this color to any dark color you prefer for paragraphs */
+}
+

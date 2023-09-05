@@ -1,0 +1,5 @@
+*.pper
+.Rproj.user
+rsconnect/*
+.RData
+.Rhistory
