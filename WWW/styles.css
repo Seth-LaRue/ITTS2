@@ -229,13 +229,3 @@ a.active {
 #shiny-tab-contact_tab > div > div > div:nth-child(2) > div > div.card-header > div > div > i, #shiny-tab-contact_tab > div > div > div:nth-child(1) > div > div.card-header > div > div > i {
     color: #32325d !important;
 }
-
-
-h1, h2, h3, h4, h5, h6 {
-  color: #2c3e50 !important;; /* Change this color to any dark color you prefer for headings */
-}
-
-p {
-  color: #1a1d25 !important; /* Change this color to any dark color you prefer for paragraphs */
-}
-
