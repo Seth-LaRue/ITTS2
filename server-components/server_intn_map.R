@@ -18,24 +18,24 @@ dat_ini_in <- dat_sin %>%
   mutate(dms_imp_exp = if_else(origin == '48', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
-  summarise(Tons_2019 = sum(Tons_2019), 
-            Tons_2021 = sum(Tons_2021),
-            Value_2019 = sum(Value_2019),
-            Value_2021 = sum(Value_2021)) %>%
+  summarise(tons_2019 = sum(tons_2019), 
+            tons_2021 = sum(tons_2021),
+            value_2019 = sum(value_2019),
+            value_2021 = sum(value_2021)) %>%
   ungroup() %>%
-  mutate(rank = rank(desc(Value_2019)))
+  mutate(rank = rank(desc(value_2019)))
 
 dat_pini_in <- dat_pin %>%
   filter(origin == '4026'|destination == '4026') %>%
   mutate(dms_imp_exp = if_else(origin == '4026', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
-  summarise(Tons_2019 = sum(Tons_2019), 
-            Tons_2021 = sum(Tons_2021),
-            Value_2019 = sum(Value_2019),
-            Value_2021 = sum(Value_2021)) %>%
+  summarise(tons_2019 = sum(tons_2019), 
+            tons_2021 = sum(tons_2021),
+            value_2019 = sum(value_2019),
+            value_2021 = sum(value_2021)) %>%
   ungroup() %>%
-  mutate(rank = rank(desc(Value_2019)))
+  mutate(rank = rank(desc(value_2019)))
 
 ln_select_in_ini <- international_base %>%
   select(GEOID, NAME) %>%
@@ -46,11 +46,11 @@ ln_select_in_pini <- international_base %>%
   inner_join(dat_pini_in, by = "GEOID")
 
 output$odmap_in <- renderLeaflet({
-  pal_factor_ini_in <- colorQuantile(palette = "Blues",domain = ln_select_in_ini$Value_2019,probs = seq(0, 1, .2))
+  pal_factor_ini_in <- colorQuantile(palette = "Blues",domain = ln_select_in_ini$value_2019,probs = seq(0, 1, .2))
   pulsecolor_ini_in='red'
   
-  pal_factor_colors_ini_in <- unique(pal_factor_ini_in(sort(ln_select_in_ini$Value_2019)))
-  pal_factor_labs_ini_in <- round(quantile(round(ln_select_in_ini$Value_2019, 1), probs = seq(0, 1, .2)), 1)
+  pal_factor_colors_ini_in <- unique(pal_factor_ini_in(sort(ln_select_in_ini$value_2019)))
+  pal_factor_labs_ini_in <- round(quantile(round(ln_select_in_ini$value_2019, 1), probs = seq(0, 1, .2)), 1)
   pal_factor_labs_ini_in <- paste(scales::comma(lag(pal_factor_labs_ini_in)), scales::comma(pal_factor_labs_ini_in), sep = " - ")[-1]
   
   con_name_ini_in=all_selected$NAME[all_selected$GEOID == '48']
@@ -59,7 +59,7 @@ output$odmap_in <- renderLeaflet({
   m_in %>%
     addPolygons(data = ln_select_in_ini,
                 layerId = ~paste("data", ln_select_in_ini$GEOID),
-                fillColor = ~pal_factor_ini_in(Value_2019),
+                fillColor = ~pal_factor_ini_in(value_2019),
                 stroke=TRUE,
                 smoothFactor = 0.3,
                 color = '#5a5a5a',#~hili,
@@ -117,11 +117,11 @@ observeEvent(input$cors_opts_in, {
     click_counties_in$curr <- "4026"
     
     output$odmap_in <- renderLeaflet({
-      pal_factor_pini_in <- colorQuantile(palette = "Blues",domain = ln_select_in_pini$Value_2019,probs = seq(0, 1, .2))
+      pal_factor_pini_in <- colorQuantile(palette = "Blues",domain = ln_select_in_pini$value_2019,probs = seq(0, 1, .2))
       pulsecolor_pini_in='red'
       
-      pal_factor_colors_pini_in <- unique(pal_factor_pini_in(sort(ln_select_in_pini$Value_2019)))
-      pal_factor_labs_pini_in <- round(quantile(round(ln_select_in_pini$Value_2019, 1), probs = seq(0, 1, .2)), 1)
+      pal_factor_colors_pini_in <- unique(pal_factor_pini_in(sort(ln_select_in_pini$value_2019)))
+      pal_factor_labs_pini_in <- round(quantile(round(ln_select_in_pini$value_2019, 1), probs = seq(0, 1, .2)), 1)
       pal_factor_labs_pini_in <- paste(scales::comma(lag(pal_factor_labs_pini_in)), scales::comma(pal_factor_labs_pini_in), sep = " - ")[-1]
       
       con_name_pini_in=all_selected$NAME[all_selected$GEOID == '4026']
@@ -130,7 +130,7 @@ observeEvent(input$cors_opts_in, {
       m_pin %>%
         addPolygons(data = ln_select_in_pini,
                     layerId = ~paste("data", ln_select_in_pini$GEOID),
-                    fillColor = ~pal_factor_pini_in(Value_2019),
+                    fillColor = ~pal_factor_pini_in(value_2019),
                     stroke=TRUE,
                     smoothFactor = 0.3,
                     color = '#5a5a5a',#~hili,
@@ -172,11 +172,11 @@ observeEvent(input$cors_opts_in, {
     click_counties_in$curr <- "48"
     
     output$odmap_in <- renderLeaflet({
-      pal_factor_ini_in <- colorQuantile(palette = "Blues",domain = ln_select_in_ini$Value_2019,probs = seq(0, 1, .2))
+      pal_factor_ini_in <- colorQuantile(palette = "Blues",domain = ln_select_in_ini$value_2019,probs = seq(0, 1, .2))
       pulsecolor_ini_in='red'
       
-      pal_factor_colors_ini_in <- unique(pal_factor_ini_in(sort(ln_select_in_ini$Value_2019)))
-      pal_factor_labs_ini_in <- round(quantile(round(ln_select_in_ini$Value_2019, 1), probs = seq(0, 1, .2)), 1)
+      pal_factor_colors_ini_in <- unique(pal_factor_ini_in(sort(ln_select_in_ini$value_2019)))
+      pal_factor_labs_ini_in <- round(quantile(round(ln_select_in_ini$value_2019, 1), probs = seq(0, 1, .2)), 1)
       pal_factor_labs_ini_in <- paste(scales::comma(lag(pal_factor_labs_ini_in)), scales::comma(pal_factor_labs_ini_in), sep = " - ")[-1]
       
       con_name_ini_in=all_selected$NAME[all_selected$GEOID == '48']
@@ -185,7 +185,7 @@ observeEvent(input$cors_opts_in, {
       m_in %>%
         addPolygons(data = ln_select_in_ini,
                     layerId = ~paste("data", ln_select_in_ini$GEOID),
-                    fillColor = ~pal_factor_ini_in(Value_2019),
+                    fillColor = ~pal_factor_ini_in(value_2019),
                     stroke=TRUE,
                     smoothFactor = 0.3,
                     color = '#5a5a5a',#~hili,
@@ -368,10 +368,10 @@ data_ss_click_in<- reactive({
         
       dat_temp_in = dat_temp_in %>%
         group_by(origin, destination, GEOID)%>%
-        summarise(Tons_2019 = sum(Tons_2019), 
-                  Tons_2021 = sum(Tons_2021),
-                  Value_2019 = sum(Value_2019),
-                  Value_2021 = sum(Value_2021)) %>%
+        summarise(tons_2019 = sum(tons_2019), 
+                  tons_2021 = sum(tons_2021),
+                  value_2019 = sum(value_2019),
+                  value_2021 = sum(value_2021)) %>%
         ungroup()
       selected_col = input$Value_opts_in
       }else{
@@ -420,10 +420,10 @@ data_ss_click_in<- reactive({
       mutate(dms_imp_exp = ifelse(origin == click_counties_in$curr, destination, origin),
              GEOID = dms_imp_exp) %>% 
       group_by(dms_imp_exp, GEOID)%>%
-      summarise(Tons_2019 = sum(Tons_2019), 
-                Tons_2021 = sum(Tons_2021),
-                Value_2019 = sum(Value_2019),
-                Value_2021 = sum(Value_2021)) %>%
+      summarise(tons_2019 = sum(tons_2019), 
+                tons_2021 = sum(tons_2021),
+                value_2019 = sum(value_2019),
+                value_2021 = sum(value_2021)) %>%
       ungroup()
     selected_col = input$Value_opts_in
     
@@ -707,6 +707,25 @@ observe({
 })
 output$table_title_in <- renderText({ table_titl() })
 
+output$scenario_title_in <- renderText({
+  
+  if (input$Scenario_opt_in == '_s1'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 1')
+  }else if (input$Scenario_opt_in == '_s2'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 2')
+  }else if (input$Scenario_opt_in == '_s3'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 3')
+  }else if (input$Scenario_opt_in == '_s4'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 4')
+  }else if (input$Scenario_opt_in == '_s5'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 5')
+  }else if (input$Scenario_opt_in == '_s6'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 6')
+  }else{
+    sencario = paste0("Selected Scenario: ", input$Scenario_opt_in)}
+  return(sencario)
+})
+
 output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
   
   
@@ -742,16 +761,16 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
   
   SETTS_ss_in<-SETTS_ss_in %>%
     arrange(rank) %>% 
-    select('NAME',starts_with('Tons_'), starts_with('Value_'))
+    select('NAME',starts_with('tons_'), starts_with('value_'))
   
   SETTS_ss_in_r$SETTS_ss_in=SETTS_ss_in
   
   SETTS_ss_in<-SETTS_ss_in %>%
-    mutate_at(vars(contains('Tons_'),contains('Value_')),~round(.,1)) %>% 
-    rename('Tons 2019</br>(Thousand Tons)'='Tons_2019',
-           'Tons 2021</br>(Thousand Tons)'='Tons_2021',
-           'Value 2019</br>($Million)'='Value_2019',
-           'Value 2021</br>($Million)'='Value_2021')
+    mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
+    rename('Tons 2019</br>(Thousand Tons)'='tons_2019',
+           'Tons 2021</br>(Thousand Tons)'='tons_2021',
+           'Value 2019</br>($Million)'='value_2019',
+           'Value 2021</br>($Million)'='value_2021')
   names(SETTS_ss_in)[grepl('_',names(SETTS_ss_in))] <- str_to_title(gsub("_"," ",names(SETTS_ss_in)[grepl('_',names(SETTS_ss_in))]))
   
   #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
@@ -846,16 +865,16 @@ observe({
     SETTS_ss_in<-SETTS_ss_in %>%
       arrange(rank) %>%
       filter(rank <= input$n_top_in) %>%
-      select(contains('NAME'),starts_with('Tons_'), starts_with('Value_'))
+      select(contains('NAME'),starts_with('tons_'), starts_with('value_'))
     
     SETTS_ss_in_r$SETTS_ss_in=SETTS_ss_in
     
     SETTS_ss_in<-SETTS_ss_in %>%
-      mutate_at(vars(contains('Tons_'),contains('Value_')),~round(.,1)) %>%
-      rename('Tons 2019</br>(Thousand Tons)'='Tons_2019',
-             'Tons 2021</br>(Thousand Tons)'='Tons_2021',
-             'Value 2019</br>($Million)'='Value_2019',
-             'Value 2021</br>($Million)'='Value_2021')
+      mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>%
+      rename('Tons 2019</br>(Thousand Tons)'='tons_2019',
+             'Tons 2021</br>(Thousand Tons)'='tons_2021',
+             'Value 2019</br>($Million)'='value_2019',
+             'Value 2021</br>($Million)'='value_2021')
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
     
     replaceData(proxy_cty2state_tbl, SETTS_ss_in, rownames = FALSE)

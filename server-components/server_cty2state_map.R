@@ -577,6 +577,25 @@ observe({
 })
 output$table_title_cs <- renderText({ table_titl() })
 
+output$scenario_title_cs <- renderText({
+  
+  if (input$Scenario_opt_cs == '_s1'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 1')
+  }else if (input$Scenario_opt_cs == '_s2'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 2')
+  }else if (input$Scenario_opt_cs == '_s3'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 3')
+  }else if (input$Scenario_opt_cs == '_s4'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 4')
+  }else if (input$Scenario_opt_cs == '_s5'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 5')
+  }else if (input$Scenario_opt_cs == '_s6'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 6')
+  }else{
+    sencario = paste0("Selected Scenario: ", input$Scenario_opt_cs)}
+  return(sencario)
+})
+
 output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
   if(input$Scenario_opt_cs == 'Baseline' &

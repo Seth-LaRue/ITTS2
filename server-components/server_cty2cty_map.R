@@ -7,9 +7,10 @@ click_counties <- reactiveValues(curr=NULL,prev=NULL)
 all_counties_centr_sel_ini=all_counties_centr %>% 
   filter(GEOID=='48453')
 
+browser()
 dat_ini <- dat %>%
-  filter(dms_orig == '48453'|dms_dest == '48453') %>%
-  mutate(dms_imp_exp = if_else(dms_orig == '48453', dms_dest, dms_orig),
+  filter(origin == '48453'|destination == '48453') %>%
+  mutate(dms_imp_exp = if_else(origin == '48453', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>%
   summarise(tons_2017 = sum(tons_2017), 
@@ -142,14 +143,14 @@ data_ss_click<- reactive({
   if(input$OD_opts != "Both"){
     # dat_temp <- dat %>%
     #   filter(!!input$OD_opts == click_counties$curr) this method didn't work unfortunately
-    if(input$OD_opts == "dms_orig"){
+    if(input$OD_opts == "origin"){
       dat_temp <- dat %>%
-        filter(dms_orig == click_counties$curr) %>%
-        mutate(GEOID = dms_dest)
+        filter(origin == click_counties$curr) %>%
+        mutate(GEOID = destination)
     } else {
       dat_temp <- dat %>%
-        filter(dms_dest == click_counties$curr) %>%
-        mutate(GEOID = dms_orig)
+        filter(destination == click_counties$curr) %>%
+        mutate(GEOID = origin)
     }
     #filtering for mode
     if(input$dms_mode_opts != "All" & nrow(dat_temp) >=1) {
@@ -164,7 +165,7 @@ data_ss_click<- reactive({
       if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
         
       dat_temp = dat_temp %>%
-        group_by(dms_orig, dms_dest, GEOID)%>%
+        group_by(origin, destination, GEOID)%>%
         summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
                   tons_2020 = sum(tons_2020),
                   tons_2050 = sum(tons_2050),
@@ -178,7 +179,7 @@ data_ss_click<- reactive({
                                        input$Value_opts,
                                        input$Scenario_opt,
                                        click_counties$curr,
-                                       c('dms_orig', 'dms_dest', 'GEOID'),
+                                       c('origin', 'destination', 'GEOID'),
                                        1)
         selected_col <- paste0(input$Value_opts, input$Scenario_opt)}
       }
@@ -186,7 +187,7 @@ data_ss_click<- reactive({
     
     if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
       dat_temp = dat_temp %>%
-        select(dms_orig, dms_dest, GEOID, contains('tons_'),contains('value_'))
+        select(origin, destination, GEOID, contains('tons_'),contains('value_'))
       selected_col = input$Value_opts
       
     }
@@ -195,16 +196,16 @@ data_ss_click<- reactive({
                                      input$Value_opts,
                                      input$Scenario_opt,
                                      click_counties$curr,
-                                     c('dms_orig', 'dms_dest', 'GEOID','Grouped_sctg2','dms_mode'),
+                                     c('origin', 'destination', 'GEOID','Grouped_sctg2','dms_mode'),
                                      1)
       selected_col <- paste0(input$Value_opts, input$Scenario_opt)
     }
     
     }
-    #this is in case someone select dms_orig and dms_dest for import/export
+    #this is in case someone select origin and destination for import/export
   } else {
     dat_temp <- dat %>%
-      filter(dms_orig == click_counties$curr|dms_dest == click_counties$curr)
+      filter(origin == click_counties$curr|destination == click_counties$curr)
     #filtering for mode
     if(input$dms_mode_opts != "All" & nrow(dat_temp) >=1) {
       dat_temp = dat_temp %>%
@@ -216,7 +217,7 @@ data_ss_click<- reactive({
     
     if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
     dat_temp = dat_temp %>%
-      mutate(dms_imp_exp = ifelse(dms_orig == click_counties$curr, dms_dest, dms_orig),
+      mutate(dms_imp_exp = ifelse(origin == click_counties$curr, destination, origin),
              GEOID = dms_imp_exp) %>% #you actually don't need this could just group by lineid, but then the map is missing
       group_by(dms_imp_exp, GEOID)%>%
       summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
@@ -287,7 +288,7 @@ observeEvent(eventExpr = map_update(), {
   
   if(input$OD_opts == "Both"){
     dir = "Inbound & Outbound to "
-  }else if(input$OD_opts == "dms_orig"){
+  }else if(input$OD_opts == "origin"){
     dir = "Outbound from "
   } else {
     dir = "Inbound to "
@@ -440,7 +441,7 @@ output$table_title <- renderText({
   req(click_counties$curr)
   
   if(input$OD_opts != "Both"){
-    if(input$OD_opts == "dms_orig"){
+    if(input$OD_opts == "origin"){
       title = paste0("Origin County: ", county_selected$county_lab[county_selected$GEOID == click_counties$curr])
       
     } else {
@@ -451,6 +452,25 @@ output$table_title <- renderText({
   }
   
   return(title)
+})
+
+output$scenario_title <- renderText({
+  
+  if (input$Scenario_opt == '_s1'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 1')
+  }else if (input$Scenario_opt == '_s2'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 2')
+  }else if (input$Scenario_opt == '_s3'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 3')
+  }else if (input$Scenario_opt == '_s4'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 4')
+  }else if (input$Scenario_opt == '_s5'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 5')
+  }else if (input$Scenario_opt == '_s6'){
+    sencario = paste0("Selected Scenario: ", 'Scenario 6')
+  }else{
+    sencario = paste0("Selected Scenario: ", input$Scenario_opt)}
+  return(sencario)
 })
 
 
@@ -480,12 +500,12 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     if(input$OD_opts == "Both"){
       SETTS_ss<-SETTS_ss %>% 
         left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-    } else if(input$OD_opts == "dms_orig"){
+    } else if(input$OD_opts == "origin"){
       SETTS_ss<-SETTS_ss %>%
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_dest" = "GEOID"))
-    } else if(input$OD_opts == "dms_dest"){
+        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
+    } else if(input$OD_opts == "destination"){
       SETTS_ss<-SETTS_ss %>%
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_orig" = "GEOID"))
+        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
     }
     
     SETTS_ss<-SETTS_ss %>%
@@ -569,12 +589,12 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   if(input$OD_opts == "Both"){
     SETTS_ss<-SETTS_ss %>% 
       left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-  } else if(input$OD_opts == "dms_orig"){
+  } else if(input$OD_opts == "origin"){
     SETTS_ss<-SETTS_ss %>%
-      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_dest" = "GEOID"))
-  } else if(input$OD_opts == "dms_dest"){
+      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
+  } else if(input$OD_opts == "destination"){
     SETTS_ss<-SETTS_ss %>%
-      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_orig" = "GEOID"))
+      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
   }
   
   SETTS_ss<-SETTS_ss %>%
