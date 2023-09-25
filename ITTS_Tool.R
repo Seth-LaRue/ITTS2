@@ -17,22 +17,22 @@ library(shinyWidgets)
 library(plotly)
 
 #Initialize Data ----
-
-dat <- read.csv('data/cnty2cnty_feature_v2.csv', colClass = c("character","character","character",
-                                                      "character",rep("numeric",6)))
-dat_cs <- read.csv('data/cnty2state_feature_v2.csv', colClass = c("character","character","character",
-                                                          "character",
-                                                          rep("numeric",6)))
-dat_ss <- read.csv('data/state2state_feature_v2.csv', colClass = c("character","character","character",
-                                                           "character",
-                                                           rep("numeric",6)))
-dat_pin <- read.csv('data/ports2international_feature.csv', colClass = c("character","character","character",
-                                                                  "character","character",
-                                                                  rep("numeric",4)))
-
-dat_sin <- read.csv('data/states2international_feature.csv', colClass = c("character","character","character",
-                                                                          "character","character",
-                                                                          rep("numeric",4)))
+# 
+# dat <- read.csv('data/cnty2cnty_feature_v2.csv', colClass = c("character","character","character",
+#                                                       "character",rep("numeric",6)))
+# dat_cs <- read.csv('data/cnty2state_feature_v2.csv', colClass = c("character","character","character",
+#                                                           "character",
+#                                                           rep("numeric",6)))
+# dat_ss <- read.csv('data/state2state_feature_v2.csv', colClass = c("character","character","character",
+#                                                            "character",
+#                                                            rep("numeric",6)))
+# dat_pin <- read.csv('data/ports2international_feature.csv', colClass = c("character","character","character",
+#                                                                   "character","character",
+#                                                                   rep("numeric",4)))
+# 
+# dat_sin <- read.csv('data/states2international_feature.csv', colClass = c("character","character","character",
+#                                                                           "character","character",
+#                                                                           rep("numeric",4)))
 
 dat_cs[,5:ncol(dat_cs)] <- lapply(dat_cs[,5:ncol(dat_cs)] ,as.numeric)
 
