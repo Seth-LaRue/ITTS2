@@ -1,16 +1,12 @@
-# Module UI function
-mod_summary_ui <- function(id) {
-  # `NS(id)` returns a namespace function, which was save as `ns` and will
-  # invoke later.
-  
-  cty_ch= county_choices$GEOID
+
+# 
+cty_ch= county_choices$GEOID
   state_ch = state_choices$GEOID
   port_ch = ports_base$GEOID
   names(port_ch) = ports_base$NAME
   names(cty_ch)=  county_choices$county_lab
   names(state_ch)= state_choices$NAME
   
-  ns <- NS(id)
   argonTabItem(
     tabName = "summary_tab",
     
@@ -28,8 +24,11 @@ mod_summary_ui <- function(id) {
     
     argonTab(
       tabName = 'Baseline Summary',
+      
       argonCard(width = 12,
+                
                 title = textOutput("totalTonsValTXT"),
+                
                 #first row of graphs
                 argonRow(width = 12,
                          argonColumn(width = 2,
@@ -55,32 +54,37 @@ mod_summary_ui <- function(id) {
                                                                                                                   "Value 2050" = "value_2050"),
                                                    selected ='value_2017')
                                      )),
-                         argonColumn( width = 6, 
+                         argonColumn( width = 5, 
                                       #Flow Direction Graph
                                       h2("Flow Direction", align = "center"), 
                                       plotlyOutput("cf_flowDirection", width = "auto", height = "auto")),
-                         argonColumn( width = 6, 
+                         
+                         argonColumn( width = 5, 
                                       #Mode Graph
                                       h2("Domestic Mode", align = "center"), 
                                       plotlyOutput("cf_mode", width = "auto", height = "auto"))
                 ),#end of first row of graphs
+                
                 #second row of graphs
                 argonRow(width = 12,
                          argonColumn(width = 12, 
                                      #Commodity Graph
                                      h2("Commodity Type", align = "center"), 
-                                     plotlyOutput("cf_commodity", width = "auto", height = "auto"))
+                                     plotlyOutput("cf_commodity", width = "auto", height = "auto")
+                                     )
                 ),#second row of graphs end
                 #third row of graphs
                 argonRow(width = 12,
                          argonColumn(width = 6,
                                      #Import Origin Graph
                                      h2("Top 10 Inbound Origins", align = "center"), 
-                                     plotlyOutput("cf_topInbound", width = "auto", height = "auto")), 
+                                     plotlyOutput("cf_topInbound", width = "auto", height = "auto")
+                                     ), 
                          argonColumn(width = 6, 
                                      #Export Destination Graphs
                                      h2("Top 10 Outbound Destinations", align = "center"),
-                                     plotlyOutput("cf_topOutbound", width = "auto", height = "auto"))
+                                     plotlyOutput("cf_topOutbound", width = "auto", height = "auto")
+                                     )
                 )#end of third row of graphs
       ) #end of Commodity Flow Profile Graphs argonCard
       
@@ -91,11 +95,13 @@ mod_summary_ui <- function(id) {
       argonCard(width = 12,
                 argonRow(width = 12,
                          argonColumn(width = 6, 
-                                     h2("Change in Mode Share", align = "center"), 
-                                     DT::dataTableOutput("cf_modeShareChange", width = "auto", height = "auto")),
+                                     h2("Change in Mode Share", align = "center")#, 
+                                     #DT::dataTableOutput("cf_modeShareChange", width = "auto", height = "auto")
+                                     ),
                          argonColumn(width = 6, 
-                                     h2("Trends by Commodities", align = "center"), 
-                                     plotlyOutput("cf_commTrends", width = "auto", height = "auto"))
+                                     h2("Trends by Commodities", align = "center")#, 
+                                     #plotlyOutput("cf_commTrends", width = "auto", height = "auto")
+                                     )
                 ),
       ), #end of mode share and commodity change argonCard
       
@@ -106,10 +112,10 @@ mod_summary_ui <- function(id) {
       tabName = 'scenarios Comparsion',
       argonCard(width = 12,
                 argonRow(width = 12,
-                         argonColumn(width = 12,
-                                     plotlyOutput('cf_scenarioCompare', width = 'auto',
-                                                  height = 'auto'))))
+                         argonColumn(width = 12#,
+                                     #plotlyOutput('cf_scenarioCompare', width = 'auto',
+                                     #             height = 'auto')))
+                                     )
     )
     )
-  )
-}
+  )))
