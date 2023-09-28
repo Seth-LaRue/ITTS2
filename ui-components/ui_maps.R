@@ -176,12 +176,12 @@ domestic_tab <-
                             tags$div(
                               title = "Select a scenario for freight movement to display on the map",
                               selectInput(inputId = "Scenario_opt", label = "Scenario Options", choices = c('Baseline',
-                                                                                                             'Scenario 1' = '_s1',
-                                                                                                             'Scenario 2' = '_s2',
-                                                                                                             'Scenario 3' = '_s3',
-                                                                                                             'Scenario 4' = '_s4',
-                                                                                                             'Scenario 5' = '_s5',
-                                                                                                             'Scenario 6' = '_s6'),
+                                                                                                            'Scenario 1' = '_s1',
+                                                                                                            'Scenario 2' = '_s2',
+                                                                                                            'Scenario 3' = '_s3',
+                                                                                                            'Scenario 4' = '_s4',
+                                                                                                            'Scenario 5' = '_s5',
+                                                                                                            'Scenario 6' = '_s6'),
                                           selected = 'Baseline')
                             )
                             
@@ -200,6 +200,7 @@ domestic_tab <-
                                    #)
                             )),
                 argonColumn(width=10,h2(textOutput('table_title'))),
+                argonColumn(width = 10, h2(textOutput('scenario_title'))),
                 argonColumn(width=2,downloadButton('download_cc','Selected Data')),# class = "butt1")),
                 br(),br(),br()
               ),
@@ -310,13 +311,13 @@ domestic_tab <-
                                    tags$div(
                                      title = "Select a scenario for freight movement to display on the map",
                                      selectizeInput(inputId = "Scenario_opt_cs", label = "Scenario Options", choices = c('Baseline',
-                                                                                                                      'Scenario 1' = '_s1',
-                                                                                                                      'Scenario 2' = '_s2',
-                                                                                                                      'Scenario 3' = '_s3',
-                                                                                                                      'Scenario 4' = '_s4',
-                                                                                                                      'Scenario 5' = '_s5',
-                                                                                                                      'Scenario 6' = '_s6'),
-                                                 selected = 'Baseline')
+                                                                                                                         'Scenario 1' = '_s1',
+                                                                                                                         'Scenario 2' = '_s2',
+                                                                                                                         'Scenario 3' = '_s3',
+                                                                                                                         'Scenario 4' = '_s4',
+                                                                                                                         'Scenario 5' = '_s5',
+                                                                                                                         'Scenario 6' = '_s6'),
+                                                    selected = 'Baseline')
                                    )
                        ))), #end of column/row
                    
@@ -333,6 +334,7 @@ domestic_tab <-
                      argonRow(
                        width = 12,
                        argonColumn(width=10,h2(textOutput('table_title_cs'))),
+                       argonColumn(width = 10, h2(textOutput('scenario_title_cs'))),
                        argonColumn(width=2,downloadButton('download_cs','Selected Data')),#, class = "butt_down_cs")),
                        br(),br(),br()
                      ),
@@ -434,11 +436,11 @@ domestic_tab <-
                                    
                                    tags$div(
                                      title = "Select a measurement of freight movement to display on the map",
-                                     selectInput(inputId = "Value_opts_in",label = "Freight Measure", choices = c("Tons 2019"="Tons_2019",
-                                                                                                                  "Tons 2021" = "Tons_2021",
-                                                                                                                  "Value 2019" = "Value_2019",
-                                                                                                                  "Value 2021" = "Value_2021"),
-                                                 selected ='Value_2019')),
+                                     selectInput(inputId = "Value_opts_in",label = "Freight Measure", choices = c("Tons 2019"="tons_2019",
+                                                                                                                  "Tons 2021" = "tons_2021",
+                                                                                                                  "Value 2019" = "value_2019",
+                                                                                                                  "Value 2021" = "value_2021"),
+                                                 selected ='value_2019')),
                                    tags$div(
                                      title = "Select a scenario for freight movement to display on the map",
                                      selectInput(inputId = "Scenario_opt_in", label = "Scenario Options", choices = c('Baseline',
@@ -465,6 +467,7 @@ domestic_tab <-
                      argonRow(
                        width = 12,
                        argonColumn(width=10,h2(textOutput('table_title_in'))),
+                       argonColumn(width = 10, h2(textOutput('scenario_title_in'))),
                        argonColumn(width=2,downloadButton('download_in','Selected Data')),#, class = "butt_down_cs")),
                        br(),br(),br()
                      ),
