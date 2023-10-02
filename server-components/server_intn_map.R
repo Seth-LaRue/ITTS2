@@ -845,15 +845,15 @@ observe({
     }else{
       names(ln_select_in)[names(ln_select_in)=='factor_lab']=paste0(input$Value_opts_in, input$Scenario_opt_in)
     }
-    browser()
+
     SETTS_ss_in<-ln_select_in %>%
       st_drop_geometry()
     
     if(input$OD_opts_in == "Both"){
-      browser()
+
       SETTS_ss_in<-SETTS_ss_in %>%
         left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-      browser()
+
     } else if(input$OD_opts_in == "dms_orig"){
       SETTS_ss_in<-SETTS_ss_in %>%
         left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))

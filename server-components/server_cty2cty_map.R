@@ -7,7 +7,7 @@ click_counties <- reactiveValues(curr=NULL,prev=NULL)
 all_counties_centr_sel_ini=all_counties_centr %>% 
   filter(GEOID=='48453')
 
-browser()
+
 dat_ini <- dat %>%
   filter(origin == '48453'|destination == '48453') %>%
   mutate(dms_imp_exp = if_else(origin == '48453', destination, origin),

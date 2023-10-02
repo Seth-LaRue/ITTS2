@@ -182,7 +182,7 @@ ui <- fluidPage(
         
         argonTabItem(
           tabName = "summary_tab",
-          mod_summary_ui("summary_ui")
+          summary_tab
           ),
           
           argonTabItem(
@@ -231,7 +231,7 @@ server <- function(input, output, session) {
   source('server-components/server_cty2cty_map.R', local = TRUE)
   source('server-components/server_cty2state_map.R', local = TRUE)
   source('server-components/server_intn_map.R', local = TRUE)
-  
+  source('server-components/server_BaselineSummary.R', local = TRUE)
   
   
 }

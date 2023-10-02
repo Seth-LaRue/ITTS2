@@ -446,7 +446,7 @@ observeEvent(eventExpr = map_update_cs(), {
       all_counties_centr_sel=all_counties_centr %>% 
         filter(GEOID==click_counties_cs$curr)
       
-      browser()
+      #browser()
       leafletProxy(mapId = "odmap_cs",session = session) %>%
         addPolygons(data = ln_select_cs,
                     layerId = ~paste("data", ln_select_cs$GEOID),
@@ -622,12 +622,12 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
     left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
    } else if(input$OD_opts_cs == "dms_orig"){
      
-     browser()
+     #browser()
 
     SETTS_ss_cs<-SETTS_ss_cs %>%
       left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))
   } else if(input$OD_opts_cs == "dms_dest"){
-    browser()
+    #browser()
 
     SETTS_ss_cs<-SETTS_ss_cs %>%
       left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("origin" = "GEOID"))
