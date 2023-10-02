@@ -7,6 +7,7 @@ click_counties <- reactiveValues(curr=NULL,prev=NULL)
 all_counties_centr_sel_ini=all_counties_centr %>% 
   filter(GEOID=='48453')
 
+
 dat_ini <- dat %>%
   filter(origin == '48453'|destination == '48453') %>%
   mutate(dms_imp_exp = if_else(origin == '48453', destination, origin),
@@ -57,7 +58,7 @@ observeEvent(input$odmap_shape_click, {
 observeEvent(input$Value_opts,{
   if(grepl('2017',input$Value_opts)){
     updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else{
+  } else if (grepl(c('2020','2050'),input$Value_opts)) {
     updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline',
                                                                                              'Scenario 1' = '_s1',
                                                                                              'Scenario 2' = '_s2',
@@ -174,7 +175,7 @@ data_ss_click<- reactive({
         ungroup()
       selected_col = input$Value_opts
       } else{
-        dat_temp = process_scenario(dat_temp,
+        dat_temp = process_scenario_cc(dat_temp,
                                        input$Value_opts,
                                        input$Scenario_opt,
                                        click_counties$curr,
@@ -230,7 +231,7 @@ data_ss_click<- reactive({
     
     }else{
       dat_temp_input = dat_temp
-      dat_temp = process_scenario(dat_temp_input,
+      dat_temp = process_scenario_cc(dat_temp_input,
                                      input$Value_opts,
                                      input$Scenario_opt,
                                      click_counties$curr,
@@ -599,11 +600,13 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   SETTS_ss<-SETTS_ss %>%
     arrange(rank) %>% 
     filter(rank <= input$n_top) %>% 
-    select(contains('county'),starts_with('tons_'), starts_with('value_'), starts_with('Tons'), starts_with('Value')) %>% 
+    select(contains('county'),starts_with('tons_'), starts_with('value_')) %>% 
     rename('County' = 'county_lab')
   
+  SETTS_ss_r$SETTS_ss=SETTS_ss
+  
   SETTS_ss<-SETTS_ss %>%
-    mutate_at(vars(contains('tons_'),contains('value_'), contains('Tons'), contains('Value')),~round(.,1)) %>% 
+    mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
     rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
            'Tons 2020</br>(Thousand Tons)'='tons_2020',
            'Tons 2050</br>(Thousand Tons)'='tons_2050',
@@ -611,13 +614,8 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
            'Value 2020</br>($Million)'='value_2020',
            'Value 2050</br>($Million)'='value_2050')
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
-  
-  
-    SETTS_ss_r$SETTS_ss=SETTS_ss
-    replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)
 
-    } else {
-      
+    replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)} else {
       SETTS_ss <- data.frame('County'=c(),
                             'Tons 2017</br>(Thousand Tons)'=c(),
                             'Tons 2020</br>(Thousand Tons)'=c(),
@@ -631,7 +629,7 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     
   
   })
-
+    
     outputOptions(output, 'subsetSETTS', suspendWhenHidden = FALSE)  
   
   output$download_cc <- downloadHandler(
