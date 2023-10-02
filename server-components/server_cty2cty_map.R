@@ -628,6 +628,8 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
       SETTS_ss_r$SETTS_ss=SETTS_ss
       replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)
     }
+    
+  
   })
 
     outputOptions(output, 'subsetSETTS', suspendWhenHidden = FALSE)  
@@ -640,5 +642,24 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
         rename()
       write.csv(tbl_out, file,row.names = F)
     })
+
   
+  observe({
+    req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
+                 input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
+    
+    ln_select=data_ss_click()
+    browser()
+    
+    output$mode <- renderPlotly({
+      validate(need(try(nrow(ln_select %>% filter((origin %in% click_counties$curr | destination %in% click_counties$curr))) > 0), 
+                    message = "Please define a geography on the user selection tab to generate a figure."))
+      {
+        mode_pie_graph(ln_select, county = click_counties$curr, 
+                       tons_value_selection = input$dms_mode_opts, 
+                       ini_modecolors = ini_modecolors, 
+                       sourceName = "mode_pie_graph")
+      }
+    })
+  })
 

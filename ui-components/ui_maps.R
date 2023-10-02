@@ -189,7 +189,11 @@ domestic_tab <-
             
             argonCard(
               width = 12,
-              argonRow(
+              tabsetPanel(
+                tabPanel(
+                  title = h2('ITTS County to County Trade'),
+                  value = 'data_table_',
+                      argonRow(
                 width = 12,
                 argonColumn(width = 12,
                             #argonCard(width =12,
@@ -208,8 +212,29 @@ domestic_tab <-
               argonRow(
                 width = 12,
                 DT::dataTableOutput("subsetSETTS")
-              ))#end of table card
-          ),
+              )),#end of table card
+            
+            
+              tabPanel(
+                title = h2('    Graph'),
+                value = 'data_graphs',
+                argonRow(
+                  width = 12,
+                  argonColumn( width = 5, 
+                               #Flow Direction Graph
+                               h2("Flow Direction", align = "center"), 
+                               plotlyOutput("flowDirection", width = "auto", height = "auto")),
+                  
+                  argonColumn( width = 5, 
+                               #Mode Graph
+                               h2("Domestic Mode", align = "center"), 
+                               plotlyOutput("mode", width = "auto", height = "auto"))
+                            )),
+          id = 'tabselection',
+          selected = NULL,
+          type = "tabs",
+          .list = NULL
+          ))),
           
           
           argonTab(tabName = "ITTS County/State to State Trade",
