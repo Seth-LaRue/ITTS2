@@ -154,7 +154,7 @@ observeEvent(input$county_opts_cs, {
 observeEvent(input$Value_opts_cs,{
   if(grepl('2017',input$Value_opts_cs)){
     updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else if (grepl(c('2020','2050'),input$Value_opts_cs)) {
+  } else {
     updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline',
                                                                                           'Scenario 1' = '_s1',
                                                                                           'Scenario 2' = '_s2',
@@ -164,15 +164,6 @@ observeEvent(input$Value_opts_cs,{
                                                                                           'Scenario 6' = '_s6'),
                       selected = 'Baseline',server = TRUE)
   }
-  # else if (!(grepl('2017',input$Value_opts_cs) & input$Scenario_opt_cs == 'Baseline')){
-  #   updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Scenario 1' = '_s1',
-  #                                                                                            'Scenario 2' = '_s2',
-  #                                                                                            'Scenario 3' = '_s3',
-  #                                                                                            'Scenario 4' = '_s4',
-  #                                                                                            'Scenario 5' = '_s5',
-  #                                                                                            'Scenario 6' = '_s6'),
-  #                        selected = 'Baseline',server = TRUE, multipe = TRUE)
-  #}
 })
 
 observeEvent(input$odmap_cs_shape_click, {
@@ -215,7 +206,7 @@ data_ss_click_cs<- reactive({
   }
   
   if(input$OD_opts_cs != "Both"){
-    if(input$OD_opts_cs == "dms_orig"){
+    if(input$OD_opts_cs == "origin"){
       dat_temp_cs <- dat_temp_cs %>%
         filter(origin == click_counties_cs$curr) %>%
         mutate(GEOID = destination)
@@ -446,7 +437,7 @@ observeEvent(eventExpr = map_update_cs(), {
       all_counties_centr_sel=all_counties_centr %>% 
         filter(GEOID==click_counties_cs$curr)
       
-      browser()
+      
       leafletProxy(mapId = "odmap_cs",session = session) %>%
         addPolygons(data = ln_select_cs,
                     layerId = ~paste("data", ln_select_cs$GEOID),
@@ -620,14 +611,10 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   if(input$OD_opts_cs == "Both"){
   SETTS_ss_cs<-SETTS_ss_cs %>% 
     left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-   } else if(input$OD_opts_cs == "dms_orig"){
-     
-     browser()
-
+   } else if(input$OD_opts_cs == "origin"){
     SETTS_ss_cs<-SETTS_ss_cs %>%
       left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))
-  } else if(input$OD_opts_cs == "dms_dest"){
-    browser()
+  } else if(input$OD_opts_cs == "destination"){
 
     SETTS_ss_cs<-SETTS_ss_cs %>%
       left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("origin" = "GEOID"))
@@ -711,7 +698,6 @@ observe({
     else{
       names(ln_select_cs)[names(ln_select_cs)=='factor_lab']=paste0(input$Value_opts_cs, input$Scenario_opt_cs)
     }
-    
     SETTS_ss_cs<-ln_select_cs %>%
       st_drop_geometry()
     
@@ -719,10 +705,10 @@ observe({
       print(head(SETTS_ss_cs))
       SETTS_ss_cs<-SETTS_ss_cs %>%
         left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-    } else if(input$OD_opts_cs == "dms_orig"){
+    } else if(input$OD_opts_cs == "origin"){
       SETTS_ss_cs<-SETTS_ss_cs %>%
         left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))
-    } else if(input$OD_opts_cs == "dms_dest"){
+    } else if(input$OD_opts_cs == "destination"){
       SETTS_ss_cs<-SETTS_ss_cs %>%
         left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("origin" = "GEOID"))
     }
@@ -732,20 +718,22 @@ observe({
     SETTS_ss_cs<-SETTS_ss_cs %>%
       arrange(rank) %>%
       filter(rank <= input$n_top_cs) %>%
-      select(contains('NAME'),starts_with('tons_'), starts_with('value_'))
+      select(contains('NAME'),starts_with('tons_'), starts_with('value_'), starts_with('Tons'), starts_with('Value'))
     
-    SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs
-    
+
     SETTS_ss_cs<-SETTS_ss_cs %>%
-      mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>%
+      mutate_at(vars(contains('tons_'),contains('value_'),contains('Tons'), contains('Value')),~round(.,1)) %>%
       rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
              'Tons 2020</br>(Thousand Tons)'='tons_2020',
              'Tons 2050</br>(Thousand Tons)'='tons_2050',
              'Value 2017</br>($Million)'='value_2017',
              'Value 2020</br>($Million)'='value_2020',
-             'Value 2050</br>($Million)'='value_2050')
+             'Value 2050</br>($Million)'='value_2050') 
+      names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))] <- str_to_title(gsub("_"," ",names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))]))
+    
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
     
+    SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs
     replaceData(proxy_cty2state_tbl, SETTS_ss_cs, rownames = FALSE)
     
   } else {
@@ -760,6 +748,7 @@ observe({
     replaceData(proxy_cty2state_tbl, SETTS_ss_cs, rownames = FALSE)
     
   }
+
 })
 
 

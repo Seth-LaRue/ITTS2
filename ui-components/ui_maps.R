@@ -27,7 +27,7 @@ commodities <- c("Agriculture and Fish",
                  "Textiles and Leather",
                  "Aggregates")
 
-od <- c("Both" = "Both","Inbound" = "dms_dest", "Outbound" = "dms_orig")
+od <- c("Both" = "Both","Inbound" = "destination", "Outbound" = "origin")
 
 ITTS_states <- data.frame(state = c("Arkansas","Florida","Georgia","Kentucky","Louisiana","Mississippi","Missouri","South Carolina","Texas","Virginia", "Alabama","Tennessee","North Carolina"),
                           FIPS = c("05","12","13","21","22","28","29","45","48","51","01","47","37"))
@@ -119,7 +119,7 @@ domestic_tab <-
                                 class = "map-loading",
                                 tags$p("Loading Map...")
                               ),
-                              leafletOutput('odmap',height = map_height)
+                              leafletOutput('odmap',height = map_height*1.3)
                             )
                 ),
                 
@@ -380,7 +380,7 @@ domestic_tab <-
                                        class = "map-loading",
                                        tags$p("Loading Map...")
                                      ),
-                                     leafletOutput('odmap_in',height = map_height)
+                                     leafletOutput('odmap_in',height = map_height*1.3)
                                    )
                        ),
                        
