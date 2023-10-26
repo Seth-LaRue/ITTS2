@@ -518,7 +518,7 @@ observeEvent(eventExpr = map_update_in(), {
     
     if(input$OD_opts_in == "Both"){
       dir = "Inbound & Outbound to "
-    }else if(input$OD_opts_in == "origin"){
+    }else if(input$OD_opts_in == "dms_orig"){
       dir = "Outbound from "
     } else {
       dir = "Inbound to "
@@ -694,7 +694,7 @@ table_titl <- reactiveVal("")
 #   req(click_counties_in$curr)
 observe({
   if(input$OD_opts_in != "Both"){
-    if(input$OD_opts_in == "origin"){
+    if(input$OD_opts_in == "dms_orig"){
       title = paste0("Origin: ", all_selected$NAME[all_selected$GEOID == click_counties_in$curr])
       
     } else {
@@ -876,6 +876,7 @@ observe({
              'Value 2019</br>($Million)'='value_2019',
              'Value 2021</br>($Million)'='value_2021')
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
+    SETTS_ss_in_r$SETTS_ss_in=SETTS_ss_in
     
     replaceData(proxy_cty2state_tbl, SETTS_ss_in, rownames = FALSE)
     
@@ -905,3 +906,87 @@ output$download_in <- downloadHandler(
     write.csv(tbl_out, file,row.names = F)
   })
 
+
+
+observe({
+  req(click_counties_in$curr,input$dms_mode_opts_in,input$county_opts_in,input$n_top_in,
+      input$OD_opts_in, input$sctg2_opts_in, input$Value_opts_in, input$Scenario_opt_in)
+  
+  if(input$cors_opts_in == "p2n"){
+    dat_in <- dat_pin
+  } else if(input$cors_opts_in == "s2n"){
+    dat_in <- dat_sin
+  }
+  
+  if (input$OD_opts_in == 'Both'){
+    dat_in <- dat_in %>% filter(origin %in% input$county_opts_in | destination %in% input$county_opts_in)
+  } else if (input$OD_opts_in == 'dms_orig'){
+    dat_in <- dat_in %>% filter(origin %in% input$county_opts_in)
+  }else if (input$OD_opts_in == 'dms_dest'){
+    dat_in <- dat_in %>% filter(destination %in% input$county_opts_in)}
+  
+  #filter for mode
+  if(input$dms_mode_opts_in != "All" & nrow(dat_in) >=1) {
+    dat_in = dat_in %>%
+      filter(dms_mode == input$dms_mode_opts_in)}
+  #filter for commodity
+  if(input$sctg2_opts_in != "All" & nrow(dat_in) >=1) {
+    dat_in = dat_in %>%
+      filter(Grouped_sctg2==input$sctg2_opts_in)}
+  
+  selected_value_in = input$Value_opts_in
+  
+  # if scenario applied
+  if (input$Scenario_opt_in != 'Baseline'){
+    dat_in = process_scenario_in(dat_in,
+                              input$Value_opts_in,
+                              input$Scenario_opt_in,
+                              click_counties_in$curr,
+                              c('origin', 'destination','Grouped_sctg2','dms_mode'),
+                              1)
+    selected_value_in = paste0(input$Value_opts_in,input$Scenario_opt_in)
+  }
+  #str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
+  
+  
+  output$in_flowDirection <- renderPlotly({
+    direction_pie_graph_countyselected(dat_in,
+                                       county = input$county_opts_in,
+                                       tons_value_selection = selected_value_in,
+                                       commcolors = init_commcolors,
+                                       sourceName = "in_flowDirection")
+  })
+  
+  output$in_mode <- renderPlotly({
+    mode_pie_graph(dat_in,
+                   #county = input$county_opts,
+                   tons_value_selection = selected_value_in,
+                   ini_modecolors = ini_modecolors,
+                   sourceName = "in_mode")
+  })
+  
+  output$in_cf_commodity <- renderPlotly({
+    tile_graph(dat_in,
+               tons_value_selection = selected_value_in,
+               sourceName = "in_cf_commodity")
+  })
+  
+  output$in_cf_topInbound <- renderPlotly({
+    top_importing_all(dat_in,
+                      tons_value_selection = selected_value_in,
+                      ton_color = "#66c2a5",
+                      value_color = "#3288bd",
+                      location = click_counties_in$curr, 
+                      sourceName = "in_cf_topInbound")
+    
+  })
+  
+  output$in_cf_topOutbound <- renderPlotly({
+    top_exporting_all(dat_in,
+                      tons_value_selection = selected_value_in,
+                      ton_color = "#66c2a5",
+                      value_color = "#3288bd",
+                      location = click_counties_in$curr, 
+                      sourceName = "in_cf_topOutbound")
+  })
+})

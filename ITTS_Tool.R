@@ -41,8 +41,56 @@ dat_cs[,5:ncol(dat_cs)] <- lapply(dat_cs[,5:ncol(dat_cs)] ,as.numeric)
 colnames(dat)[colnames(dat) %in% c("dms_orig", 'dms_dest')] = c("origin",'destination')
 colnames(dat_pin)[colnames(dat_pin) %in% c('Tons_2019','Tons_2021','Value_2019','Value_2021')] = c('tons_2019','tons_2021','value_2019','value_2021')
 colnames(dat_sin)[colnames(dat_sin) %in% c('Tons_2019','Tons_2021','Value_2019','Value_2021')] = c('tons_2019','tons_2021','value_2019','value_2021')
- 
- 
+
+
+ITTS_base <- state_base %>%
+  mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',NAME),
+         GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',GEOID)) %>%
+  group_by(NAME, GEOID) %>%
+  summarise(NAME = unique(NAME),
+            GEOID = unique(GEOID))%>%
+  ungroup()
+
+ITTS_boundary <- ITTS_base %>% filter(GEOID == 'ITTS') %>% 
+  select('GEOID','NAME') %>%
+  mutate(type = '',
+         mode_nm = '')
+
+all_selected = rbind(all_selected,ITTS_boundary) 
+
+SE_base <- state_base %>%
+  mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',NAME),
+         GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',GEOID)) %>%
+  group_by(NAME, GEOID) %>%
+  summarise(NAME = unique(NAME),
+            GEOID = unique(GEOID))%>%
+  ungroup()
+
+SE_boundary <- SE_base %>% filter(GEOID == 'Southeast Region') %>% 
+  select('GEOID','NAME') %>%
+  mutate(type = '',
+         mode_nm = '')
+
+all_selected = rbind(all_selected,SE_boundary) 
+
+other_states = state_base %>% 
+  filter(!(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))) %>%
+  select(-'state_lab',-'STATEFP') %>%
+  mutate(type = "",
+         mode_nm = "")
+all_selected <- rbind(all_selected,other_states)  ## add all geographical boundaries to this layer, used in graphs. 
+
+international_base <- international_base %>%
+  mutate(type = "",
+         mode_nm = "")
+all_selected <- rbind(all_selected,international_base)
+
+
+# this is for hatch pattern on ITTS and SE_hatch
+ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
+SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
+
+
 source("gral_parameters.R")
 source("ini_map_load.R")
 source('function/scenario_process.R')
