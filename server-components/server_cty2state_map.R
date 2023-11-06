@@ -88,7 +88,7 @@ ln_select_cs_ini<- reactive({
         select(GEOID, NAME) %>%
         inner_join(dat_ini_rs,by = "GEOID")
     } else {
-    ln_select_cs_ini <- ITTS_base %>%
+    ln_select_cs_ini <- SE_base %>%
       select(GEOID, NAME) %>%
       inner_join(dat_ini_se,by = "GEOID")}
 
@@ -375,11 +375,15 @@ data_ss_click_cs<- reactive({
       select(GEOID, NAME) %>%
       inner_join(dat_temp_cs,by = "GEOID") %>%
       mutate(tranp=ifelse(rank <= input$n_top_cs, 1,.25))
+    
+
     }else {
       ln_select_cs <- SE_base %>%
         select(GEOID, NAME) %>%
         inner_join(dat_temp_cs,by = "GEOID") %>%
         mutate(tranp=ifelse(rank <= input$n_top_cs, 1,.25))
+
+      
     }
     
 
