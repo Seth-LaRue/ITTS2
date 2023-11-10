@@ -227,11 +227,12 @@ server <- function(input, output, session) {
 
   
   ##################################################################
-  ## Server portion for Analysis tab
+  # Server portion for Analysis tab
   source('server-components/server_cty2cty_map.R', local = TRUE)
   source('server-components/server_cty2state_map.R', local = TRUE)
   source('server-components/server_intn_map.R', local = TRUE)
   source('server-components/server_BaselineSummary.R', local = TRUE)
+  source('server-components/server_BaselineScenarioComparison.R', local = TRUE)
   
   
 }
