@@ -20,9 +20,9 @@
 # geoinput <- reactiveVal(value = c(county_base$COUNTYFP))
 
 ini_modecolors <- data.frame(
-  dms_mode = c("1","2","3","4","5","6","7"),
-  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown"),  
-  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5"))
+  dms_mode = c("1","2","3","4","5","6","7","8"),
+  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","No Domestic Mode"),  
+  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd"))
 
 ini_commcolors <- data.frame(commodities = c("Agriculture and Fish",
                                                         "Energy Products", 
@@ -71,7 +71,7 @@ top_importing_county <- function(df_in, tons_value_selection = "tons_2017",
     ungroup() %>%
     mutate(rank = rank(desc(factor_lab))) %>% 
     filter(rank <= 10) %>%
-    left_join(county_selected, by=c("origin"="GEOID")) 
+    left_join(county_selected, by=c("origin"="GEOID")) # Qi: changed from county_selected to al_selected, to apply for all geographic level.
     
   
   #rank_keep = df_temp$rank[df_temp$destination == county]
@@ -82,9 +82,9 @@ top_importing_county <- function(df_in, tons_value_selection = "tons_2017",
     import_plot <- df_temp %>% 
       plot_ly(source = sourceName, 
               type = "bar", color= I(ton_color), 
-              x = ~reorder(county_lab, desc(factor_lab)), y = ~factor_lab, 
+              x = ~reorder(NAME, desc(factor_lab)), y = ~factor_lab,    # change from county_lab to NAME column
               hovertemplate = ~paste("%{label} <br>:", round(factor_lab,digits=0), "<extra></extra>"), 
-              text = ~reorder(county_lab, desc(factor_lab)), 
+              text = ~reorder(NAME, desc(factor_lab)), 
               textposition = "none") %>%
       layout(
         xaxis = list(title = ""),
@@ -100,6 +100,56 @@ top_importing_county <- function(df_in, tons_value_selection = "tons_2017",
   return(import_plot)
   
 }
+
+
+## exclude the internal flows within the selected geography
+top_importing_all <- function(df_in, tons_value_selection = "tons_2017",  
+                                 ton_color = "#66c2a5", 
+                                 value_color = "#3288bd",
+                              location,
+                                 sourceName = sourceName){
+  
+  #first: filter, group, and summarize Transearch data based on user selections
+  df_temp <- df_in %>%
+    filter(destination != origin,
+           destination == location) %>% # exclude internal flows. 
+    rename(factor_lab = tons_value_selection) %>%
+    group_by(origin) %>%
+    summarise(factor_lab = sum(factor_lab, na.rm= T)) %>%
+    ungroup() %>%
+    mutate(rank = rank(desc(factor_lab))) %>% 
+    filter(rank <= 10) %>%
+    left_join(all_selected, by=c("origin"="GEOID")) # Qi: changed from county_selected to al_selected, to apply for all geographic level.
+  
+  
+  #rank_keep = df_temp$rank[df_temp$destination == county]
+  #ranks_keep = c(seq(rank_keep-5, rank_keep), seq(rank_keep+1,rank_keep+4))
+  #df_temp <- df_temp %>% filter(rank %in% ranks_keep)
+  
+  #then, make graph using filtered data. Graph differs for tons vs. value 
+  import_plot <- df_temp %>% 
+    plot_ly(source = sourceName, 
+            type = "bar", color= I(ton_color), 
+            x = ~reorder(NAME, desc(factor_lab)), y = ~factor_lab,    # change from county_lab to NAME column
+            hovertemplate = ~paste("%{label} <br>: ", formatC(factor_lab,digits=1,format="f",big.mark = ","), "<extra></extra>"), 
+            text = ~reorder(NAME, desc(factor_lab)), 
+            textposition = "none") %>%
+    layout(
+      xaxis = list(title = "",tickfont = list(size = 15)),
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))),tickfont = list(size = 15))) %>% 
+    config(displaylogo = FALSE, 
+           modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
+           # toImageButtonOptions= list(filename = saveName,
+           #                            width = saveWidth,
+           #                            height =  saveHeight)
+    )
+  
+  
+  return(import_plot)
+  
+}
+
+
 
 top_exporting_county <- function(df_in, tons_value_selection = "tons_2017",  
                                 ton_color = "#66c2a5", 
@@ -126,13 +176,59 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2017",
   export_plot <- df_temp %>% 
     plot_ly(source = sourceName, 
             type = "bar", color= I(ton_color), 
-            x = ~reorder(county_lab, desc(factor_lab)), y = ~factor_lab, 
+            x = ~reorder(NAME, desc(factor_lab)), y = ~factor_lab, 
             hovertemplate = ~paste("%{label} <br>:", round(factor_lab,digits=0), "<extra></extra>"), 
-            text = ~reorder(county_lab, desc(factor_lab)), 
+            text = ~reorder(NAME, desc(factor_lab)), 
             textposition = "none") %>%
     layout(
       xaxis = list(title = ""),
       yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")))), autosize = T) %>% 
+    config(displaylogo = FALSE, 
+           modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
+           # toImageButtonOptions= list(filename = saveName,
+           #                            width = saveWidth,
+           #                            height =  saveHeight)
+    )
+  
+  
+  return(export_plot)
+  
+}
+
+top_exporting_all <- function(df_in, tons_value_selection = "tons_2017",  
+                                 ton_color = "#66c2a5", 
+                                 value_color = "#3288bd", 
+                                 location,
+                                 sourceName = sourceName){
+  
+  #first: filter, group, and summarize Transearch data based on user selections
+  df_temp <- df_in %>%
+    filter(origin != destination,
+           origin == location) %>%
+    rename(factor_lab = tons_value_selection) %>%
+    group_by(destination) %>%
+    summarise(factor_lab = sum(factor_lab, na.rm= T)) %>%
+    ungroup() %>%
+    mutate(rank = rank(desc(factor_lab))) %>% 
+    filter(rank <= 10) %>%
+    left_join(all_selected, by=c("destination"="GEOID")) 
+  
+  
+  #rank_keep = df_temp$rank[df_temp$destination == county]
+  #ranks_keep = c(seq(rank_keep-5, rank_keep), seq(rank_keep+1,rank_keep+4))
+  #df_temp <- df_temp %>% filter(rank %in% ranks_keep)
+  
+  #then, make graph using filtered data. Graph differs for tons vs. value 
+  export_plot <- df_temp %>% 
+    plot_ly(source = sourceName, 
+            type = "bar", color= I(ton_color), 
+            x = ~reorder(NAME, desc(factor_lab)), y = ~factor_lab, 
+            hovertemplate = ~paste("%{label} <br>: ", formatC(factor_lab,digits=1,format="f",big.mark = ","), "<extra></extra>"), 
+            text = ~reorder(NAME, desc(factor_lab)), 
+            textposition = "none") %>%
+    layout(
+      xaxis = list(title = "",tickfont = list(size = 15)),
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))),tickfont = list(size = 15))) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
@@ -164,13 +260,14 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
     left_join(ini_modecolors)
   
     mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
-      add_pie(values = ~factor_lab, labels = ~mode_group, automargin = TRUE, marker = list(colors = ~color, line = list(color = "#595959", width = 1)),
-                                                                 hovertemplate = ~paste("%{label} <br>: ", round(factor_lab, digits = 1), "</br> %{percent} <extra></extra>"), 
+      add_pie(values = ~factor_lab,  textinfo='none', labels = ~mode_group, automargin = TRUE, marker = list(colors = ~color, line = list(color = "#595959", width = 1)),
+                                                                 hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"), 
                                                                  text = ~mode_group, key=~mode_group, hole = 0.6, #textfont = list(family = "Arial"), 
                                                                  textposition = "outside") %>%
       layout(#font = list(family = "Arial, "Source Sans Pro", \"Helvetica Neue\", Helvetica, sans-serif", color = "#333"),
-        showlegend = FALSE, autosize = T, 
-        annotations = list(text = HTML(paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F)) %>% 
+        #showlegend = T, autosize = T, 
+        annotations = list(text = HTML(paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F,font=list(size = 20))) %>% 
+      layout(legend = list(font = list(size = 20))) %>%
       config(displaylogo = FALSE, 
              modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
              # toImageButtonOptions= list(filename = saveName,
@@ -225,8 +322,8 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
   
   dir_temp <- df_in %>% dplyr::filter(origin %in% county | destination %in% county) 
   dir_temp$direction[dir_temp$origin == county & dir_temp$origin == dir_temp$destination] <- "Within"
-  dir_temp$direction[dir_temp$origin == county & dir_temp$origin != dir_temp$destination] <- "Export"
-  dir_temp$direction[dir_temp$destination == county & dir_temp$origin != dir_temp$destination] <- "Import"
+  dir_temp$direction[dir_temp$origin == county & dir_temp$origin != dir_temp$destination] <- "Outbound"
+  dir_temp$direction[dir_temp$destination == county & dir_temp$origin != dir_temp$destination] <- "Inbound"
   dir_temp <- dir_temp %>% 
     rename(factor_lab = tons_value_selection) %>%  
     dplyr::group_by(direction) %>% 
@@ -238,12 +335,12 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
 
   dir_plot <- dir_temp %>% plot_ly(source = sourceName) %>% add_pie(labels = ~direction, values = ~factor_lab, automargin = TRUE, #text = ~Aggregate.Commodity.Group, 
                                                                       key = ~direction, hole = 0.6, sort = TRUE, direction = "clockwise",
-                                                                      hovertemplate = ~paste("%{label} <br>: ", round(factor_lab, digits = 1), "</br> %{percent} <extra></extra>"), 
+                                                                      hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"), 
                                                                       marker = list(colors = ~color, line = list(color = "#595959", width = 1)), #textfont = list(family = "Arial", size = 10), 
                                                                       textposition = "none") %>%
     layout(
       #showlegend = TRUE, autosize = T, 
-      annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F)) %>% 
+      annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F),font=list(size = 20)) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
@@ -276,7 +373,7 @@ direction_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
                                                                     textposition = "none") %>%
     layout(
       #showlegend = TRUE, autosize = T, 
-      annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F)) %>% 
+      annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F,font=list(size = 20))) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
@@ -408,11 +505,14 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
     data = coms_temp,
     type = "treemap",
     ids = ~Grouped_sctg2,
-    labels = ~Grouped_sctg2 %>% str_wrap(width = 15),
+    labels = ~Grouped_sctg2 %>% str_wrap(width = 20),
     branchvalues = 'total',
     values = ~factor_lab,
-    parents = ~parents
-  )
+    parents = ~parents,
+    hovertemplate = ~paste("%{label} <br> :", formatC(factor_lab,digits=1,format="f",big.mark = ","), "<extra></extra>")
+  ) %>%
+    layout(uniformtext=list(minsize= 20 #,mode='hide'
+                            ))
   
   return(tile_graph)
 }

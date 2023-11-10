@@ -143,7 +143,7 @@ data_ss_click<- reactive({
   if(input$OD_opts != "Both"){
     # dat_temp <- dat %>%
     #   filter(!!input$OD_opts == click_counties$curr) this method didn't work unfortunately
-    if(input$OD_opts == "origin"){
+    if(input$OD_opts == "dms_orig"){
       dat_temp <- dat %>%
         filter(origin == click_counties$curr) %>%
         mutate(GEOID = destination)
@@ -161,9 +161,49 @@ data_ss_click<- reactive({
       dat_temp = dat_temp %>%
         filter(Grouped_sctg2==input$sctg2_opts)}
     
+    # output$c2c_flowDirection <- renderPlotly({
+    #   direction_pie_graph_countyselected(dat_temp,
+    #                                      county = input$county_opts,
+    #                                      tons_value_selection = input$Value_opts,
+    #                                      commcolors = init_commcolors,
+    #                                      sourceName = "c2c_flowDirection")
+    # })
+    # 
+    # output$c2c_mode <- renderPlotly({
+    #   mode_pie_graph(dat_temp,
+    #                  #county = input$county_opts,
+    #                  tons_value_selection = input$Value_opts,
+    #                  ini_modecolors = ini_modecolors,
+    #                  sourceName = "c2c_mode")
+    # })
+    # 
+    # output$c2c_cf_commodity <- renderPlotly({
+    #   tile_graph(dat_temp,
+    #              tons_value_selection = input$Value_opts,
+    #              sourceName = "c2c_cf_commodity")
+    # })
+    # 
+    # output$c2c_cf_topInbound <- renderPlotly({
+    #   top_importing_county(dat_temp,
+    #                        tons_value_selection = input$Value_opts,
+    #                        ton_color = "#66c2a5",
+    #                        value_color = "#3288bd",
+    #                        sourceName = "c2c_cf_topInbound")
+    #   
+    # })
+    # 
+    # output$c2c_cf_topOutbound <- renderPlotly({
+    #   top_exporting_county(dat_temp,
+    #                        tons_value_selection = input$Value_opts,
+    #                        ton_color = "#66c2a5",
+    #                        value_color = "#3288bd",
+    #                        sourceName = "c2c_cf_topOutbound")
+    # })
+    # 
     if(input$sctg2_opts == "All" | input$dms_mode_opts == "All"){
+      
       if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
-        
+  
       dat_temp = dat_temp %>%
         group_by(origin, destination, GEOID)%>%
         summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
@@ -174,8 +214,9 @@ data_ss_click<- reactive({
                   value_2050 = sum(value_2050)) %>%
         ungroup()
       selected_col = input$Value_opts
+      
       } else{
-        dat_temp = process_scenario_cc(dat_temp,
+        dat_temp = process_scenario(dat_temp,
                                        input$Value_opts,
                                        input$Scenario_opt,
                                        click_counties$curr,
@@ -192,6 +233,7 @@ data_ss_click<- reactive({
       
     }
     else{
+
       dat_temp = process_scenario(dat_temp,
                                      input$Value_opts,
                                      input$Scenario_opt,
@@ -215,7 +257,47 @@ data_ss_click<- reactive({
       dat_temp = dat_temp %>%
         filter(Grouped_sctg2==input$sctg2_opts)}
     
+    #   output$c2c_flowDirection <- renderPlotly({
+    #     direction_pie_graph_countyselected(dat_temp,
+    #                    county = input$county_opts,
+    #                    tons_value_selection = factor_lab,
+    #                    commcolors = init_commcolors,
+    #                    sourceName = "c2c_flowDirection")
+    #   })
+    # 
+    #   output$c2c_mode <- renderPlotly({
+    #     mode_pie_graph(dat_temp,
+    #                    #county = input$county_opts,
+    #                    tons_value_selection = factor_lab,
+    #                    ini_modecolors = ini_modecolors,
+    #                    sourceName = "c2c_mode")
+    #   })
+    # 
+    #   output$c2c_cf_commodity <- renderPlotly({
+    #     tile_graph(dat_temp,
+    #                tons_value_selection = input$Value_opts,
+    #                sourceName = "c2c_cf_commodity")
+    #   })
+    # 
+    #   output$c2c_cf_topInbound <- renderPlotly({
+    #     top_importing_county(dat_temp,
+    #                          tons_value_selection = input$Value_opts,
+    #                          ton_color = "#66c2a5",
+    #                          value_color = "#3288bd",
+    #                          sourceName = "c2c_cf_topInbound")
+    # 
+    # })
+    # 
+    #   output$c2c_cf_topOutbound <- renderPlotly({
+    #     top_exporting_county(dat_temp,
+    #                          tons_value_selection = input$Value_opts,
+    #                          ton_color = "#66c2a5",
+    #                          value_color = "#3288bd",
+    #                          sourceName = "c2c_cf_topOutbound")
+    #   })
+    
     if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
+      
     dat_temp = dat_temp %>%
       mutate(dms_imp_exp = ifelse(origin == click_counties$curr, destination, origin),
              GEOID = dms_imp_exp) %>% #you actually don't need this could just group by lineid, but then the map is missing
@@ -230,8 +312,9 @@ data_ss_click<- reactive({
     selected_col = input$Value_opts
     
     }else{
+
       dat_temp_input = dat_temp
-      dat_temp = process_scenario_cc(dat_temp_input,
+      dat_temp = process_scenario(dat_temp_input,
                                      input$Value_opts,
                                      input$Scenario_opt,
                                      click_counties$curr,
@@ -241,6 +324,8 @@ data_ss_click<- reactive({
       selected_col <- paste0(input$Value_opts, input$Scenario_opt)
     }
   }
+  
+  
   
   dat_temp = dat_temp %>%
     rename(factor_lab = selected_col) %>%
@@ -288,7 +373,7 @@ observeEvent(eventExpr = map_update(), {
   
   if(input$OD_opts == "Both"){
     dir = "Inbound & Outbound to "
-  }else if(input$OD_opts == "origin"){
+  }else if(input$OD_opts == "dms_orig"){
     dir = "Outbound from "
   } else {
     dir = "Inbound to "
@@ -441,7 +526,7 @@ output$table_title <- renderText({
   req(click_counties$curr)
   
   if(input$OD_opts != "Both"){
-    if(input$OD_opts == "origin"){
+    if(input$OD_opts == "dms_orig"){
       title = paste0("Origin County: ", county_selected$county_lab[county_selected$GEOID == click_counties$curr])
       
     } else {
@@ -500,10 +585,10 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     if(input$OD_opts == "Both"){
       SETTS_ss<-SETTS_ss %>% 
         left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-    } else if(input$OD_opts == "origin"){
+    } else if(input$OD_opts == "dms_orig"){
       SETTS_ss<-SETTS_ss %>%
         left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
-    } else if(input$OD_opts == "destination"){
+    } else if(input$OD_opts == "dms_dest"){
       SETTS_ss<-SETTS_ss %>%
         left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
     }
@@ -589,10 +674,10 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   if(input$OD_opts == "Both"){
     SETTS_ss<-SETTS_ss %>% 
       left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-  } else if(input$OD_opts == "origin"){
+  } else if(input$OD_opts == "dms_orig"){
     SETTS_ss<-SETTS_ss %>%
       left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
-  } else if(input$OD_opts == "destination"){
+  } else if(input$OD_opts == "dms_dest"){
     SETTS_ss<-SETTS_ss %>%
       left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
   }
@@ -603,8 +688,6 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     select(contains('county'),starts_with('tons_'), starts_with('value_')) %>% 
     rename('County' = 'county_lab')
   
-  SETTS_ss_r$SETTS_ss=SETTS_ss
-  
   SETTS_ss<-SETTS_ss %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
     rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
@@ -613,8 +696,12 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
            'Value 2017</br>($Million)'='value_2017',
            'Value 2020</br>($Million)'='value_2020',
            'Value 2050</br>($Million)'='value_2050')
-    #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
+  
+  SETTS_ss <- SETTS_ss %>% rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
+  
 
+  SETTS_ss_r$SETTS_ss=SETTS_ss
+  
     replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)} else {
       SETTS_ss <- data.frame('County'=c(),
                             'Tons 2017</br>(Thousand Tons)'=c(),
@@ -623,9 +710,11 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
                             'Value 2017</br>($Million)'=c(),
                             'Value 2020</br>($Million)'=c(),
                             'Value 2050</br>($Million)'=c())
-      SETTS_ss_r$SETTS_ss=SETTS_ss
+      
       replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)
     }
+    
+  
   })
     
     outputOptions(output, 'subsetSETTS', suspendWhenHidden = FALSE)  
@@ -638,5 +727,82 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
         rename()
       write.csv(tbl_out, file,row.names = F)
     })
+
   
+  observe({
+    req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
+        input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
+
+    if (input$OD_opts == 'Both'){
+      dat_in <- dat %>% filter(origin %in% input$county_opts | destination %in% input$county_opts)
+    } else if (input$OD_opts == 'dms_orig'){
+      dat_in <- dat %>% filter(origin %in% input$county_opts)
+    }else if (input$OD_opts == 'dms_dest'){
+      dat_in <- dat %>% filter(destination %in% input$county_opts)}
+
+    #filter for mode
+    if(input$dms_mode_opts != "All" & nrow(dat_in) >=1) {
+      dat_in = dat_in %>%
+        filter(dms_mode == input$dms_mode_opts)}
+    #filter for commodity
+    if(input$sctg2_opts != "All" & nrow(dat_in) >=1) {
+      dat_in = dat_in %>%
+        filter(Grouped_sctg2==input$sctg2_opts)}
+    
+    selected_value = input$Value_opts
+    
+    # if scenario applied
+    if (input$Scenario_opt != 'Baseline'){
+      dat_in = process_scenario(dat_in,
+                                input$Value_opts,
+                                input$Scenario_opt,
+                                click_counties$curr,
+                                c('origin', 'destination','Grouped_sctg2','dms_mode'),
+                                1)
+      selected_value = paste0(input$Value_opts,input$Scenario_opt)
+    }
+    #str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
+
+
+    output$c2c_flowDirection <- renderPlotly({
+      direction_pie_graph_countyselected(dat_in,
+                     county = input$county_opts,
+                     tons_value_selection = selected_value,
+                     commcolors = init_commcolors,
+                     sourceName = "c2c_flowDirection")
+    })
+
+    output$c2c_mode <- renderPlotly({
+      mode_pie_graph(dat_in,
+                     #county = input$county_opts,
+                     tons_value_selection = selected_value,
+                     ini_modecolors = ini_modecolors,
+                     sourceName = "c2c_mode")
+    })
+
+    output$c2c_cf_commodity <- renderPlotly({
+      tile_graph(dat_in,
+                 tons_value_selection = selected_value,
+                 sourceName = "c2c_cf_commodity")
+    })
+
+    output$c2c_cf_topInbound <- renderPlotly({
+      top_importing_all(dat_in,
+                           tons_value_selection = selected_value,
+                           ton_color = "#66c2a5",
+                           value_color = "#3288bd",
+                           location = click_counties$curr,
+                           sourceName = "c2c_cf_topInbound")
+
+  })
+
+    output$c2c_cf_topOutbound <- renderPlotly({
+      top_exporting_all(dat_in,
+                           tons_value_selection = selected_value,
+                           ton_color = "#66c2a5",
+                           value_color = "#3288bd",
+                           location = click_counties$curr,
+                           sourceName = "c2c_cf_topOutbound")
+    })
+    })
 

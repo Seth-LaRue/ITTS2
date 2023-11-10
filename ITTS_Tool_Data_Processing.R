@@ -552,54 +552,69 @@ save(cnty2cnty_feature,cnty2state_feature, county2Internatioal_feature,
 save(dat,dat_cs,dat_ss, file = "C:/Users/slarue/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Commodity Flow/Data Viz Tool/ITTS_tool_data_files_10312022.RData")
 
 
-## add scenarios:
+## data data to rdata
+dat_rs <- dat_ss %>%
+  mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',origin),
+         destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51"), 'ITTS',destination))
+
+dat_se <- dat_ss %>%
+  mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',origin),
+         destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',destination))
+
+# make column names consistent
+colnames(dat)[colnames(dat) %in% c("dms_orig", 'dms_dest')] = c("origin",'destination')
+colnames(dat_pin)[colnames(dat_pin) %in% c('Tons_2019','Tons_2021','Value_2019','Value_2021')] = c('tons_2019','tons_2021','value_2019','value_2021')
+colnames(dat_sin)[colnames(dat_sin) %in% c('Tons_2019','Tons_2021','Value_2019','Value_2021')] = c('tons_2019','tons_2021','value_2019','value_2021')
 
 
-### add scenarios
+ITTS_base <- state_base %>%
+  mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',NAME),
+         GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',GEOID)) %>%
+  group_by(NAME, GEOID) %>%
+  summarise(NAME = unique(NAME),
+            GEOID = unique(GEOID))%>%
+  ungroup()
 
-dat_cs <- dat_cs %>%
-  rowwise() %>%
-  mutate(
-    #tons_2017_s1 = 1.1 * tons_2017 + runif(1),
-    tons_2020_s1 = 1.15* tons_2020 + runif(1),
-    tons_2050_s1 = 1.2* tons_2050 + runif(1),
-    #value_2017_s1 = 1.1 * value_2017 + runif(1),
-    value_2020_s1 = 1.05* value_2020 + runif(1),
-    value_2050_s1 = 1.25* value_2050 + runif(1) #,
-    
-    # #tons_2017_s2 = 1.3 * tons_2017 + runif(1),
-    # tons_2020_s2 = 1.05* tons_2020 + runif(1),
-    # tons_2050_s2 = 1.02* tons_2050 + runif(1),
-    # #value_2017_s2 = 1.05 * value_2017 + runif(1),
-    # value_2020_s2 = 1.1* value_2020 + runif(1),
-    # value_2050_s2 = 1.03* value_2050 + runif(1),
-    # 
-    # #tons_2017_s3 = 1.13 * tons_2017 + runif(1),
-    # tons_2020_s3 = 1.05* tons_2020 + runif(1),
-    # tons_2050_s3 = 1.06* tons_2050 + runif(1),
-    # #value_2017_s3 = 1.25 * value_2017 + runif(1),
-    # value_2020_s3 = 1.13* value_2020 + runif(1),
-    # value_2050_s3 = 1.3* value_2050 + runif(1),
-    # 
-    # #tons_2017_s4 = 1.3 * tons_2017 + runif(1),
-    # tons_2020_s4 = 1.05* tons_2020 + runif(1),
-    # tons_2050_s4 = 1.09* tons_2050 + runif(1),
-    # #value_2017_s4 = 1.15 * value_2017 + runif(1),
-    # value_2020_s4 = 1.03* value_2020 + runif(1),
-    # value_2050_s4 = 1.23* value_2050 + runif(1),
-    # 
-    # #tons_2017_s5 = 1.2 * tons_2017 + runif(1),
-    # tons_2020_s5 = 1.4* tons_2020 + runif(1),
-    # tons_2050_s5 = 1.3* tons_2050 + runif(1),
-    # #value_2017_s5 = 1.1 * value_2017 + runif(1),
-    # value_2020_s5 = 1.3* value_2020 + runif(1),
-    # value_2050_s5 = 1.2* value_2050 + runif(1),
-    # 
-    # 
-    # #tons_2017_s6 = 1.02 * tons_2017 + runif(1),
-    # tons_2020_s6 = 1.23* tons_2020 + runif(1),
-    # tons_2050_s6 = 1.12* tons_2050 + runif(1),
-    # #value_2017_s6 = 1.14 * value_2017 + runif(1),
-    # value_2020_s6 = 1.24* value_2020 + runif(1),
-    # value_2050_s6 = 1.25* value_2050 + runif(1),
-  )
+ITTS_boundary <- ITTS_base %>% filter(GEOID == 'ITTS') %>% 
+  select('GEOID','NAME') %>%
+  mutate(type = '',
+         mode_nm = '')
+
+all_selected = rbind(all_selected,ITTS_boundary) 
+
+SE_base <- state_base %>%
+  mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',NAME),
+         GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',GEOID)) %>%
+  group_by(NAME, GEOID) %>%
+  summarise(NAME = unique(NAME),
+            GEOID = unique(GEOID))%>%
+  ungroup()
+
+SE_boundary <- SE_base %>% filter(GEOID == 'Southeast Region') %>% 
+  select('GEOID','NAME') %>%
+  mutate(type = '',
+         mode_nm = '')
+
+all_selected = rbind(all_selected,SE_boundary) 
+
+other_states = state_base %>% 
+  filter(!(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))) %>%
+  select(-'state_lab',-'STATEFP') %>%
+  mutate(type = "",
+         mode_nm = "")
+all_selected <- rbind(all_selected,other_states)  ## add all geographical boundaries to this layer, used in graphs. 
+
+international_base <- international_base %>%
+  mutate(type = "",
+         mode_nm = "")
+all_selected <- rbind(all_selected,international_base)
+
+
+# this is for hatch pattern on ITTS and SE_hatch
+ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
+SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
+
+
+ITTS_base <- sf::st_transform(ITTS_base,CRS("+init=epsg:4269"))
+SE_base <- sf::st_transform(SE_base,CRS("+init=epsg:4269"))
+all_selected <- sf::st_transform(all_selected,CRS("+init=epsg:4269"))
