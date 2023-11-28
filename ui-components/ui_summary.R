@@ -186,11 +186,10 @@ od <- c("Inbound","Outbound","Within ITTS")
           ), #end of card
           
           argonCard(width = 12, 
+                    argonRow(width = 12, h1("Trends by year")),
+                    argonRow(width = 12, p("This section shows the total amount of tonnage (left) and value (right) for different measures (mode, direction, and commodity) for the selected year, see below.")),
                     argonRow(width = 12, 
-                             argonRow(width = 12, h1("Trends by year")),
-                             argonRow(width = 12, p("This section shows the total amount of tonnage (left) and value (right) for different measures (mode, direction, and commodity) for the selected year, see below.")),
-                             argonColumn(width = 2,
-                                         
+                    argonColumn(width = 2,
                                          tags$div(
                                            title = "Select a measurement of freight movement to display on the map",
                                            selectInput(inputId = "stab2_value_opts", label = "Freight Measure", choices = c("Tons 2017"="tons_2017",

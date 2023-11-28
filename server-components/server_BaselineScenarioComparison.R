@@ -254,7 +254,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     left_join(state_join)%>%
     rename(label = state_lab)
   
-  output$stab2_value_state_growth_dotplot <- renderPlotly({ dot_plot(df_temp)meas = "Value USD"})
+  output$stab2_value_state_growth_dotplot <- renderPlotly({ dot_plot(df_temp,meas = "Value USD")})
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
