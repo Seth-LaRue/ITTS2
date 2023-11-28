@@ -16,13 +16,22 @@ state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10
 scen_colors <- data.frame(
   scenario = c("s0","s1","s2","s3","s4","s5","s6"),
   scen_name = c("Baseline", "Scenario 1","Scenario 2","Scenario 3","Scenario 4", "Scenario 5","Scenario 6"),
-  scen_color = c("#EE4B2B","#F4BF96","#7752FE","#C2D9FF","#FFF6F6","#495E57","#99B080"),
+  scen_color = c("#EE4B2B","#F4BF96","#7752FE","#C2D9FF","#66c2a5","#495E57","#99B080"),
   lntype = c("dash","solid","solid","solid","solid","solid","solid"),
   dotmrk = c("square","circle","circle","circle","circle","circle","circle"))
+
 ini_modecolors <- data.frame(
-  dms_mode = c("1","2","3","4","5","6","7"),
-  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown"),
-  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5"))
+  dms_mode = c("1","2","3","4","5","6","7","99"),
+  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","Unknown"),
+  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#E11111"))
+
+ini_international <- data.frame(
+  country_lab = c("Africa","Asia","Australia and Oceania",
+              "North America",
+              "South/Central America",
+              "Antarctica","Europe"),
+  country = c("1","2","3","4","6","7","8")
+)
 
 #dataframe reactive----------------
 #withProgress(message = "Running Data Processing",{
@@ -174,12 +183,12 @@ dot_plot <- function(df_in, meas = "Tonnage"){
   df_temp <- df_in %>% left_join(scen_colors)
 
   dplot <-  plot_ly(df_temp) %>% 
-    add_trace(trace, x = ~value, y = ~str_wrap(label,16), type = 'scatter', mode = 'lines', color = ~label,
+    add_trace(trace, x = ~value, y = ~str_wrap(label,25), type = 'scatter', mode = 'lines', color = ~label,
               line = list(color = "#6a6a6a",
                           dash = 'dash'
                           ),
               showlegend = FALSE) %>%
-    add_trace(df_temp, x = ~value, y = ~str_wrap(label,16), type = 'scatter', mode = 'markers', 
+    add_trace(df_temp, x = ~value, y = ~str_wrap(label,25), type = 'scatter', mode = 'markers', 
               color = ~I(scen_color),
               name = ~scen_name,
               symbol = ~I(dotmrk),
@@ -245,7 +254,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     left_join(state_join)%>%
     rename(label = state_lab)
   
-  output$stab2_value_state_growth_dotplot <- renderPlotly({ dot_plot(df_temp) })
+  output$stab2_value_state_growth_dotplot <- renderPlotly({ dot_plot(df_temp)meas = "Value USD"})
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
@@ -299,7 +308,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     left_join(ini_modecolors) %>%
     rename(label = mode_group)
   
-  output$stab2_value_mode_growth_dotplot <- renderPlotly({ dot_plot(df_temp) })
+  output$stab2_value_mode_growth_dotplot <- renderPlotly({ dot_plot(df_temp, meas = "Value USD") })
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
@@ -352,7 +361,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     rename(label = Grouped_sctg2)
   #df$label = sapply(df$label, FUN = function(x){paste(strwrap(x, width = 16))})
   
-  output$stab2_value_com_growth_dotplot <- renderPlotly({ dot_plot(df_temp) })
+  output$stab2_value_com_growth_dotplot <- renderPlotly({ dot_plot(df_temp, meas = "Value USD") })
 })
 
 #bar plots -----------
@@ -664,4 +673,160 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
   })
 })
 
-int_sankey_diagram <- function(df_in, meas = "Tonnage"){}
+#international sankey----
+# input <- list("stab2_commodity" = c("Agriculture and Fish",
+#                                  "Energy Products", 
+#                                  "Food, Alcohol and Tobacco",
+#                                  "Machinery, Electric, and Precision Instruments",
+#                                  "Mixed Freight",
+#                                  "Waste and Scrap",
+#                                  "Nonmetallic Mineral and Base Metal Products",
+#                                  "Raw and Finished Wood Products",
+#                                  "Chemicals, Pharmaceuticals, Plastics, and Rubber",
+#                                  "Vehicles and Transportation Equipment",
+#                                  "Textiles and Leather",
+#                                  "Aggregates"),
+#            "stab2_states" = c("01","05","12","13"))
+# 
+# df_in <- dat_sin %>%
+#   mutate(state = ifelse(nchar(origin)!=1, str_sub(origin,1,2), str_sub(destination,1,2)),
+#          country = ifelse(nchar(origin)==1, origin, destination)) %>%
+#   filter(state %in% input$stab2_states) %>%
+#   #mutate(direction = ifelse(nchar(origin)!=1, "Export","Import"))
+#   #mutate(direction_filt = ifelse(direction == "Export","Outbound","Inbound")) %>%
+#   #filter(direction %in% input$stab2_OD) %>%
+#   #filter the simple ones
+#   filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
+#   #filter(dms_mode %in% input$stab2_mode) %>%
+#   group_by(state, country, dms_mode, Grouped_sctg2) %>%
+#   summarise(value = sum(Tons_2019))
+#   
+# 
+# ini_sankey_diagram <- function(df_in, meas = "Tonnage"){
+#   
+#   blabs <- c("Alabama", "Arkansas", "Florida", "Georgia", "Kentucky",
+#              "Louisiana", "Mississippi", "Missouri", "North Carolina", "South Carolina",
+#              "Tennessee", "Texas", "Virginia",
+#              
+#              "Water", "Air", "Unknown",
+#              
+#              "Aggregates", "Agriculture and Fish", "Energy Products", 
+#              "Machinery, Electric, and Precision Instruments", "Mixed Freight", "Nonmetallic Mineral and Base Metal Products", 
+#              "Raw and Finished Wood Products", "Waste and Scrap", "Chemicals, Pharmaceuticals, Plastics, and Rubber", 
+#              "Food, Alcohol and Tobacco", "Textiles and Leather", "Vehicles and Transportation Equipment",
+#              
+#              "Africa","Asia","Australia and Oceania","North America","South/Central America","Antarctica","Europe")
+#   
+#   
+#   shell_orig <- data.frame(source = blabs,
+#                            index = c(seq(0:34))
+#   )
+#   shell1 <- shell_orig[1:13,] %>% rename(source1 = source,
+#                                          index1 = index)
+#   shell2 <- shell_orig[14:16,] %>% rename(source2 = source, 
+#                                           index2 = index)
+#   shell3 <- shell_orig[17:28,] %>% rename(source3 = source,
+#                                           index3 = index)
+#   shell4 <- shell_orig[29:35,] %>% rename(source4 = source,
+#                                           index4 = index)
+#   source_1t2 <- source1_temp <- shell1
+#   source_1t2$source2 <- shell2$source2[1]
+#   source_1t2$index2 <- shell2$index2[1]
+#   
+#   for(n in 2:nrow(shell2)){
+#     print(n)
+#     source_temp <- source1_temp
+#     source_temp$source2 <- shell2$source2[n]
+#     source_temp$index2 <- shell2$index2[n]
+#     source_1t2 <- rbind(source_1t2, source_temp)
+#   }
+#   
+#   source_2t3 <- source2_temp <- shell2
+#   source_2t3$source3 <- shell3$source3[1]
+#   source_2t3$index3 <- shell3$index3[1]
+#   
+#   for(n in 2:nrow(shell3)){
+#     print(n)
+#     source_temp <- source2_temp
+#     source_temp$source3 <- shell3$source3[n]
+#     source_temp$index3 <- shell3$index3[n]
+#     source_2t3 <- rbind(source_2t3, source_temp)
+#   }
+#   
+#   source_3t4 <- source3_temp <- shell3
+#   source_3t4$source4 <- shell4$source4[1]
+#   source_3t4$index4 <- shell4$index4[1]
+#   
+#   for(n in 2:nrow(shell4)){
+#     print(n)
+#     source_temp <- source3_temp
+#     source_temp$source4 <- shell4$source4[n]
+#     source_temp$index4 <- shell4$index4[n]
+#     source_3t4 <- rbind(source_3t4, source_temp)
+#   }
+#   
+#   link_1t2 <- df_in %>% 
+#     #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>%
+#     left_join(state_join) %>% rename(source1 = state_lab) %>%
+#     left_join(ini_modecolors) %>% rename(source2 = mode_group) %>%
+#     group_by(source1, source2) %>% summarise(value = sum(value))
+#   
+#   
+#   link_2t3 <- df_in %>%
+#     left_join(ini_modecolors) %>% rename(source2 = mode_group) %>%
+#     rename(source3 = Grouped_sctg2) %>%
+#     group_by(source2, source3) %>% summarise(value = sum(value))
+#   
+#   link_3t4 <- df_in %>%
+#     left_join(ini_international) %>% rename(source3 = Grouped_sctg2) %>%
+#     rename(source4 = country_lab) %>%
+#     group_by(source3, source4) %>% summarise(value = sum(value))
+#   
+#   source_1t2_full <- left_join(source_1t2, link_1t2) %>% filter(!is.na(value))
+#   source_2t3_full <- left_join(source_2t3, link_2t3) %>% filter(!is.na(value))
+#   source_3t4_full <- left_join(source_3t4, link_3t4) %>% filter(!is.na(value))
+#   #source_1t2_full$value[is.na(source_1t2_full$value)] <- 0
+#   #source_2t3_full$value[is.na(source_2t3_full$value)] <- 0
+#   #source_3t4_full$value[is.na(source_3t4_full$value)] <- 0
+#   
+#   snkey <- plot_ly(type = "sankey",
+#                    
+#                    #domain = list(
+#                    #  x =  c(0,1),
+#                    #  y =  c(0,1)
+#                    #),
+#                    
+#                    #orientation = "h",
+#                    #valueformat = ".0f",
+#                    #valuesuffix = "TWh",
+#                    
+#                    node = list(
+#                      label = blabs,
+#                      #data$data[[1]]$node$color,
+#                      pad = 15,
+#                      thickness = 15,
+#                      line = list(
+#                        color = "black",
+#                        width = 0.5
+#                      )
+#                    ),
+#                    
+#                    link = list(
+#                      source = c(source_1t2_full$index1-1,
+#                                 source_2t3_full$index2-1,
+#                                 source_3t4_full$index3-1
+#                      ),
+#                      target = c(source_1t2_full$index2-1,
+#                                 source_2t3_full$index3-1,
+#                                 source_3t4_full$index4-1
+#                      ),
+#                      value =  c(source_1t2_full$value,
+#                                 source_2t3_full$value,
+#                                 source_3t4_full$value
+#                      )#,
+#                      #label =  blabs
+#                    )
+#   ) %>% config(displayModeBar = FALSE)
+#   
+#   return(snkey)
+# }

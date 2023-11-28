@@ -42,7 +42,8 @@ od <- c("Inbound","Outbound","Within ITTS")
             
             
             column(12,
-                   h1("Scenario Comparison"))),
+                   h1("Scenario Comparison"),
+                   p("This tab is to help users compare differences between the scenarios. Please select which commodities, directions, modes, and scenarios you would like to see data for and press the button to the right to run the analysis."))),
           #First Card w inputs/button --------------
           argonCard(width = 12,
                     argonRow(width = 12,
@@ -135,7 +136,8 @@ od <- c("Inbound","Outbound","Within ITTS")
                     )), #end of input card
           #second card line graphs ---------
           argonCard(width = 12, 
-                    argonRow(width = 12,h2("Growth year over year", align = 'center')),
+                    argonRow(width = 12,h1("Growth year over year", align = 'center')),
+                    argonRow(width = 12, p("The total tonnage and value for each chosen scenario for the base and future years.")),
                     argonRow(width = 12,
                              argonColumn(width = 6, 
                                          #h2("Tons Growth", align = "center"), 
@@ -148,7 +150,9 @@ od <- c("Inbound","Outbound","Within ITTS")
                     )),
           #third card ----
           argonCard(width = 12,
-                    argonRow(width = 12,h2("Percent Growth by State")),
+                    argonRow(width = 12,h1("Percent Growth by State")),
+                    argonRow(width = 12, p("This section compares the percent growth for key measures from the base (2019) and future year (2050) by tonnage on the right and value on the left.
+                                           The first row of graph compares the growth for each mode and the second each commodity selected above. Each dot represents a scenario with a higher growth for that scenario the further right the dot is on the line.")),
                     argonRow(width = 12,
                              argonColumn(width = 6, 
                                          #h2("State Growth Tons", align = "center"), 
@@ -173,7 +177,8 @@ od <- c("Inbound","Outbound","Within ITTS")
                              argonColumn(width = 6, 
                                          #h2("Commodity Growth Tons", align = "center"), 
                                          plotlyOutput("stab2_tons_com_growth_dotplot", width = "auto", height = "auto")
-                             ),
+                             )),
+                    argonRow(width = 12, 
                              argonColumn(width = 6, 
                                          #h2("Commodity Growth Value", align = "center"), 
                                          plotlyOutput("stab2_value_com_growth_dotplot", width = "auto", height = "auto")
@@ -182,6 +187,8 @@ od <- c("Inbound","Outbound","Within ITTS")
           
           argonCard(width = 12, 
                     argonRow(width = 12, 
+                             argonRow(width = 12, h1("Trends by year")),
+                             argonRow(width = 12, p("This section shows the total amount of tonnage (left) and value (right) for different measures (mode, direction, and commodity) for the selected year, see below.")),
                              argonColumn(width = 2,
                                          
                                          tags$div(
@@ -212,6 +219,8 @@ od <- c("Inbound","Outbound","Within ITTS")
                              )
                     )),
           argonCard(width = 12,
+                    argonRow(width = 12, h1("Flow Diagram")),
+                    argonRow(width = 12, p("This section shows the overall flow of tonnage for the selected scenario. Flow lines represent the amount of tonnage moving from one category to another.")),
                     argonRow(width = 12,
                              selectInput(
                                inputId= "stab2_sankey_filt",
