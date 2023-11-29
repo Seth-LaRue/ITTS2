@@ -150,9 +150,10 @@ od <- c("Inbound","Outbound","Within ITTS")
                     )),
           #third card ----
           argonCard(width = 12,
-                    argonRow(width = 12,h1("Percent Growth by State")),
+                    argonRow(width = 12,h1("Percent Growth")),
                     argonRow(width = 12, p("This section compares the percent growth for key measures from the base (2019) and future year (2050) by tonnage on the right and value on the left.
                                            The first row of graph compares the growth for each mode and the second each commodity selected above. Each dot represents a scenario with a higher growth for that scenario the further right the dot is on the line.")),
+                    argonRow(width = 12,h2("Percent Growth by State")),
                     argonRow(width = 12,
                              argonColumn(width = 6, 
                                          #h2("State Growth Tons", align = "center"), 
@@ -174,12 +175,12 @@ od <- c("Inbound","Outbound","Within ITTS")
                              )),
                     argonRow(width = 12,h2("Percent Growth by Commodity", align = "center")),
                     argonRow(width = 12,
-                             argonColumn(width = 6, 
+                             argonColumn(width = 12, 
                                          #h2("Commodity Growth Tons", align = "center"), 
                                          plotlyOutput("stab2_tons_com_growth_dotplot", width = "auto", height = "auto")
                              )),
                     argonRow(width = 12, 
-                             argonColumn(width = 6, 
+                             argonColumn(width = 12, 
                                          #h2("Commodity Growth Value", align = "center"), 
                                          plotlyOutput("stab2_value_com_growth_dotplot", width = "auto", height = "auto")
                              ))

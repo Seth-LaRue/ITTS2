@@ -204,7 +204,7 @@ dot_plot <- function(df_in, meas = "Tonnage"){
 }
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
-  #browser()
+  print('dp1')
   df_temp <- stab2_data() %>%
     #filter(nchar(origin) == 5) %>%
     #mutate(state = str_sub(origin,1,2)) %>%
@@ -220,9 +220,9 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     names_sep = "_",
     names_to = c("scenario","measure", "year"),
     values_to = "value") %>%
-    pivot_wider(id_cols = c(state,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
+    pivot_wider(id_cols = c(state,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>% 
     group_by(state, measure, scenario) %>%
-    summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+    dplyr::summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
     filter(measure == "tons") %>%
     left_join(state_join) %>%
     rename(label = state_lab)
@@ -231,7 +231,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
-  
+  print('dp2')
   df_temp <- stab2_data() %>%
     #filter(nchar(origin) == 5) %>%
     #mutate(state = str_sub(origin,1,2)) %>%
@@ -249,7 +249,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     values_to = "value") %>%
     pivot_wider(id_cols = c(state,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
     group_by(state, measure, scenario) %>%
-    summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+    dplyr::summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
     filter(measure == "value") %>%
     left_join(state_join)%>%
     rename(label = state_lab)
@@ -258,7 +258,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
-  
+  print('dp3')
   df_temp <- stab2_data() %>%
     #filter(nchar(origin) == 5) %>%
     #mutate(state = str_sub(origin,1,2)) %>%
@@ -276,7 +276,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     values_to = "value") %>%
     pivot_wider(id_cols = c(dms_mode,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
     group_by(dms_mode, measure, scenario) %>%
-    summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+    dplyr::summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
     filter(measure == "tons") %>%
     left_join(ini_modecolors) %>%
     rename(label = mode_group)
@@ -285,7 +285,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
-  
+  print('dp4')
   df_temp <- stab2_data() %>%
     #filter(nchar(origin) == 5) %>%
     #mutate(state = str_sub(origin,1,2)) %>%
@@ -303,7 +303,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     values_to = "value") %>%
     pivot_wider(id_cols = c(dms_mode,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
     group_by(dms_mode, measure, scenario) %>%
-    summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+    dplyr::summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
     filter(measure == "value") %>%
     left_join(ini_modecolors) %>%
     rename(label = mode_group)
@@ -312,7 +312,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
-  
+  print('dp5')
   df_temp <- stab2_data() %>%
     #filter(nchar(origin) == 5) %>%
     #mutate(state = str_sub(origin,1,2)) %>%
@@ -330,7 +330,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     values_to = "value") %>%
     pivot_wider(id_cols = c(Grouped_sctg2,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
     group_by(Grouped_sctg2, measure, scenario) %>%
-    summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+    dplyr::summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
     filter(measure == "tons") %>%
     rename(label = Grouped_sctg2)
   
@@ -338,10 +338,11 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
 })
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
-  #browser()
+  print('dp6')
+
   df_temp <- stab2_data() %>%
-    filter(nchar(origin) == 5) %>%
-    mutate(state = str_sub(origin,1,2)) %>%
+    #filter(nchar(origin) == 5) %>%
+    #mutate(state = str_sub(origin,1,2)) %>%
     group_by(Grouped_sctg2) %>%
     summarise_if(is.numeric, sum) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
@@ -353,13 +354,12 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     )),
     names_sep = "_",
     names_to = c("scenario","measure", "year"),
-    values_to = "value") %>%
+    values_to = "value") %>% 
     pivot_wider(id_cols = c(Grouped_sctg2,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
-    group_by(Grouped_sctg2, measure, scenario) %>%
-    summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+    group_by(Grouped_sctg2, measure, scenario) %>% 
+    dplyr::summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
     filter(measure == "value") %>%
     rename(label = Grouped_sctg2)
-  #df$label = sapply(df$label, FUN = function(x){paste(strwrap(x, width = 16))})
   
   output$stab2_value_com_growth_dotplot <- renderPlotly({ dot_plot(df_temp, meas = "Value USD") })
 })
@@ -393,7 +393,7 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2017', sourceName = sourc
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
 
   dir_temp <- stab2_data() %>%
-    filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>%
+    filter(str_sub(origin,1,2) %in% input$stab2_states|str_sub(destination,1,2) %in% input$stab2_states) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
@@ -403,7 +403,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),
-                 values_to = "value") %>%
+                 values_to = "value") %>% 
     left_join(ini_modecolors) %>%
     filter(measure == stringr::str_split(input$stab2_value_opts, "_")[[1]][1]) %>%
     filter(year == stringr::str_split(input$stab2_value_opts, "_")[[1]][2]) %>%
@@ -415,7 +415,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
   #dir_temp$direction[(nchar(dir_temp$origin) == 5 & str_sub(dir_temp$origin,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))|(nchar(dir_temp$destination) == 5 & str_sub(dir_temp$destination,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Within ITTS"
   #dir_temp$direction[nchar(dir_temp$origin) == 5 & !(dir_temp$destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Export"
   #dir_temp$direction[nchar(dir_temp$destination) == 5  & !(dir_temp$origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Import"
-  #browser()
+  
   output$stab2_mode_bar <- renderPlotly({
 
     bar_plot_singleyear(dir_temp, #county = input$stab1_county_opts,
@@ -429,8 +429,6 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
 
   #print(stringr::str_split(input$stab2_value_opts, "_"))
-
-
   dir_temp <- stab2_data() %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
