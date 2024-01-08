@@ -197,15 +197,13 @@ observeEvent(input$Value_opts_cs,{
     updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
   } else if (grepl(c('2020','2050'),input$Value_opts_cs)) {
     updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline',
-                                                                                          'Scenario 1' = '_s1',
-                                                                                          'Scenario 2' = '_s2',
-                                                                                          'Scenario 3' = '_s3',
-                                                                                          'Scenario 4' = '_s4',
-                                                                                          'Scenario 5' = '_s5',
-                                                                                          'Scenario 6' = '_s6'),
+                                                                                             'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                             'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                             'Scenario 3: Embrace Technology Transformations' = '_s3'),
                       selected = 'Baseline',server = TRUE)
   }
-},ignoreInit = TRUE)
+}#,ignoreInit = TRUE
+)
 
 observeEvent(input$odmap_cs_shape_click, {
   req(input$odmap_cs_shape_click)
@@ -798,20 +796,46 @@ observe({
 output$scenario_title_cs <- renderText({
   
   if (input$Scenario_opt_cs == '_s1'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 1')
+    sencario = paste0("Selected Scenario: ", 'Scenario 1- Respond to Heightened Supply Chain Risks')
   }else if (input$Scenario_opt_cs == '_s2'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 2')
+    sencario = paste0("Selected Scenario: ", 'Scenario 2- Leverage Multi-State Strength')
   }else if (input$Scenario_opt_cs == '_s3'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 3')
-  }else if (input$Scenario_opt_cs == '_s4'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 4')
-  }else if (input$Scenario_opt_cs == '_s5'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 5')
-  }else if (input$Scenario_opt_cs == '_s6'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 6')
+    sencario = paste0("Selected Scenario: ", 'Scenario 3- Embrace Technology Transformations')
   }else{
     sencario = paste0("Selected Scenario: ", input$Scenario_opt_cs)}
   return(sencario)
+})
+
+output$scenario_text_output <- renderText({
+  req(input$Scenario_opt_cs)
+
+  if(input$Scenario_opt_cs == '_s1'){
+    return('In Scenario 1, due to the resilience and readiness of the region’s supply chains, the Southeast
+           region increases its production of consumer goods and agricultural goods over time. The Southeast
+           grows its production of consumer goods at a 2.9% annual rate. For agriculture, the tonnage of 
+           these goods originating in the Southeast will increase by about 1.3% annually.')
+  } else if (input$Scenario_opt_cs == '_s2'){
+    return('Recognizing that economies are cyclic, production occurs throughout the world, and weather and 
+    other events can cause major shocks to the system, and that production (particularly resource-based) depends
+    on weather and other high-variability factors, no region of the US can be self-sufficient. For reasons of 
+    regional protection (from disruption and negative change) and also economic competitiveness and opportunity, 
+    the ITTS region aims to: (1) produce a majority share of goods consumed in the Southeast region within the 
+    Southeast region; (2) become a net exporter of goods to the rest of the US and the world; (3) serve as the 
+    leading global gateway for international imports and exports for the entire US; (4) operate from a platform 
+    of heightened energy self-sufficiency. In Scenario 2, Southeast trade overall increases, and the region is 
+    assumed to grow more energy-independent. As a result, non-energy Southeast imports and exports grow at 2.9% 
+    and 2.3% annually, respectively. For energy products, Southeast imports of energy products decline at an annual
+    rate of -1.4%, and exports increase 2.95% annually.')
+  }else if (input$Scenario_opt_cs == '_s3'){
+    return('As the U.S. reduces its use of coal and gasoline and embraces alternative energy, energy production 
+    technologies are rapidly evolving, impacting the movement of various commodities. Comparable technology 
+    transformations in agriculture and other resource industries may occur, and distributed manufacturing (3-D 
+    printing) may “flatten” or simplify the traditional three-tiered (resources, intermediate products, final 
+    products) supply chain. In Scenario 3, coal shipments in the Southeast are projected to decline by approximately
+    -4.5% annually until they vanish from the network. And high-tech durable manufacturing goods will grow by 
+    2.8% annually through 2050.')
+  }
+  
 })
 
 output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{

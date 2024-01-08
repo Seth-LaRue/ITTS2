@@ -9,7 +9,7 @@ library(sf)
 library(shinyjs)
 library(DT)
 #library(shinyalert)
-library(rgdal)
+#library(rgdal)
 library(leaflet.extras)
 library(shinyWidgets)
 #library(leafgl)
@@ -87,8 +87,8 @@ all_selected <- rbind(all_selected,international_base)
 
 
 # this is for hatch pattern on ITTS and SE_hatch
-ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
-SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
+# ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
+# SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
 
 
 remove(ITTS_boundary)
