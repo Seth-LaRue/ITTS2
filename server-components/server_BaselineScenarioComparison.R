@@ -14,11 +14,14 @@ state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10
                                       "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "U.S. Virgin Islands"))
 
 scen_colors <- data.frame(
-  scenario = c("s0","s1","s2","s3","s4","s5","s6"),
-  scen_name = c("Baseline", "Scenario 1","Scenario 2","Scenario 3","Scenario 4", "Scenario 5","Scenario 6"),
-  scen_color = c("#EE4B2B","#F4BF96","#7752FE","#C2D9FF","#66c2a5","#495E57","#99B080"),
-  lntype = c("dash","solid","solid","solid","solid","solid","solid"),
-  dotmrk = c("square","circle","circle","circle","circle","circle","circle"))
+  scenario = c("s0","s1","s2","s3"),
+  scen_name = c("Baseline",
+                "Scenario 1: Respond to Heightened Supply Chain Risks",
+                "Scenario 2: Leverage Multi-State Strength",
+                "Scenario 3: Embrace Technology Transformations"),
+  scen_color = c("#EE4B2B","#7752FE","#495E57","#99B080"),
+  lntype = c("dash","solid","solid","solid"),
+  dotmrk = c("square","circle","circle","circle"))
 
 ini_modecolors <- data.frame(
   dms_mode = c("1","2","3","4","5","6","7","99"),
@@ -76,24 +79,6 @@ stab2_data <- eventReactive(input$stab2_mainbutt,
          s3_value_2017 = 2.45*value_2017,
          s3_value_2020 = 2.56*value_2020,
          s3_value_2050 = 2.6*value_2050) %>%
-  mutate(s4_tons_2017 = 2.7*tons_2017,
-         s4_tons_2020 = 2.8*tons_2020,
-         s4_tons_2050 = 2.92*tons_2050,
-         s4_value_2017 = 1.1*value_2017,
-         s4_value_2020 = 1.4*value_2020,
-         s4_value_2050 = 2.947*value_2050) %>%
-  mutate(s6_tons_2017 = 3.43*tons_2017,
-         s6_tons_2020 = 2.45*tons_2020,
-         s6_tons_2050 = 3.182*tons_2050,
-         s6_value_2017 = 1.22*value_2017,
-         s6_value_2020 = 1.11*value_2020,
-         s6_value_2050 = 1.957*value_2050) %>%
-  mutate(s5_tons_2017 = 1.4*tons_2017,
-         s5_tons_2020 = 2.1*tons_2020,
-         s5_tons_2050 = 1.38*tons_2050,
-         s5_value_2017 = 3*value_2017,
-         s5_value_2020 = 1.3*value_2020,
-         s5_value_2050 = 1.97*value_2050) %>%
     rename(s0_tons_2017 = tons_2017,
            s0_tons_2020 = tons_2020,
            s0_tons_2050 = tons_2050,
@@ -132,14 +117,68 @@ line_plot <- function(df_in, meas = "Tonnage"){
   
 }
 
+observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
+  req(input$stab2_comps, input$stab2_states, input$stab2_OD, input$stab2_mode, input$stab2_commodity)
+  
+  # dynamic text summarize users selection
+  output$scen_select <- renderText({
+    if (length(input$stab2_comps) == 0) {
+      return("No scenarios selected.")
+    }
+    
+    if (length(input$stab2_comps) == 1) {
+      return(paste0("Scenario selected: ", names(scenario_choices)[scenario_choices %in% input$stab2_comps]))
+    } else {
+      return(paste0("Scenarios selected: ", paste(names(scenario_choices)[scenario_choices %in% input$stab2_comps], collapse = ", ")))
+    }
+  })
+  
+  output$state_select <- renderText({
+    if (length(input$stab2_states) == 0) {
+      return("No state selected.")
+    } else if (length(input$stab2_states) == 1) {
+      return(paste0("State selected: ", names(state_ch)[state_ch %in% input$stab2_states]))
+    } else if (length(input$stab2_states) > 1) {
+      return(paste0("States selected: ", paste(names(state_ch)[state_ch %in% input$stab2_states], collapse = "; ")))
+    }
+  })
+  
+  output$dir_select <- renderText({
+    if (length(input$stab2_OD) == 0) {
+      return("No mode selected.")
+    } else if(length(input$stab2_OD) == 1){
+      return(paste0("Direction selected: ", input$stab2_OD))
+    } else if (length(input$stab2_OD) > 1){
+      return(paste0("Directions selected: ", paste(input$stab2_OD, collapse = "; ")))
+    }
+  })
+  
+  output$mode_select <- renderText({
+    if (length(input$stab2_mode) == 0) {
+      return("No mode selected.")
+    } else if(length(input$stab2_mode) == 1){
+      return(paste0("Mode selected: ", names(modes)[modes %in% input$stab2_mode]))
+    } else if (length(input$stab2_mode) > 1){
+      return(paste0("Modes selected: ", paste(names(modes)[modes %in% input$stab2_mode], collapse = "; ")))
+    }
+  })
+  
+  output$comm_select <- renderText({
+    if(length(input$stab2_commodity) == 1){
+      return(paste0("Commodity selected: ", input$stab2_commodity))
+    } else if (length(input$stab2_commodity) > 1){
+      return(paste("Commodities selected: ", paste(input$stab2_commodity, collapse = ", ")))
+    }
+  })
+})
+
+
+
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
   df_temp <- stab2_data() %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
-                                      "s4_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),
@@ -148,20 +187,18 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
     group_by(scenario, year) %>%
     summarise(value = sum(value)) %>% ungroup()
   
-  
+    
   output$stab2_line_tons <- renderPlotly({
     line_plot(df_temp, meas = "Tonnage")
   })
 })
+
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
   df_temp <- stab2_data() %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
-                                      "s4_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),
@@ -212,9 +249,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     summarise_if(is.numeric, sum) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
-                                      "s3_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
+                                      "s3_tons","s3_value",
                                       "s0_tons","s0_value"
     )),
     names_sep = "_",
@@ -239,9 +274,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     summarise_if(is.numeric, sum) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
-                                      "s3_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
+                                      "s3_tons","s3_value",
                                       "s0_tons","s0_value"
     )),
     names_sep = "_",
@@ -266,9 +299,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     summarise_if(is.numeric, sum) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
-                                      "s3_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
+                                      "s3_tons","s3_value",
                                       "s0_tons","s0_value"
     )),
     names_sep = "_",
@@ -293,9 +324,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     summarise_if(is.numeric, sum) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
-                                      "s3_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
+                                      "s3_tons","s3_value",
                                       "s0_tons","s0_value"
     )),
     names_sep = "_",
@@ -320,9 +349,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     summarise_if(is.numeric, sum) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
-                                      "s3_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
+                                      "s3_tons","s3_value",
                                       "s0_tons","s0_value"
     )),
     names_sep = "_",
@@ -347,9 +374,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     summarise_if(is.numeric, sum) %>%
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
-                                      "s3_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
+                                      "s3_tons","s3_value",
                                       "s0_tons","s0_value"
     )),
     names_sep = "_",
@@ -397,9 +422,6 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
-                                      "s4_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),
@@ -433,9 +455,6 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
-                                      "s4_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),
@@ -468,9 +487,6 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
-                                      "s4_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),
@@ -516,9 +532,6 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt,{
 #     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
 #                                       "s2_tons","s2_value",
 #                                       "s3_tons","s3_value",
-#                                       "s4_tons","s4_value",
-#                                       "s5_tons","s5_value",
-#                                       "s6_tons","s6_value",
 #                                       "s0_tons","s0_value")),
 #                  names_sep = "_",
 #                  names_to = c("scenario","measure", "year"),
@@ -633,18 +646,27 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   ),
   
   link = list(
-    source = c(source_1t2_full$index1-1,
-               source_2t3_full$index2-1
-               ),
-    target = c(source_1t2_full$index2-1,
-               source_2t3_full$index3-1
-               ),
-    value =  c(source_1t2_full$value-1,
-               source_2t3_full$value-1
-               )#,
-    #label =  blabs
+    source = c(source_1t2_full$index1-1, source_2t3_full$index2-1),
+    target = c(source_1t2_full$index2-1, source_2t3_full$index3-1),
+    value = c(source_1t2_full$value-1, source_2t3_full$value-1),
+    label = paste("Tonnage: ", source_1t2_full$value, "\n")
   )
-  ) 
+  )
+  
+  #browser()
+  # Add annotations for labels
+  # snkey <- snkey %>%
+  #   add_annotations(
+  #     x = c(0.1, 0.9),
+  #     y = c(0.5, 0.5),
+  #     text = c(paste0("Tonnage: ", source_1t2_full$value),
+  #              paste0("Tonnage: ", sum(source_2t3_full$value))),
+  #     showarrow = FALSE,
+  #     font = list(size = 14),
+  #     xref = "paper",
+  #     yref = "paper"
+  #   )
+  
   
 return(snkey)
   }
@@ -654,9 +676,6 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
-                                      "s4_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),

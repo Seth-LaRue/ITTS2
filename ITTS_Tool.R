@@ -16,7 +16,7 @@ library(shinyWidgets)
 #library(leaflet.extras2)
 library(plotly)
 library(data.table)
-
+library(networkD3)
 #Initialize Data ----
 # 
 # dat <- read.csv('data/cnty2cnty_feature_v2.csv', colClass = c("character","character","character",
@@ -34,6 +34,7 @@ library(data.table)
 # dat_sin <- read.csv('data/states2international_feature.csv', colClass = c("character","character","character",
 #                                                                           "character","character",
 #                                                                           rep("numeric",4)))
+load("ITTS_Hatch.RData")
 
 #
   dat_cs[,5:ncol(dat_cs)] <- lapply(dat_cs[,5:ncol(dat_cs)] ,as.numeric)
@@ -94,9 +95,6 @@ all_selected <- rbind(all_selected,international_base)
 remove(ITTS_boundary)
 remove(SE_boundary)
 remove(other_states)
-
-
-
 
 
 source("gral_parameters.R")

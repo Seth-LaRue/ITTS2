@@ -258,12 +258,17 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
     dplyr::group_by(dms_mode) %>% 
     dplyr::summarise(factor_lab = sum(factor_lab, na.rm = TRUE)) %>% ungroup() %>%
     left_join(ini_modecolors)
-  
-    mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
-      add_pie(values = ~factor_lab,  textinfo='none', labels = ~mode_group, automargin = TRUE, marker = list(colors = ~color, line = list(color = "#595959", width = 1)),
-                                                                 hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"), 
-                                                                 text = ~mode_group, key=~mode_group, hole = 0.6, #textfont = list(family = "Arial"), 
-                                                                 textposition = "outside") %>%
+
+      mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
+      add_pie(values = ~factor_lab, 
+              #textinfo='none', 
+              labels = ~mode_group, 
+              automargin = TRUE, 
+              marker = list(colors = ~color, 
+                            line = list(color = "#595959", width = 1)),
+              hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"),
+              text = ~mode_group, key=~mode_group, hole = 0.6, #textfont = list(family = "Arial"),
+              textposition = "outside") %>%
       layout(#font = list(family = "Arial, "Source Sans Pro", \"Helvetica Neue\", Helvetica, sans-serif", color = "#333"),
         #showlegend = T, autosize = T, 
         annotations = list(text = HTML(paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F,font=list(size = 20))) %>% 
@@ -274,7 +279,6 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
              #                            width = saveWidth,
              #                            height =  saveHeight)
              )
-
   return(mode_plot)
 }
 
@@ -332,21 +336,27 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
   a <- c("#d53e4f","#e6f598","#f69081")
   
   dir_temp$color <- a[1:nrow(dir_temp)]
+  
 
-  dir_plot <- dir_temp %>% plot_ly(source = sourceName) %>% add_pie(labels = ~direction, values = ~factor_lab, automargin = TRUE, #text = ~Aggregate.Commodity.Group, 
-                                                                      key = ~direction, hole = 0.6, sort = TRUE, direction = "clockwise",
-                                                                      hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"), 
-                                                                      marker = list(colors = ~color, line = list(color = "#595959", width = 1)), #textfont = list(family = "Arial", size = 10), 
-                                                                      textposition = "none") %>%
+  dir_plot <- dir_temp %>% plot_ly(source = sourceName, 
+                                   labels = ~direction, 
+                                   values = ~factor_lab) %>% 
+    add_pie(automargin = TRUE, #text = ~Aggregate.Commodity.Group, 
+            key = ~direction, 
+            hole = 0.6, 
+            sort = TRUE, 
+            direction = "clockwise",hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"), 
+                                                                    marker = list(colors = ~color, line = list(color = "#595959", width = 1)), #textfont = list(family = "Arial", size = 10), 
+                                                                    textposition = "bottom center") %>%
     layout(
       #showlegend = TRUE, autosize = T, 
-      annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F),font=list(size = 20)) %>% 
-    config(displaylogo = FALSE, 
-           modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
-           # toImageButtonOptions= list(filename = saveName,
-           #                            width = saveWidth,
-           #                            height =  saveHeight)
-    )
+      annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F),font=list(size = 20)) #%>% 
+    # config(displaylogo = FALSE, 
+    #        modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
+    #        # toImageButtonOptions= list(filename = saveName,
+    #        #                            width = saveWidth,
+    #        #                            height =  saveHeight)
+    # )
   
   return(dir_plot)
   
@@ -370,7 +380,8 @@ direction_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
                                                                     key = ~direction, hole = 0.6, sort = TRUE, direction = "clockwise",
                                                                     hovertemplate = ~paste("%{label} <br>: ", round(factor_lab, digits = 1), "</br> %{percent} <extra></extra>"), 
                                                                     marker = list(colors = ~color, line = list(color = "#595959", width = 1)), #textfont = list(family = "Arial", size = 10), 
-                                                                    textposition = "none") %>%
+                                                                    #textposition = "none"
+                                                                    ) %>%
     layout(
       #showlegend = TRUE, autosize = T, 
       annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F,font=list(size = 20))) %>% 
@@ -401,8 +412,7 @@ total_tons_or_value <- function(df_in, tons_value_selection){
 #functino for bubble graph
 state_bubbles <- function(df_in, tons_value_selection, sourceName){
   
-  #browser()
-  
+
   state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", 
                                      "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27",
                                      "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
@@ -499,9 +509,10 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
     rename(factor_lab = tons_value_selection) %>% 
     group_by(Grouped_sctg2) %>% 
     summarise(factor_lab = sum(factor_lab)) %>%
-    ungroup() %>% mutate(parents = '')
-  
-  tile_graph <- plot_ly(
+    ungroup() %>% mutate(parents = '') %>%
+    mutate(percent = factor_lab/sum(factor_lab))
+
+    tile_graph <- plot_ly(
     data = coms_temp,
     type = "treemap",
     ids = ~Grouped_sctg2,
@@ -509,11 +520,12 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
     branchvalues = 'total',
     values = ~factor_lab,
     parents = ~parents,
+    text = ~paste(format(round(factor_lab),big.mark = ","), "<br>", round(percent*100, 1), "%"),
     hovertemplate = ~paste("%{label} <br> :", formatC(factor_lab,digits=1,format="f",big.mark = ","), "<extra></extra>")
   ) %>%
     layout(uniformtext=list(minsize= 20 #,mode='hide'
                             ))
-  
+  tile_graph
   return(tile_graph)
 }
 #observe events
@@ -537,7 +549,6 @@ observe({
 })
 
 observe({
-  #browser()
   req(input$stab1_value_opts)
   output$cf_mode <- renderPlotly({
 
