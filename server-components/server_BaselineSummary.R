@@ -19,10 +19,10 @@
 
 # geoinput <- reactiveVal(value = c(county_base$COUNTYFP))
 
-ini_modecolors <- data.frame(
+ini_modecolors2 <- data.frame(
   dms_mode = c("1","2","3","4","5","6","7","8"),
-  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","No Domestic Mode"),  
-  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#3288bd"))
+  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","Non-Domestic Mode"),
+  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#E11111"))
 
 ini_commcolors <- data.frame(commodities = c("Agriculture and Fish",
                                                         "Energy Products", 
@@ -244,6 +244,7 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2017",
 mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
                            ini_modecolors = ini_modecolors,
                            sourceName = sourceName){
+  #browser()
   #arguments: cf_db = Transearch database, yrSelection = Year, flowUnit = Tons or Value,
   #counties = counties selected by the user;
   #modecolors = data frame with two columns ("Mode_Group" and "color") that crosswalks between modes and their color on the graph
@@ -260,14 +261,14 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
     left_join(ini_modecolors)
   
     mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
-      add_pie(values = ~factor_lab,  textinfo='none', labels = ~mode_group, automargin = TRUE, marker = list(colors = ~color, line = list(color = "#595959", width = 1)),
+      add_pie(values = ~factor_lab,  textinfo='none', labels = ~str_wrap(mode_group,14), automargin = TRUE, marker = list(colors = ~color, line = list(color = "#595959", width = 1)),
                                                                  hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"), 
                                                                  text = ~mode_group, key=~mode_group, hole = 0.6, #textfont = list(family = "Arial"), 
                                                                  textposition = "outside") %>%
       layout(#font = list(family = "Arial, "Source Sans Pro", \"Helvetica Neue\", Helvetica, sans-serif", color = "#333"),
         #showlegend = T, autosize = T, 
         annotations = list(text = HTML(paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F,font=list(size = 20))) %>% 
-      layout(legend = list(font = list(size = 20))) %>%
+      layout(legend = list(font = list(size = 16))) %>%
       config(displaylogo = FALSE, 
              modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
              # toImageButtonOptions= list(filename = saveName,

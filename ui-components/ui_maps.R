@@ -51,7 +51,7 @@ ITTS_states_choices <- data.frame(statename=c("Arkansas","Florida","Georgia","Ke
 #   select(-c(STATEFP)) %>%
 #   arrange(statename)
 
-cty_ch= county_choices$GEOID
+cty_ch = county_choices$GEOID
 state_ch = state_choices$GEOID
 port_ch = ports_base$GEOID
 names(port_ch) = ports_base$NAME
@@ -66,7 +66,7 @@ domestic_tab <-
   
   argonTabItem(
     tabName = "maps_tabs",
-    
+
     argonRow(
       
       argonColumn(
@@ -239,14 +239,14 @@ domestic_tab <-
                        tabName = h2('Graphs'),
                        argonRow(
                          width = 12,
-                         argonColumn( width = 6, 
+                         argonColumn( width = 5.5, 
                                       #Flow Direction Graph
-                                      h2("Flow Direction", align = "center"), 
+                                      h2("Flow Direction", align = "left"), 
                                       plotlyOutput("c2s_flowDirection", width = "auto", height = "auto")),
                          
-                         argonColumn( width = 6, 
+                         argonColumn( width = 6.5, 
                                       #Mode Graph
-                                      h2("Domestic Mode", align = "center"), 
+                                      h2("Domestic Mode", align = "left"), 
                                       plotlyOutput("c2s_mode", width = "auto", height = "auto"))
                        ),
                        argonRow(

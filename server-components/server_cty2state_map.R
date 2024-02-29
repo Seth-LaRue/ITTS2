@@ -4,6 +4,9 @@ all_counties_centr_sel_ini_cs=all_counties_centr %>%
 # all_state_centr_sel_ini_cs=all_state_centr %>% 
 #   filter(GEOID=='48453')
 
+#initial datatables -----------------------------------------------------------------------
+
+
 dat_ini_cs <- dat_cs %>%
   filter(origin == '48453'|destination == '48453') %>%
   mutate(dms_imp_exp = if_else(origin == '48453', destination, origin),
@@ -162,6 +165,8 @@ output$odmap_cs <- renderLeaflet({
                            color=pulsecolor_ini_cs))
 })
 
+# reactive
+
 observeEvent(input$cors_opts, {
   
   req(input$cors_opts)
@@ -179,8 +184,6 @@ observeEvent(input$cors_opts, {
   }
   
 },ignoreInit = TRUE)
-
-
 
 observeEvent(input$county_opts_cs, {
   req(input$county_opts_cs)
@@ -1051,10 +1054,11 @@ observe({
   })
   
   output$c2s_mode <- renderPlotly({
+    #browser()
     mode_pie_graph(dat_in,
                    #county = input$county_opts,
                    tons_value_selection = selected_value_cs,
-                   ini_modecolors = ini_modecolors,
+                   ini_modecolors = ini_modecolors2,
                    sourceName = "c2s_mode")
   })
   
