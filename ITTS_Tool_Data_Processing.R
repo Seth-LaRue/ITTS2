@@ -9,11 +9,12 @@ library(fuzzyjoin)
 library(leaflet)
 # Process ITTS Features Data ----
 ## Load data -----
-# base_path = "C:/Users/slarue/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Commodity Flow/"
+ base_path = "C:/Users/qsi/OneDrive - Cambridge Systematics/Commodity Flow/"
 #base_path = "C:/Users/qsi/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Commodity Flow/"
 
 ### load the aggregated commodity groups 
 commodity_group <- read_excel("SETTS_sandbox/GroupedCommodities.xlsx")
+
 state_code <- read_excel("SETTS_sandbox/ZoneLookup.xlsx")
 
 # ### load trade type dictionary

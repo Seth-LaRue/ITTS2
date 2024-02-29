@@ -59,8 +59,6 @@ names(cty_ch)=  county_choices$county_lab
 names(state_ch)= state_choices$NAME
 
 
-
-
 domestic_tab <- 
   
   
@@ -108,7 +106,7 @@ domestic_tab <-
                                       By default the map displays the combined outbound and inbound freight movements by all modes for the selected county/state to all other states in the US. 
                                       The data can be refined further using the 'Inbound/Outbound', 'Mode Type', and 'Commodity' drop down boxes. 
                                       These freight movements are summarized for three vintages 2017, 2020, and 2050 by tonnage or value, 
-                                      any of which can be selected from the 'Freight Measure' drop down box. 
+                                      any of which can be selected from the 'Freight Measure' drop down box. The base year for domestic trade is 2017.
                                       Additionally, the 'Top Partners' slide selector can be used to show only the top X trade partners."
                                           #)
                                    )),
@@ -185,12 +183,9 @@ domestic_tab <-
                                    tags$div(
                                      title = "Select a scenario for freight movement to display on the map",
                                      selectizeInput(inputId = "Scenario_opt_cs", label = "Scenario Options", choices = c('Baseline',
-                                                                                                                         'Scenario 1' = '_s1',
-                                                                                                                         'Scenario 2' = '_s2',
-                                                                                                                         'Scenario 3' = '_s3',
-                                                                                                                         'Scenario 4' = '_s4',
-                                                                                                                         'Scenario 5' = '_s5',
-                                                                                                                         'Scenario 6' = '_s6'),
+                                                                                                                         'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                                                         'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                                                         'Scenario 3: Embrace Technology Transformations' = '_s3'),
                                                     selected = 'Baseline')
                                    )
                        ))), #end of column/row
@@ -218,7 +213,7 @@ domestic_tab <-
                      argonColumn(width = 12,
                                  tags$h2("County/State/Region to State Trade Table"),
                                  tags$p("The table below displays the data for the specific county OR state and filters selected above. 
-                                 The table displays both tonnage and value by all three vintages 2017, 2020, and 2050.
+                                 The table displays both tonnage and value by all three vintages 2017, 2020, and 2050.The base year for domestic trade is 2017.
                                  The table can be downloaded in a CSV file format using the 'Download Data' button below."
                                         #)
                                  )),
@@ -226,6 +221,7 @@ domestic_tab <-
                        width = 12,
                        argonColumn(width=10,h2(textOutput('table_title_cs'))),
                        argonColumn(width = 10, h2(textOutput('scenario_title_cs'))),
+                       argonColumn(width = 10, p(textOutput("scenario_text_output"))),
                        argonColumn(width=2,downloadButton('download_cs','Selected Data')),#, class = "butt_down_cs")),
                        br(),br(),br()
                      ),
@@ -357,12 +353,9 @@ domestic_tab <-
                             tags$div(
                               title = "Select a scenario for freight movement to display on the map",
                               selectInput(inputId = "Scenario_opt", label = "Scenario Options", choices = c('Baseline',
-                                                                                                            'Scenario 1' = '_s1',
-                                                                                                            'Scenario 2' = '_s2',
-                                                                                                            'Scenario 3' = '_s3',
-                                                                                                            'Scenario 4' = '_s4',
-                                                                                                            'Scenario 5' = '_s5',
-                                                                                                            'Scenario 6' = '_s6'),
+                                                                                                            'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                                            'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                                            'Scenario 3: Embrace Technology Transformations' = '_s3'),
                                           selected = 'Baseline')
                             )
                             
@@ -467,7 +460,7 @@ domestic_tab <-
                                       By default the map displays the combined outbound and inbound freight movements 
                                       by all modes for the selected state to international trade regions. 
                                       The freight movements summarized can be refined further using the 'Import/Export' and 'Commodity' drop down boxes. 
-                                      These freight movements are available in three vintages 2017, 2020, and 2050 by tonnage or value, 
+                                      These freight movements are available in two vintages 2019, and 2050 by tonnage or value. The base year for international trade is 2019. 
                                       any of which can be selected from the 'Freight Measure' drop down box. 
                                       Additionally, the 'Top Partners' slide selector can be used to show only the top X trade partners."
                                           #)
@@ -505,7 +498,7 @@ domestic_tab <-
                                                            label='State',
                                                            
                                                            #choices = unique(county_choices$county_lab),
-                                                           choices = state_ch,#cbind(county_choices$county_lab, value = county_choices$GEOID),
+                                                           choices = c(state_ch), #cbind(county_choices$county_lab, value = county_choices$GEOID),
                                                            multiple = F,
                                                            selected = 'Select State',
                                                            #selected = NULL,
@@ -544,12 +537,9 @@ domestic_tab <-
                                    tags$div(
                                      title = "Select a scenario for freight movement to display on the map",
                                      selectInput(inputId = "Scenario_opt_in", label = "Scenario Options", choices = c('Baseline',
-                                                                                                                      'Scenario 1' = '_s1',
-                                                                                                                      'Scenario 2' = '_s2',
-                                                                                                                      'Scenario 3' = '_s3',
-                                                                                                                      'Scenario 4' = '_s4',
-                                                                                                                      'Scenario 5' = '_s5',
-                                                                                                                      'Scenario 6' = '_s6'),
+                                                                                                                      'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                                                      'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                                                      'Scenario 3: Embrace Technology Transformations' = '_s3'),
                                                  selected = 'Baseline')
                                    )
                        ))), #end of column/row

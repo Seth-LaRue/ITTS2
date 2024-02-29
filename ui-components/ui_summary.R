@@ -31,6 +31,14 @@ modes <- c("Truck"="1",
 od <- c("Inbound","Outbound","Within ITTS")
 
 
+scenario_choices <- c(
+  "Baseline" = "s0",
+  "Scenario 1: Respond to Heightened Supply Chain Risks"= "s1",
+  "Scenario 2: Leverage Multi-State Strength"= "s2",
+  "Scenario 3: Embrace Technology Transformations"= "s3"
+)
+
+
 #TAB 1 ---------------
         summary_tab<-argonPage(
           
@@ -135,6 +143,13 @@ od <- c("Inbound","Outbound","Within ITTS")
           argonCard(width = 12, 
                     argonRow(width = 12,h1("Growth year over year", align = 'center')),
                     argonRow(width = 12, p("The total tonnage and value for each chosen scenario for the base and future years.")),
+                    argonRow(width = 12, 
+                             argonColumn(width = 10, p(textOutput("scen_select"))),
+                             argonColumn(width = 10, p(textOutput("state_select"))),
+                             argonColumn(width = 10, p(textOutput("dir_select"))),
+                             argonColumn(width = 10, p(textOutput("mode_select"))),
+                             argonColumn(width = 10, p(textOutput("comm_select")))
+                             ),
                     argonRow(width = 12,
                              argonColumn(width = 6, 
                                          #h2("Tons Growth", align = "center"), 
@@ -223,12 +238,9 @@ od <- c("Inbound","Outbound","Within ITTS")
                                inputId= "stab2_sankey_filt",
                                label = "Scenario(s)",
                                choices = c("Baseline" = "s0",
-                                           "Scenario 1"= "s1",
-                                           "Scenario 2"= "s2",
-                                           "Scenario 3"= "s3",
-                                           "Scenario 4"= "s4",
-                                           "Scenario 5"= "s5",
-                                           "Scenario 6"= "s6")),
+                                           "Scenario 1: Respond to Heightened Supply Chain Risks"= "s1",
+                                           "Scenario 2: Leverage Multi-State Strength"= "s2",
+                                           "Scenario 3: Embrace Technology Transformations"= "s3")),
                              argonColumn(width = 12, 
                                          h2("Commodity Flow Breakdown", align = "center"), 
                                          plotlyOutput("stab2_sankey", width = "auto", height = "auto")

@@ -775,15 +775,16 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
   
   #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
   
-  if(input$cors_opts_in=="p2n"){
-    SETTS_ss_in<-SETTS_ss_in %>%
-      rename('International Region'='NAME')#%>%
-    #filter(rank <= input$n_top_in)
-  } else if(input$cors_opts_in=="s2n"){
-    SETTS_ss_in<-SETTS_ss_in %>%
-      rename('International Region'='NAME') #%>%
-    #filter(rank <= input$n_top_in)
-  }
+  #Qi: not sure why this crash the tool, 
+  # if(input$cors_opts_in=="p2n"){
+  #   SETTS_ss_in<-SETTS_ss_in %>%
+  #     rename('International Region'='NAME')#%>%
+  #   #filter(rank <= input$n_top_in)
+  # } else if(input$cors_opts_in=="s2n"){
+  #   SETTS_ss_in<-SETTS_ss_in %>%
+  #     rename('International Region'='NAME') #%>%
+  #   #filter(rank <= input$n_top_in)
+  # }
   
   
   

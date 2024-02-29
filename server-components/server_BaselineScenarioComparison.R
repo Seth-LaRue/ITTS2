@@ -15,8 +15,11 @@ state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10
 
 scen_colors <- data.frame(
   scenario = c("s0","s1","s2","s3"),
-  scen_name = c("Baseline", "Respond to Heightened Supply Chain Risks","Leverage Multi-State Strength","Embrace Technology Transformations"),
-  scen_color = c("#EE4B2B","#F4BF96","#7752FE","#C2D9FF"),
+  scen_name = c("Baseline",
+                "Scenario 1: Respond to Heightened Supply Chain Risks",
+                "Scenario 2: Leverage Multi-State Strength",
+                "Scenario 3: Embrace Technology Transformations"),
+  scen_color = c("#EE4B2B","#7752FE","#495E57","#99B080"),
   lntype = c("dash","solid","solid","solid"),
   dotmrk = c("square","circle","circle","circle"))
 
@@ -178,6 +181,63 @@ line_plot <- function(df_in, meas = "Tonnage"){
   
 }
 
+observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
+  req(input$stab2_comps, input$stab2_states, input$stab2_OD, input$stab2_mode, input$stab2_commodity)
+  
+  # dynamic text summarize users selection
+  output$scen_select <- renderText({
+    if (length(input$stab2_comps) == 0) {
+      return("No scenarios selected.")
+    }
+    
+    if (length(input$stab2_comps) == 1) {
+      return(paste0("Scenario selected: ", names(scenario_choices)[scenario_choices %in% input$stab2_comps]))
+    } else {
+      return(paste0("Scenarios selected: ", paste(names(scenario_choices)[scenario_choices %in% input$stab2_comps], collapse = ", ")))
+    }
+  })
+  
+  output$state_select <- renderText({
+    if (length(input$stab2_states) == 0) {
+      return("No state selected.")
+    } else if (length(input$stab2_states) == 1) {
+      return(paste0("State selected: ", names(state_ch)[state_ch %in% input$stab2_states]))
+    } else if (length(input$stab2_states) > 1) {
+      return(paste0("States selected: ", paste(names(state_ch)[state_ch %in% input$stab2_states], collapse = "; ")))
+    }
+  })
+  
+  output$dir_select <- renderText({
+    if (length(input$stab2_OD) == 0) {
+      return("No mode selected.")
+    } else if(length(input$stab2_OD) == 1){
+      return(paste0("Direction selected: ", input$stab2_OD))
+    } else if (length(input$stab2_OD) > 1){
+      return(paste0("Directions selected: ", paste(input$stab2_OD, collapse = "; ")))
+    }
+  })
+  
+  output$mode_select <- renderText({
+    if (length(input$stab2_mode) == 0) {
+      return("No mode selected.")
+    } else if(length(input$stab2_mode) == 1){
+      return(paste0("Mode selected: ", names(modes)[modes %in% input$stab2_mode]))
+    } else if (length(input$stab2_mode) > 1){
+      return(paste0("Modes selected: ", paste(names(modes)[modes %in% input$stab2_mode], collapse = "; ")))
+    }
+  })
+  
+  output$comm_select <- renderText({
+    if(length(input$stab2_commodity) == 1){
+      return(paste0("Commodity selected: ", input$stab2_commodity))
+    } else if (length(input$stab2_commodity) > 1){
+      return(paste("Commodities selected: ", paste(input$stab2_commodity, collapse = ", ")))
+    }
+  })
+})
+
+
+
   output$stab2_line_tons <- renderPlotly({
     #browser()
     req(stab2_data())
@@ -204,9 +264,6 @@ line_plot <- function(df_in, meas = "Tonnage"){
     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
                                       "s2_tons","s2_value",
                                       "s3_tons","s3_value",
-                                      "s4_tons","s4_value",
-                                      "s5_tons","s5_value",
-                                      "s6_tons","s6_value",
                                       "s0_tons","s0_value")),
                  names_sep = "_",
                  names_to = c("scenario","measure", "year"),
@@ -554,9 +611,6 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2017', sourceName = sourc
 #     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
 #                                       "s2_tons","s2_value",
 #                                       "s3_tons","s3_value",
-#                                       "s4_tons","s4_value",
-#                                       "s5_tons","s5_value",
-#                                       "s6_tons","s6_value",
 #                                       "s0_tons","s0_value")),
 #                  names_sep = "_",
 #                  names_to = c("scenario","measure", "year"),
@@ -671,18 +725,27 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   ),
   
   link = list(
-    source = c(source_1t2_full$index1-1,
-               source_2t3_full$index2-1
-               ),
-    target = c(source_1t2_full$index2-1,
-               source_2t3_full$index3-1
-               ),
-    value =  c(source_1t2_full$value-1,
-               source_2t3_full$value-1
-               )#,
-    #label =  blabs
+    source = c(source_1t2_full$index1-1, source_2t3_full$index2-1),
+    target = c(source_1t2_full$index2-1, source_2t3_full$index3-1),
+    value = c(source_1t2_full$value-1, source_2t3_full$value-1),
+    label = paste("Tonnage: ", source_1t2_full$value, "\n")
   )
-  ) 
+  )
+  
+  #browser()
+  # Add annotations for labels
+  # snkey <- snkey %>%
+  #   add_annotations(
+  #     x = c(0.1, 0.9),
+  #     y = c(0.5, 0.5),
+  #     text = c(paste0("Tonnage: ", source_1t2_full$value),
+  #              paste0("Tonnage: ", sum(source_2t3_full$value))),
+  #     showarrow = FALSE,
+  #     font = list(size = 14),
+  #     xref = "paper",
+  #     yref = "paper"
+  #   )
+  
   
 return(snkey)
   }

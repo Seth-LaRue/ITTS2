@@ -9,14 +9,14 @@ library(sf)
 library(shinyjs)
 library(DT)
 #library(shinyalert)
-library(rgdal)
+#library(rgdal)
 library(leaflet.extras)
 library(shinyWidgets)
 #library(leafgl)
 #library(leaflet.extras2)
 library(plotly)
 library(data.table)
-
+library(networkD3)
 #Initialize Data ----
 # 
 # dat_old <- read.csv('data/cnty2cnty_feature_v2.csv', colClass = c("character","character","character",
@@ -34,6 +34,7 @@ library(data.table)
 # dat_sin_old <- read.csv('data/states2international_feature.csv', colClass = c("character","character","character",
 #                                                                           "character","character",
 #                                                                           rep("numeric",4)))
+load("ITTS_Hatch.RData")
 
 #
 
@@ -89,8 +90,8 @@ all_selected <- rbind(all_selected,international_base)
 
 
 # this is for hatch pattern on ITTS and SE_hatch
-ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
-SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
+# ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
+# SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
 
 
 remove(ITTS_boundary)
