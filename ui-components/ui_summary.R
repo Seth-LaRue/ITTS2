@@ -162,6 +162,13 @@ scenario_choices <- c(
                     argonRow(width = 12,h1("Percent Growth")),
                     argonRow(width = 12, p("This section compares the percent growth for key measures from the base (2019) and future year (2050) by tonnage on the right and value on the left.
                                            The first row of graph compares the growth for each mode and the second each commodity selected above. Each dot represents a scenario with a higher growth for that scenario the further right the dot is on the line.")),
+                    argonRow(width = 12, 
+                             argonColumn(width = 10, p(textOutput("scen_select_pw"))),
+                             argonColumn(width = 10, p(textOutput("state_select_pw"))),
+                             argonColumn(width = 10, p(textOutput("dir_select_pw"))),
+                             argonColumn(width = 10, p(textOutput("mode_select_pw"))),
+                             argonColumn(width = 10, p(textOutput("comm_select_pw")))
+                    ),
                     argonRow(width = 12,h2("Percent Growth by State")),
                     argonRow(width = 12,
                              argonColumn(width = 6, 
@@ -198,6 +205,13 @@ scenario_choices <- c(
           argonCard(width = 12, 
                     argonRow(width = 12, h1("Trends by year")),
                     argonRow(width = 12, p("This section shows the total amount of tonnage (left) and value (right) for different measures (mode, direction, and commodity) for the selected year, see below.")),
+                    argonRow(width = 12, 
+                             argonColumn(width = 10, p(textOutput("scen_select_ty"))),
+                             argonColumn(width = 10, p(textOutput("state_select_ty"))),
+                             argonColumn(width = 10, p(textOutput("dir_select_ty"))),
+                             argonColumn(width = 10, p(textOutput("mode_select_ty"))),
+                             argonColumn(width = 10, p(textOutput("comm_select_ty")))
+                    ),
                     argonRow(width = 12, 
                     argonColumn(width = 2,
                                          tags$div(

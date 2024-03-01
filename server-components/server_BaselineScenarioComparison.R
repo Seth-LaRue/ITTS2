@@ -121,7 +121,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
   req(input$stab2_comps, input$stab2_states, input$stab2_OD, input$stab2_mode, input$stab2_commodity)
   
   # dynamic text summarize users selection
-  output$scen_select <- renderText({
+  output$scen_select_ty <- output$scen_select_pw <- output$scen_select <- renderText({
     if (length(input$stab2_comps) == 0) {
       return("No scenarios selected.")
     }
@@ -133,7 +133,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     }
   })
   
-  output$state_select <- renderText({
+  output$state_select_ty <- output$state_select_pw <- output$state_select <- renderText({
     if (length(input$stab2_states) == 0) {
       return("No state selected.")
     } else if (length(input$stab2_states) == 1) {
@@ -143,7 +143,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     }
   })
   
-  output$dir_select <- renderText({
+  output$dir_select_ty <- output$dir_select_pw <- output$dir_select <- renderText({
     if (length(input$stab2_OD) == 0) {
       return("No mode selected.")
     } else if(length(input$stab2_OD) == 1){
@@ -153,7 +153,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     }
   })
   
-  output$mode_select <- renderText({
+  output$mode_select_ty <- output$mode_select_pw <- output$mode_select <- renderText({
     if (length(input$stab2_mode) == 0) {
       return("No mode selected.")
     } else if(length(input$stab2_mode) == 1){
@@ -163,7 +163,7 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
     }
   })
   
-  output$comm_select <- renderText({
+  output$comm_select_ty <- output$comm_select_pw <- output$comm_select <- renderText({
     if(length(input$stab2_commodity) == 1){
       return(paste0("Commodity selected: ", input$stab2_commodity))
     } else if (length(input$stab2_commodity) > 1){
