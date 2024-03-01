@@ -19,24 +19,26 @@ library(data.table)
 library(networkD3)
 #Initialize Data ----
 # 
-# dat <- read.csv('data/cnty2cnty_feature_v2.csv', colClass = c("character","character","character",
+# dat_old <- read.csv('data/cnty2cnty_feature_v2.csv', colClass = c("character","character","character",
 #                                                       "character",rep("numeric",6)))
-# dat_cs <- read.csv('data/cnty2state_feature_v2.csv', colClass = c("character","character","character",
+# dat_cs_old <- read.csv('data/cnty2state_feature_v2.csv', colClass = c("characteor","character","character",
 #                                                           "character",
 #                                                           rep("numeric",6)))
-# dat_ss <- read.csv('data/state2state_feature_v2.csv', colClass = c("character","character","character",
+# dat_ss_old <- read.csv('data/state2state_feature_v2.csv', colClass = c("character","character","character",
 #                                                            "character",
 #                                                            rep("numeric",6)))
-# dat_pin <- read.csv('data/ports2international_feature.csv', colClass = c("character","character","character",
+# dat_pin_old <- read.csv('data/ports2international_feature.csv', colClass = c("character","character","character",
 #                                                                   "character","character",
 #                                                                   rep("numeric",4)))
 # 
-# dat_sin <- read.csv('data/states2international_feature.csv', colClass = c("character","character","character",
+# dat_sin_old <- read.csv('data/states2international_feature.csv', colClass = c("character","character","character",
 #                                                                           "character","character",
 #                                                                           rep("numeric",4)))
 load("ITTS_Hatch.RData")
 
 #
+
+#Remove or incorporate into rdata file ------------
   dat_cs[,5:ncol(dat_cs)] <- lapply(dat_cs[,5:ncol(dat_cs)] ,as.numeric)
 
 colnames(dat)[colnames(dat) %in% c("dms_orig", 'dms_dest')] = c("origin",'destination')
@@ -97,16 +99,28 @@ remove(SE_boundary)
 remove(other_states)
 
 
+#Source scripts ---- same as orig
 source("gral_parameters.R")
 source("ini_map_load.R")
-source('function/scenario_process.R')
+source('function/scenario_process.R') #this is new
 #Load modules ----
 source('ui-components/ui_welcome.R', encoding = "utf8")
 source('ui-components/ui_maps.R', encoding = "utf8")
 source('ui-components/ui_summary.R', encoding = "utf8")
 source('ui-components/ui_resources.R', encoding = "utf8")
 
+#This was missing ----
+show_waiter_message <- function(){
+  runjs('$("#waiter-message" ).removeClass(\'d-none\');')
+  runjs('$("#waiter-inner-content" ).removeClass(\'d-none\');')
+  runjs('$("#loading_ongoing" ).removeClass(\'d-none\');')
+  runjs('$("#loading_ongoing").show();')
+  runjs('$("#waiter-message").show();')
+}
 
+flush_waiter_message <- function(){
+  runjs('$("#waiter-message").hide()')
+}
 
 #UI ----
 ui <- fluidPage(
@@ -135,36 +149,51 @@ ui <- fluidPage(
           text-align: center;
         }"
     ),
-    
-    # tags$script(
-    #   '$("#tabset_maps-ITTSCountytoCountyTrade").on("click", function() { $("#odmap").trigger("shown"); });'
-    # )
-    
-    tags$script(
-      '$("#tabset_maps-ITTSCountytoCountyTrade\").click(function(){
-                                      $("#odmap").trigger("shown");
-                                     });'
-    )
-    
-    # runjs(code = '$("#tabset_maps-ITTSCountytoCountyTrade\").click(function(){
-    #                                   $("#odmap").trigger("shown");
-    #                                  });')
-    
-    
+
+    tags$script(HTML("
+    $(document).ready(function() {
+      var counter = 0;
+      var interval = setInterval(function() {
+        counter++;
+        $('#counter').text(counter + ' seconds');
+        if (counter >= 60) {
+          clearInterval(interval);
+        }
+      }, 1000);
+    });
+  ")),
+  
+  tags$link(rel = "icon", href = "commodity-flow-icon.svg", type = "image/x-icon")
+  
+  
   ),
   useShinyjs(),
-  
+  tags$div(id = "waiter-message", class = "overlay-message d-none",
+           div(class = 'inner-content d-none', 
+               id = 'waiter-inner-content',
+               fluidRow(class = 'start_loader',
+                        div(id = 'loading')),
+               fluidRow(class = "start_loader mt-1",
+                        h1("Loading..."),
+               )
+           )
+  ),
   div(id = "loading-content", class = "overlay-message",
       div(class = 'inner-content',
-    fluidRow(class = 'start_loader',
-             div(id = 'loading')),
-    fluidRow(class = "start_loader",
-      h1("Loading the application")
-    ),
-    fluidRow(class = "start_loader",
-      h3("This shouldn't take too long")
-    )
-  )),
+          fluidRow(class = 'start_loader',
+                   div(id = 'loading')),
+          fluidRow(class = "start_loader mt-1",
+                   h1("Loading the application")
+          ),
+          fluidRow(class = "start_loader",
+                   h3("This should take approximately 20-40 seconds.")
+          ),
+          fluidRow(class = "start_loader",
+                   h4("Elapsed time:  "),
+                   h4(id = "counter", "0 seconds")
+          )
+      )),
+  
   
   argonDashPage(
     title = "SETTS data visualization tool",
@@ -200,16 +229,10 @@ ui <- fluidPage(
           style = "text-align:left",
           icon = icon("atom"),
           "Scenario Analyzer"
-        ),
-        argonSidebarItem(
-          tabName = "resources_tab",
-          style = "text-align:left",
-          icon = img(src='commodity-flow-icon.svg', align = "left", class ="sidebar-icon"),
-          "Resources"
         )
       ),
       argonSidebarDivider(),
-      argonSidebarHeader(title = "Version 0.0.004")
+      argonSidebarHeader(title = "Version 1.0.000")
     ),
     
     header = 
@@ -257,27 +280,35 @@ ui <- fluidPage(
 #Server ----
 server <- function(input, output, session) {
 
-  main_tables <- reactiveValues(table = NULL)
+  #main_tables <- reactiveValues(table = NULL)#What is this for?
   
   
-  onFlushed(function() {
-   hide(id = "loading-content", anim = TRUE, animType = "fade")
-    runjs('$("body").css("overflow", "auto")')
-    runjs('$("#loading-content").css("opacity", .8)')
-    
-    
-    runjs('$("#tab-maps_tabs\").click()')
-    runjs('$("#tabset_maps-ITTSCountytoCountyTrade\").click()')
-    runjs('$("#tabset_maps-ITTSInternationalTrade\").click()')
-    runjs('$("#tab-welcome_tab\").click()')
-    
+  onFlush(function(){
+    print('this ran also')
+    runjs('
+          $("#tab-maps_tabs").click();
+          $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click();
+          //$("#tabset_maps-ITTSInternationalTrade-tab").click();
+          $("#tabset_maps-ITTSCountytoCountyTrade-tab").click();
 
+          $("#tabset_maps-ITTSCountytoCountyTrade-tab").click(function(){$("#odmap").trigger("shown");});
+          $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click(function(){$("#odmap_cs").trigger("shown");});
+          $("#tabset_maps-ITTSInternationalTrade-tab").click(function(){$("#odmap_in").trigger("shown");});
+
+          ')
+    flush_waiter_message()
   })
   
-  # runjs(code = '$("#tabset_maps-ITTSCountytoCountyTrade\").click(function(){
-  #                                     $("#odmap").trigger("shown");
-  #                                    });')
-  
+  onFlushed(function() {
+    print('this ran')
+    runjs('
+          document.querySelector("#tabset_maps-ITTSInternationalTrade").classList.remove("active");
+          document.querySelector("#tabset_maps-ITTSCountyStatetoStateTrade").classList.remove("active");
+          $("#tab-welcome_tab").click();
+          $("body").css("overflow", "auto");
+          ')
+    hide(id = "loading-content", anim = TRUE, animType = "fade")
+  })
 
   
   ##################################################################
@@ -285,7 +316,7 @@ server <- function(input, output, session) {
   source('server-components/server_cty2cty_map.R', local = TRUE)
   source('server-components/server_cty2state_map.R', local = TRUE)
   source('server-components/server_intn_map.R', local = TRUE)
-  source('server-components/server_BaselineSummary.R', local = TRUE)
+  #source('server-components/server_BaselineSummary.R', local = TRUE)
   source('server-components/server_BaselineScenarioComparison.R', local = TRUE)
   
   

@@ -51,7 +51,7 @@ scenario_choices <- c(
             
             column(12,
                    h1("Scenario Comparison"),
-                   p("This tab is to help users compare differences between the scenarios. Please select which commodities, directions, modes, and scenarios you would like to see data for and press the button to the right to run the analysis."))),
+                   p("This tab is to help users compare differences between the scenarios. Please select which commodities, directions, modes, and scenarios you would like to see displayed and press the button to the right to run the analysis."))),
           #First Card w inputs/button --------------
           argonCard(width = 12,
                     argonRow(width = 12,
@@ -61,10 +61,13 @@ scenario_choices <- c(
                                            pickerInput(
                                              inputId= "stab2_comps",
                                              label = "Scenario(s)",
-                                             choices = scenario_choices,
+                                             choices = c("Baseline" = "s0",
+                                                         "Respond to Heightened Supply Chain Risks"= "s1",
+                                                         "Leverage Multi-State Strength"= "s2",
+                                                         "Embrace Technology Transformations"= "s3"),
                                              multiple = TRUE,
                                              options = list(
-                                               size = 7,
+                                               size = 4,
                                                title = "Please select the Scenario(s) to compare",
                                                'actions-box' = TRUE,
                                                'selected-text-format' = "count > 1"
@@ -76,7 +79,7 @@ scenario_choices <- c(
                                            #title = "Select States(s) for comparison",
                                            pickerInput(inputId = "stab2_states", 
                                                        label = "State(s)", 
-                                                       choices = state_ch,
+                                                       choices = c("All States" = "99", state_ch),
                                                        multiple = TRUE,
                                                        options = list(
                                                          size = 7,
