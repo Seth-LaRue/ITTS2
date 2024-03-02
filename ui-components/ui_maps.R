@@ -85,7 +85,8 @@ domestic_tab <-
           size = "sm",
           
           width = 12, 
-          
+
+#ITTS County/State/Region to State Trade: TOP-----------------------------------
           argonTab(tabName = "ITTS County/State/Region to State Trade",
                    active = T,
                    
@@ -173,10 +174,10 @@ domestic_tab <-
                                    tags$div(
                                      title = "Select a measurement of freight movement to display on the map",
                                      selectInput(inputId = "Value_opts_cs",label = "Freight Measure", choices = c("Tons 2017"="tons_2017",
-                                                                                                                  "Tons 2020" = "tons_2020",
+                                                                                                                  "Tons 2022" = "tons_2022",
                                                                                                                   "Tons 2050" = "tons_2050",
                                                                                                                   "Value 2017" = "value_2017",
-                                                                                                                  "Value 2020" = "value_2020",
+                                                                                                                  "Value 2022" = "value_2022",
                                                                                                                   "Value 2050" = "value_2050"),
                                                  selected ='value_2017')),
                                    
@@ -190,7 +191,8 @@ domestic_tab <-
                                    )
                        ))), #end of column/row
                    
-                   ## QI SI 
+#ITTS County/State/Region to State Trade: BOTTOM--------------------------------
+                   
                    argonCard(
                      width = 12,
                      argonTabSet(
@@ -264,7 +266,7 @@ domestic_tab <-
                                      plotlyOutput("c2s_cf_topOutbound",width = "auto", height = "auto"))
                        )))
           )), #end county to state tab
-          
+#ITTS County to County Trade: TOP  ---------------------------------------------
           argonTab(
             tabName = "ITTS County to County Trade",
             
@@ -343,10 +345,10 @@ domestic_tab <-
                             tags$div(
                               title = "Select a measurement of freight movement to display on the map",
                               selectInput(inputId = "Value_opts", label = "Freight Measure", choices = c("Tons 2017"="tons_2017",
-                                                                                                         "Tons 2020" = "tons_2020",
+                                                                                                         "Tons 2022" = "tons_2022",
                                                                                                          "Tons 2050" = "tons_2050",
                                                                                                          "Value 2017" = "value_2017",
-                                                                                                         "Value 2020" = "value_2020",
+                                                                                                         "Value 2022" = "value_2022",
                                                                                                          "Value 2050" = "value_2050"),
                                           selected ='value_2017')
                             ),
@@ -360,6 +362,7 @@ domestic_tab <-
                             )
                             
                 ))), #end of map and inputs card
+#ITTS County to County Trade: BOTTOM  ---------------------------------------------
             
             argonCard(
               width = 12,
@@ -435,186 +438,187 @@ domestic_tab <-
                               h2("Top 10 Outbound Trading Partners", align = "center"),
                               plotlyOutput("c2c_cf_topOutbound",width = "auto", height = "auto"))
                 ))
-          ))),
+          ))) #, #<- you need to uncomment this for international
           
-        
-          argonTab(tabName = "ITTS International Trade", 
-                   #using in as a suffix
-                   argonCard(
-                     width = 12,
-                     
-                     argonRow(
-                       width = 12,
-                       center = TRUE,
-                       argonColumn(width = 12,
-                                   #argonCard(width =12,
-                                   tags$h2("Port/State to International Trade Map"),
-                                   tags$p("This tab displays US Trade Online data for freight movements between the ITTS member states 
-                                      (as well as other southern states in the region) and international trade regions.  
-                                      The 'Focus Map on' filter allows you to switch between selecting ports OR states as the basis for summarizing the data. 
-                                      A specific port or state can be selected by clicking on the map or choosing from the drop down box to the right. 
-                                      When focusing on Ports, only the mode type handled by the port is being shown;
-                                      the 'Mode Type' drop down box can be used to only disply ports of that mode type e.g. only airports. 
-                                      When focusing on states, the 'Mode Type' is used to select which freight movements involing the selected state are summarized,
-                                      selecting 'All' will combine all modes together. 
-                                      By default the map displays the combined outbound and inbound freight movements 
-                                      by all modes for the selected state to international trade regions. 
-                                      The freight movements summarized can be refined further using the 'Import/Export' and 'Commodity' drop down boxes. 
-                                      These freight movements are available in two vintages 2019, and 2050 by tonnage or value. The base year for international trade is 2019. 
-                                      any of which can be selected from the 'Freight Measure' drop down box. 
-                                      Additionally, the 'Top Partners' slide selector can be used to show only the top X trade partners."
-                                          #)
-                                   )),
-                       argonColumn(width = 10,
-                                   tags$div(
-                                     class = "map-container",
-                                     tags$div(
-                                       id = "leafletBusy",
-                                       class = "map-loading",
-                                       tags$p("Loading Map...")
-                                     ),
-                                     leafletOutput('odmap_in',height = map_height*1.3)
-                                   )
-                       ),
-                       
-                       argonColumn(width = 2,
-                                   
-                                   tags$div(title = "Switch between Port to/from International to State to/from State", #start switch
-                                            
-                                            prettyRadioButtons(
-                                              inputId = "cors_opts_in",
-                                              label = "Focus Map on:", 
-                                              choices = c("Port" = "p2n", "State" = "s2n"),
-                                              selected= c("State" = "s2n"),
-                                              inline = TRUE, 
-                                              shape='round',
-                                              status = "info",
-                                              fill = TRUE
-                                            )
-                                   ), #end
-                                   
-                                   tags$div(title = "Select Port/State for analysis.", #startdiv
-                                            selectizeInput('county_opts_in',
-                                                           label='State',
-                                                           
-                                                           #choices = unique(county_choices$county_lab),
-                                                           choices = c(state_ch), #cbind(county_choices$county_lab, value = county_choices$GEOID),
-                                                           multiple = F,
-                                                           selected = 'Select State',
-                                                           #selected = NULL,
-                                                           options = list(
-                                                             placeholder = 'Select State', 
-                                                             searchField = c('NAME','county_lab','statename', 'GEOID')
-                                                           )
-                                            )),#end div
-                                   tags$div( #startdiv
-                                     title = "Select whether the Port/State of analysis is treated as an origin, destination, or, if outbound and inbound movements should be combined, select Both",
-                                     selectInput(inputId = "OD_opts_in", label = "Import/Export", choices = od_in)
-                                   ), #enddiv
-                                   
-                                   tags$div(
-                                     title = "Select the a mode of transport to filter the analysis by or All. Note: Border Crossing include values measurements but tonnage measurements are not known.",
-                                     selectInput(inputId = 'dms_mode_opts_in',label = 'Mode Type',choices =c("All" = "All",modes_int))
-                                   ),
-                                   
-                                   tags$div(
-                                     title = "Select the commodity to filter the analysis by or All",
-                                     selectInput(inputId = 'sctg2_opts_in',label = 'Commodity',choices = c("All"="All", commodities))
-                                   ),
-                                   
-                                   tags$div(
-                                     title = "Select the number of top counties to highlight on the map",
-                                     sliderInput(inputId = 'n_top_in', label = 'Top Partners',min = 0, max = 8, value = 8)
-                                   ),
-                                   
-                                   tags$div(
-                                     title = "Select a measurement of freight movement to display on the map",
-                                     selectInput(inputId = "Value_opts_in",label = "Freight Measure", choices = c("Tons 2019"="tons_2019",
-                                                                                                                  "Tons 2021" = "tons_2021",
-                                                                                                                  "Value 2019" = "value_2019",
-                                                                                                                  "Value 2021" = "value_2021"),
-                                                 selected ='value_2019')),
-                                   tags$div(
-                                     title = "Select a scenario for freight movement to display on the map",
-                                     selectInput(inputId = "Scenario_opt_in", label = "Scenario Options", choices = c('Baseline',
-                                                                                                                      'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
-                                                                                                                      'Scenario 2: Leverage Multi-State Strength' = '_s2',
-                                                                                                                      'Scenario 3: Embrace Technology Transformations' = '_s3'),
-                                                 selected = 'Baseline')
-                                   )
-                       ))), #end of column/row
-                   
-                   argonCard(
-                     width = 12,
-                     argonTabSet(
-                       width = 12, 
-                       
-                       card_wrapper = TRUE,
-                       
-                       horizontal = TRUE,
-                       
-                       size = "sm",
-                       
-                       
-                       id = "in_tab",
-                     argonTab(
-                       active = T,
-                       width = 12,
-                       tabName = h2('Port/State to International Trade  Table'),
-                     argonColumn(width = 12,
-                                 #argonCard(width =12,
-                                 tags$h2("Port/State to International Trade Table"),
-                                 tags$p("The table below displays the data for the specific port OR state and filters selected above. 
-                                 The table displays both tonnage and value by all three vintages 2017, 2020, and 2050.
-                                 The table can be downloaded in a CSV file format using the 'Download Data' button below."
-                                        #)
-                                 )),
-                     argonRow(
-                       width = 12,
-                       argonColumn(width=10,h2(textOutput('table_title_in'))),
-                       argonColumn(width = 10, h2(textOutput('scenario_title_in'))),
-                       argonColumn(width=2,downloadButton('download_in','Selected Data')),#, class = "butt_down_cs")),
-                       br(),br(),br()
-                     ),
-                     
-                     argonRow(
-                       width = 12,
-                       DT::dataTableOutput("subsetSETTS_in")
-                     )),
-                     argonTab(
-                       width = 12,
-                       tabName = h2('Graphs'),
-                       argonRow(
-                         width = 12,
-                         argonColumn( width = 6, 
-                                      #Flow Direction Graph
-                                      h2("Flow Direction", align = "center"), 
-                                      plotlyOutput("in_flowDirection", width = "auto", height = "auto")),
-                         
-                         argonColumn( width = 6, 
-                                      #Mode Graph
-                                      h2("International Mode", align = "center"), 
-                                      plotlyOutput("in_mode", width = "auto", height = "auto"))
-                       ),
-                       argonRow(
-                         width = 12,
-                         argonColumn(
-                           width = 12,
-                           # commodity graph
-                           h2("Commodity Type", align = 'center'),
-                           plotlyOutput("in_cf_commodity", width = "auto", height = 'auto'))),
-                       argonRow(
-                         width = 12,
-                         argonColumn(width = 6,
-                                     #Top Import
-                                     h2("Top Import Trading Partners",align = "center"),
-                                     plotlyOutput("in_cf_topInbound",width = "auto", height = "auto")),
-                         argonColumn(width = 6,
-                                     #Top Export
-                                     h2("Top Export Trading Partners", align = "center"),
-                                     plotlyOutput("in_cf_topOutbound",width = "auto", height = "auto"))
-                       )))
-          )) #end int tab
+#ITTS International Trade: TOP--------------------------------------------------
+# 
+#           argonTab(tabName = "ITTS International Trade", 
+#                    #using in as a suffix
+#                    argonCard(
+#                      width = 12,
+#                      
+#                      argonRow(
+#                        width = 12,
+#                        center = TRUE,
+#                        argonColumn(width = 12,
+#                                    #argonCard(width =12,
+#                                    tags$h2("Port/State to International Trade Map"),
+#                                    tags$p("This tab displays US Trade Online data for freight movements between the ITTS member states 
+#                                       (as well as other southern states in the region) and international trade regions.  
+#                                       The 'Focus Map on' filter allows you to switch between selecting ports OR states as the basis for summarizing the data. 
+#                                       A specific port or state can be selected by clicking on the map or choosing from the drop down box to the right. 
+#                                       When focusing on Ports, only the mode type handled by the port is being shown;
+#                                       the 'Mode Type' drop down box can be used to only disply ports of that mode type e.g. only airports. 
+#                                       When focusing on states, the 'Mode Type' is used to select which freight movements involing the selected state are summarized,
+#                                       selecting 'All' will combine all modes together. 
+#                                       By default the map displays the combined outbound and inbound freight movements 
+#                                       by all modes for the selected state to international trade regions. 
+#                                       The freight movements summarized can be refined further using the 'Import/Export' and 'Commodity' drop down boxes. 
+#                                       These freight movements are available in two vintages 2019, and 2050 by tonnage or value. The base year for international trade is 2019. 
+#                                       any of which can be selected from the 'Freight Measure' drop down box. 
+#                                       Additionally, the 'Top Partners' slide selector can be used to show only the top X trade partners."
+#                                           #)
+#                                    )),
+#                        argonColumn(width = 10,
+#                                    tags$div(
+#                                      class = "map-container",
+#                                      tags$div(
+#                                        id = "leafletBusy",
+#                                        class = "map-loading",
+#                                        tags$p("Loading Map...")
+#                                      ),
+#                                      leafletOutput('odmap_in',height = map_height*1.3)
+#                                    )
+#                        ),
+#                        
+#                        argonColumn(width = 2,
+#                                    
+#                                    tags$div(title = "Switch between Port to/from International to State to/from State", #start switch
+#                                             
+#                                             prettyRadioButtons(
+#                                               inputId = "cors_opts_in",
+#                                               label = "Focus Map on:", 
+#                                               choices = c("Port" = "p2n", "State" = "s2n"),
+#                                               selected= c("State" = "s2n"),
+#                                               inline = TRUE, 
+#                                               shape='round',
+#                                               status = "info",
+#                                               fill = TRUE
+#                                             )
+#                                    ), #end
+#                                    
+#                                    tags$div(title = "Select Port/State for analysis.", #startdiv
+#                                             selectizeInput('county_opts_in',
+#                                                            label='State',
+#                                                            
+#                                                            #choices = unique(county_choices$county_lab),
+#                                                            choices = c(state_ch), #cbind(county_choices$county_lab, value = county_choices$GEOID),
+#                                                            multiple = F,
+#                                                            selected = 'Select State',
+#                                                            #selected = NULL,
+#                                                            options = list(
+#                                                              placeholder = 'Select State', 
+#                                                              searchField = c('NAME','county_lab','statename', 'GEOID')
+#                                                            )
+#                                             )),#end div
+#                                    tags$div( #startdiv
+#                                      title = "Select whether the Port/State of analysis is treated as an origin, destination, or, if outbound and inbound movements should be combined, select Both",
+#                                      selectInput(inputId = "OD_opts_in", label = "Import/Export", choices = od_in)
+#                                    ), #enddiv
+#                                    
+#                                    tags$div(
+#                                      title = "Select the a mode of transport to filter the analysis by or All. Note: Border Crossing include values measurements but tonnage measurements are not known.",
+#                                      selectInput(inputId = 'dms_mode_opts_in',label = 'Mode Type',choices =c("All" = "All",modes_int))
+#                                    ),
+#                                    
+#                                    tags$div(
+#                                      title = "Select the commodity to filter the analysis by or All",
+#                                      selectInput(inputId = 'sctg2_opts_in',label = 'Commodity',choices = c("All"="All", commodities))
+#                                    ),
+#                                    
+#                                    tags$div(
+#                                      title = "Select the number of top counties to highlight on the map",
+#                                      sliderInput(inputId = 'n_top_in', label = 'Top Partners',min = 0, max = 8, value = 8)
+#                                    ),
+#                                    
+#                                    tags$div(
+#                                      title = "Select a measurement of freight movement to display on the map",
+#                                      selectInput(inputId = "Value_opts_in",label = "Freight Measure", choices = c("Tons 2019"="tons_2019",
+#                                                                                                                   "Tons 2021" = "tons_2021",
+#                                                                                                                   "Value 2019" = "value_2019",
+#                                                                                                                   "Value 2021" = "value_2021"),
+#                                                  selected ='value_2019')),
+#                                    tags$div(
+#                                      title = "Select a scenario for freight movement to display on the map",
+#                                      selectInput(inputId = "Scenario_opt_in", label = "Scenario Options", choices = c('Baseline',
+#                                                                                                                       'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+#                                                                                                                       'Scenario 2: Leverage Multi-State Strength' = '_s2',
+#                                                                                                                       'Scenario 3: Embrace Technology Transformations' = '_s3'),
+#                                                  selected = 'Baseline')
+#                                    )
+#                        ))), #end of column/row
+#                    
+#                    argonCard(
+#                      width = 12,
+#                      argonTabSet(
+#                        width = 12, 
+#                        
+#                        card_wrapper = TRUE,
+#                        
+#                        horizontal = TRUE,
+#                        
+#                        size = "sm",
+#                        
+#                        
+#                        id = "in_tab",
+#                      argonTab(
+#                        active = T,
+#                        width = 12,
+#                        tabName = h2('Port/State to International Trade  Table'),
+#                      argonColumn(width = 12,
+#                                  #argonCard(width =12,
+#                                  tags$h2("Port/State to International Trade Table"),
+#                                  tags$p("The table below displays the data for the specific port OR state and filters selected above. 
+#                                  The table displays both tonnage and value by all three vintages 2017, 2020, and 2050.
+#                                  The table can be downloaded in a CSV file format using the 'Download Data' button below."
+#                                         #)
+#                                  )),
+#                      argonRow(
+#                        width = 12,
+#                        argonColumn(width=10,h2(textOutput('table_title_in'))),
+#                        argonColumn(width = 10, h2(textOutput('scenario_title_in'))),
+#                        argonColumn(width=2,downloadButton('download_in','Selected Data')),#, class = "butt_down_cs")),
+#                        br(),br(),br()
+#                      ),
+#                      
+#                      argonRow(
+#                        width = 12,
+#                        DT::dataTableOutput("subsetSETTS_in")
+#                      )),
+#                      argonTab(
+#                        width = 12,
+#                        tabName = h2('Graphs'),
+#                        argonRow(
+#                          width = 12,
+#                          argonColumn( width = 6, 
+#                                       #Flow Direction Graph
+#                                       h2("Flow Direction", align = "center"), 
+#                                       plotlyOutput("in_flowDirection", width = "auto", height = "auto")),
+#                          
+#                          argonColumn( width = 6, 
+#                                       #Mode Graph
+#                                       h2("International Mode", align = "center"), 
+#                                       plotlyOutput("in_mode", width = "auto", height = "auto"))
+#                        ),
+#                        argonRow(
+#                          width = 12,
+#                          argonColumn(
+#                            width = 12,
+#                            # commodity graph
+#                            h2("Commodity Type", align = 'center'),
+#                            plotlyOutput("in_cf_commodity", width = "auto", height = 'auto'))),
+#                        argonRow(
+#                          width = 12,
+#                          argonColumn(width = 6,
+#                                      #Top Import
+#                                      h2("Top Import Trading Partners",align = "center"),
+#                                      plotlyOutput("in_cf_topInbound",width = "auto", height = "auto")),
+#                          argonColumn(width = 6,
+#                                      #Top Export
+#                                      h2("Top Export Trading Partners", align = "center"),
+#                                      plotlyOutput("in_cf_topOutbound",width = "auto", height = "auto"))
+#                        )))
+#           )) #end int tab
           
           
         ) #end tab set

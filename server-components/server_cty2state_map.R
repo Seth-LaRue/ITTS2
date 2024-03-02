@@ -13,10 +13,10 @@ dat_ini_cs <- dat_cs %>%
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
   summarise(tons_2017 = sum(tons_2017), 
-            tons_2020 = sum(tons_2020),
+            tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
             value_2017 = sum(value_2017),
-            value_2020 = sum(value_2020),
+            value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
             ) %>%
   ungroup() %>%
@@ -28,10 +28,10 @@ dat_ini_ss <- dat_ss %>%
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
   summarise(tons_2017 = sum(tons_2017), 
-            tons_2020 = sum(tons_2020),
+            tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
             value_2017 = sum(value_2017),
-            value_2020 = sum(value_2020),
+            value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
   ) %>%
   ungroup() %>%
@@ -46,10 +46,10 @@ dat_ini_rs <- dat_ss %>%
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
   summarise(tons_2017 = sum(tons_2017), 
-            tons_2020 = sum(tons_2020),
+            tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
             value_2017 = sum(value_2017),
-            value_2020 = sum(value_2020),
+            value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
   ) %>%
   ungroup() %>%
@@ -63,10 +63,10 @@ dat_ini_se <- dat_ss %>%
          GEOID = dms_imp_exp) %>%
   group_by(dms_imp_exp, GEOID)%>%
   summarise(tons_2017 = sum(tons_2017),
-            tons_2020 = sum(tons_2020),
+            tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
             value_2017 = sum(value_2017),
-            value_2020 = sum(value_2020),
+            value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
   ) %>%
   ungroup() %>%
@@ -282,10 +282,10 @@ data_ss_click_cs<- reactive({
       dat_temp_cs = dat_temp_cs %>%
         group_by(origin, destination, GEOID)%>%
         summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
-                  tons_2020 = sum(tons_2020),
+                  tons_2022 = sum(tons_2022),
                   tons_2050 = sum(tons_2050),
                   value_2017 = sum(value_2017),
-                  value_2020 = sum(value_2020),
+                  value_2022 = sum(value_2022),
                   value_2050 = sum(value_2050)
                   ) %>%
         ungroup()
@@ -335,10 +335,10 @@ data_ss_click_cs<- reactive({
              GEOID = dms_imp_exp) %>% 
       group_by(dms_imp_exp, GEOID)%>%
       summarise(tons_2017 = sum(tons_2017), 
-                tons_2020 = sum(tons_2020),
+                tons_2022 = sum(tons_2022),
                 tons_2050 = sum(tons_2050),
                 value_2017 = sum(value_2017),
-                value_2020 = sum(value_2020),
+                value_2022 = sum(value_2022),
                 value_2050 = sum(value_2050)
                 ) %>%
       ungroup()
@@ -885,10 +885,10 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   SETTS_ss_cs<-SETTS_ss_cs %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
     rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-           'Tons 2020</br>(Thousand Tons)'='tons_2020',
+           'Tons 2022</br>(Thousand Tons)'='tons_2022',
            'Tons 2050</br>(Thousand Tons)'='tons_2050',
            'Value 2017</br>($Million)'='value_2017',
-           'Value 2020</br>($Million)'='value_2020',
+           'Value 2022</br>($Million)'='value_2022',
            'Value 2050</br>($Million)'='value_2050')
   names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))] <- str_to_title(gsub("_"," ",names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))]))
   
@@ -982,10 +982,10 @@ observe({
     SETTS_ss_cs<-SETTS_ss_cs %>%
       mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>%
       rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-             'Tons 2020</br>(Thousand Tons)'='tons_2020',
+             'Tons 2022</br>(Thousand Tons)'='tons_2022',
              'Tons 2050</br>(Thousand Tons)'='tons_2050',
              'Value 2017</br>($Million)'='value_2017',
-             'Value 2020</br>($Million)'='value_2020',
+             'Value 2022</br>($Million)'='value_2022',
              'Value 2050</br>($Million)'='value_2050')
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
     SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs

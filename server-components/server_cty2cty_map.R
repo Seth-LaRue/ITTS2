@@ -14,10 +14,10 @@ dat_ini <- dat %>%
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>%
   summarise(tons_2017 = sum(tons_2017), 
-            tons_2020 = sum(tons_2020),
+            tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
             value_2017 = sum(value_2017),
-            value_2020 = sum(value_2020),
+            value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)) %>%
   ungroup() %>%
   mutate(rank = rank(desc(value_2017)))
@@ -207,10 +207,10 @@ data_ss_click<- reactive({
       dat_temp = dat_temp %>%
         group_by(origin, destination, GEOID)%>%
         summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
-                  tons_2020 = sum(tons_2020),
+                  tons_2022 = sum(tons_2022),
                   tons_2050 = sum(tons_2050),
                   value_2017 = sum(value_2017),
-                  value_2020 = sum(value_2020),
+                  value_2022 = sum(value_2022),
                   value_2050 = sum(value_2050)) %>%
         ungroup()
       selected_col = input$Value_opts
@@ -303,10 +303,10 @@ data_ss_click<- reactive({
              GEOID = dms_imp_exp) %>% #you actually don't need this could just group by lineid, but then the map is missing
       group_by(dms_imp_exp, GEOID)%>%
       summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
-                tons_2020 = sum(tons_2020),
+                tons_2022 = sum(tons_2022),
                 tons_2050 = sum(tons_2050),
                 value_2017 = sum(value_2017),
-                value_2020 = sum(value_2020),
+                value_2022 = sum(value_2022),
                 value_2050 = sum(value_2050)) %>%
       ungroup()
     selected_col = input$Value_opts
@@ -603,10 +603,10 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     SETTS_ss<-SETTS_ss %>%
       mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
       rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-             'Tons 2020</br>(Thousand Tons)'='tons_2020',
+             'Tons 2022</br>(Thousand Tons)'='tons_2022',
              'Tons 2050</br>(Thousand Tons)'='tons_2050',
              'Value 2017</br>($Million)'='value_2017',
-             'Value 2020</br>($Million)'='value_2020',
+             'Value 2022</br>($Million)'='value_2022',
              'Value 2050</br>($Million)'='value_2050')
     names(SETTS_ss)[grepl('_',names(SETTS_ss))] <- str_to_title(gsub("_"," ",names(SETTS_ss)[grepl('_',names(SETTS_ss))]))
       #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
@@ -691,10 +691,10 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   SETTS_ss<-SETTS_ss %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
     rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-           'Tons 2020</br>(Thousand Tons)'='tons_2020',
+           'Tons 2022</br>(Thousand Tons)'='tons_2022',
            'Tons 2050</br>(Thousand Tons)'='tons_2050',
            'Value 2017</br>($Million)'='value_2017',
-           'Value 2020</br>($Million)'='value_2020',
+           'Value 2022</br>($Million)'='value_2022',
            'Value 2050</br>($Million)'='value_2050')
   
   SETTS_ss <- SETTS_ss %>% rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 

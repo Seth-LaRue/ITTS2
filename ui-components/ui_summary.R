@@ -220,10 +220,10 @@ scenario_choices <- c(
                                          tags$div(
                                            title = "Select a measurement of freight movement to display on the map",
                                            selectInput(inputId = "stab2_value_opts", label = "Freight Measure", choices = c("Tons 2017"="tons_2017",
-                                                                                                                            "Tons 2020" = "tons_2020",
+                                                                                                                            "Tons 2022" = "tons_2022",
                                                                                                                             "Tons 2050" = "tons_2050",
                                                                                                                             "Value 2017" = "value_2017",
-                                                                                                                            "Value 2020" = "value_2020",
+                                                                                                                            "Value 2022" = "value_2022",
                                                                                                                             "Value 2050" = "value_2050"),
                                                        selected ='value_2017'))
                                          
