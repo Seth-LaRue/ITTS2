@@ -42,8 +42,8 @@ ini_international <- data.frame(
 #   print('working')
 #   browser()})
 
-stab2_data <- eventReactive(input$stab2_mainbutt, {
- 
+stab2_data <- reactive({
+ #browser()
 return<-dat_cs %>% 
     #state filter
     mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>%
@@ -57,36 +57,8 @@ return<-dat_cs %>%
     
     #filter the simple ones
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
-    filter(dms_mode %in% input$stab2_mode) %>%
+    filter(dms_mode %in% input$stab2_mode)
     
-    #make scenarios
-    mutate(s1_tons_2017 = 1.22*tons_2017,
-           s1_tons_2022 = 1.663*tons_2022,
-           s1_tons_2050 = 1.455*tons_2050,
-           s2_tons_2017 = 1.54*tons_2017,
-           s2_tons_2022 = 1.633*tons_2022,
-           s2_tons_2050 = 1.72*tons_2050) %>%
-    mutate(s1_value_2017 = 1.80*value_2017,
-           s1_value_2022 = 1.91*value_2022,
-           s1_value_2050 = 2*value_2050,
-         s2_value_2017 = 2.12*value_2017,
-         s2_value_2022 = 2.21*value_2022,
-         s2_value_2050 = 2.32*value_2050) %>%
-  mutate(s3_tons_2017 = 1.35*tons_2017,
-         s3_tons_2022 = 1.54*tons_2022,
-         s3_tons_2050 = 2*tons_2050,
-         s3_value_2017 = 2.45*value_2017,
-         s3_value_2022 = 2.56*value_2022,
-         s3_value_2050 = 2.6*value_2050) %>%
-    rename(s0_tons_2017 = tons_2017,
-           s0_tons_2022 = tons_2022,
-           s0_tons_2050 = tons_2050,
-           s0_value_2017 = value_2017,
-           s0_value_2022 = value_2022,
-           s0_value_2050 = value_2050) %>%
-    #filter scenarios
-    select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) 
-
 if("99" %in% input$stab2_states){
   add_row<-dat_cs %>% 
     #state filter
@@ -99,90 +71,48 @@ if("99" %in% input$stab2_states){
     filter(direction %in% input$stab2_OD) %>% 
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
     filter(dms_mode %in% input$stab2_mode) %>%
-    mutate(s1_tons_2017 = 1.22*tons_2017,
-           s1_tons_2022 = 1.663*tons_2022,
-           s1_tons_2050 = 1.455*tons_2050,
-           s2_tons_2017 = 1.54*tons_2017,
-           s2_tons_2022 = 1.633*tons_2022,
-           s2_tons_2050 = 1.72*tons_2050) %>%
-    mutate(s1_value_2017 = 1.80*value_2017,
-           s1_value_2022 = 1.91*value_2022,
-           s1_value_2050 = 2*value_2050,
-           s2_value_2017 = 2.12*value_2017,
-           s2_value_2022 = 2.21*value_2022,
-           s2_value_2050 = 2.32*value_2050) %>%
-    mutate(s3_tons_2017 = 1.35*tons_2017,
-           s3_tons_2022 = 1.54*tons_2022,
-           s3_tons_2050 = 2*tons_2050,
-           s3_value_2017 = 2.45*value_2017,
-           s3_value_2022 = 2.56*value_2022,
-           s3_value_2050 = 2.6*value_2050) %>%
-    rename(s0_tons_2017 = tons_2017,
-           s0_tons_2022 = tons_2022,
-           s0_tons_2050 = tons_2050,
-           s0_value_2017 = value_2017,
-           s0_value_2022 = value_2022,
-           s0_value_2050 = value_2050) %>% 
-    group_by(origin, destination, direction, Grouped_sctg2, dms_mode) %>%
-    summarise(s1_tons_2017 = sum(s1_tons_2017,na.rm=T),
-              s1_tons_2022 = sum(s1_tons_2022,na.rm=T),
-              s1_tons_2050 = sum(s1_tons_2050,na.rm=T),
-              s2_tons_2017 = sum(s2_tons_2017,na.rm=T),
-              s2_tons_2022 = sum(s2_tons_2022,na.rm=T),
-              s2_tons_2050 = sum(s2_tons_2050,na.rm=T),
-              s1_value_2017 = sum(s1_value_2017,na.rm=T),
-              s1_value_2022 = sum(s1_value_2022,na.rm=T),
-              s1_value_2050 = sum(s1_value_2050,na.rm=T),
-              s2_value_2017 = sum(s2_value_2017,na.rm=T),
-              s2_value_2022 = sum(s2_value_2022,na.rm=T),
-              s2_value_2050 = sum(s2_value_2050,na.rm=T),
-              s3_tons_2017 = sum(s3_tons_2017,na.rm=T),
-              s3_tons_2022 = sum(s3_tons_2022,na.rm=T),
-              s3_tons_2050 = sum(s3_tons_2050,na.rm=T),
-              s3_value_2017 = sum(s3_value_2017,na.rm=T),
-              s3_value_2022 = sum(s3_value_2022,na.rm=T),
-              s3_value_2050 = sum(s3_value_2050,na.rm=T),
-              s0_tons_2017 = sum(s0_tons_2017,na.rm=T),
-              s0_tons_2022 = sum(s0_tons_2022,na.rm=T),
-              s0_tons_2050 = sum(s0_tons_2050,na.rm=T),
-              s0_value_2017 = sum(s0_value_2017,na.rm=T),
-              s0_value_2022 = sum(s0_value_2022,na.rm=T),
-              s0_value_2050 = sum(s0_value_2050,na.rm=T)) %>%
-    mutate(state = "99000") %>%
-    select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) 
-    
+    mutate(state = "99000")
+
     return <- return %>% rbind(add_row)
 }
+
+#add scenarios
+curr = unique(c(return$origin[nchar(return$origin)==5], return$destination[nchar(return$destination)==5]))
+return <- process_scenario_v3(dat_temp_cs = return, #the filtered datatable
+                    Scenario_opt_cs = input$stab2_comps, #scenario selection
+                    curr = curr, #select which are the basis of imports and exports
+                    all_flag = 1 #not sure which one
+                    )
+
+return <- return %>% 
+  rename(tons_2017_s0 = tons_2017,
+         tons_2022_s0 = tons_2022,
+         tons_2050_s0 = tons_2050,
+         value_2017_s0 = value_2017,
+         value_2022_s0 = value_2022,
+          value_2050_s0 = value_2050) #%>%
+  # mutate(tons_2022_s1 = tons_2022_s0,
+  #        tons_2022_s2 = tons_2022_s0,
+  #        tons_2022_s3 = tons_2022_s0,
+  #        value_2022_s1 = value_2022_s0,
+  #        value_2022_s2 = value_2022_s0,
+  #        value_2022_s3 = value_2022_s0) %>%
+  # mutate(tons_2017_s1 = tons_2017_s0,
+  #        tons_2017_s2 = tons_2017_s0,
+  #        tons_2017_s3 = tons_2017_s0,
+  #        value_2017_s1 = value_2017_s0,
+  #        value_2017_s2 = value_2017_s0,
+  #        value_2017_s3 = value_2017_s0)  %>%
+  # select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) 
+
   return(return)
-  })
-
-
-#lineplots --------
-line_plot <- function(df_in, meas = "Tonnage"){
-
-  df_temp <- df_in %>% mutate(year = as.numeric(year)) %>%
-    left_join(scen_colors)
-  
-  lplot <- plot_ly(df_temp, x = ~year, y = ~value, type = 'scatter', mode = 'lines', 
-                   color = ~I(scen_color),
-                   linetype = ~I(lntype),
-                   name = ~scen_name,
-                   hovertemplate = paste0('Year: %{x}<br>', 
-                                         meas, 
-                                         ':%{y:.2s} <br>')) %>%
-    layout(xaxis = list(title = 'Year'),
-           yaxis = list(title = meas, separatethousands= TRUE)) %>%
-    config(displayModeBar = FALSE)
-  if(meas == "Value USD"){
-    lplot<-lplot %>% layout(yaxis = list(title = meas, tickformat = "$~s"))
-  }
-  
-  return(lplot)
-  
-}
+  }) %>% 
+  bindCache(input$stab2_states, input$stab2_OD, input$stab2_commodity, input$stab2_mode) %>%
+  bindEvent(input$stab2_mainbutt)
 
 observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
   req(input$stab2_comps, input$stab2_states, input$stab2_OD, input$stab2_mode, input$stab2_commodity)
+  print("RUNNING SCEN_COMP: selection text")
   
   # dynamic text summarize users selection
   output$scen_select_ty <- output$scen_select_pw <- output$scen_select <- renderText({
@@ -237,36 +167,68 @@ observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
 })
 
 
+#lineplots --------
+line_plot <- function(df_in, meas = "Tonnage"){
 
-  output$stab2_line_tons <- renderPlotly({
-    #browser()
-    req(stab2_data())
+  df_temp <- df_in %>% mutate(year = as.numeric(year)) %>%
+    left_join(scen_colors)
+  
+  lplot <- plot_ly(df_temp, x = ~year, y = ~value, type = 'scatter', mode = 'lines', 
+                   color = ~I(scen_color),
+                   linetype = ~I(lntype),
+                   name = ~scen_name,
+                   hovertemplate = paste0('Year: %{x}<br>', 
+                                         meas, 
+                                         ':%{y:.2s} <br>')) %>%
+    layout(xaxis = list(title = 'Year'),
+           yaxis = list(title = meas, separatethousands= TRUE)) %>%
+    config(displayModeBar = FALSE)
+  if(meas == "Value USD"){
+    lplot<-lplot %>% layout(yaxis = list(title = meas, tickformat = "$~s"))
+  }
+  
+  return(lplot)
+  
+}
+
+output$stab2_line_tons <- renderPlotly({
+  req(stab2_data())
+  print("RUNNING SCEN_COMP: tonnage lineplot")
     df_temp <- stab2_data() %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s3_value",
-                                        "s0_tons","s0_value")),
+      mutate(tons_2022_s1 = tons_2022_s0,
+                     tons_2022_s2 = tons_2022_s0,
+                     tons_2022_s3 = tons_2022_s0,
+                     value_2022_s1 = value_2022_s0,
+                     value_2022_s2 = value_2022_s0,
+                     value_2022_s3 = value_2022_s0) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
-                   names_to = c("scenario","measure", "year"),
-                   values_to = "value") %>%
+                   names_to = c("measure","year", "scenario"),
+                   values_to = "value") %>% 
       filter(measure == "tons") %>%
       group_by(scenario, year) %>%
-      summarise(value = sum(value)) %>% ungroup()
+      summarise(value = sum(value,na.rm = T)) %>% ungroup()
     
     line_plot(df_temp, meas = "Tonnage")
   })
   
   
-  output$stab2_line_value <- renderPlotly({
-
-    req(stab2_data())
+output$stab2_line_value <- renderPlotly({
+  req(stab2_data())
+  print("RUNNING SCEN_COMP: value lineplot")
+  
     df_temp <- stab2_data() %>%
-    pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                      "s2_tons","s2_value",
-                                      "s3_tons","s3_value",
-                                      "s0_tons","s0_value")),
+      mutate(tons_2022_s1 = tons_2022_s0,
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                  names_sep = "_",
-                 names_to = c("scenario","measure", "year"),
+                 names_to = c("measure","year", "scenario"),
                  values_to = "value") %>%
     filter(measure == "value") %>%
     group_by(scenario, year) %>%
@@ -304,48 +266,53 @@ dot_plot <- function(df_in, meas = "Tonnage"){
 
   output$stab2_tons_state_growth_dotplot <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: tonnage state dot")
     
     df_temp <- stab2_data() %>%
+      mutate(tons_2017_s1 = tons_2017_s0,
+             tons_2017_s2 = tons_2017_s0,
+             tons_2017_s3 = tons_2017_s0,
+             value_2017_s1 = value_2017_s0,
+             value_2017_s2 = value_2017_s0,
+             value_2017_s3 = value_2017_s0)  %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(state) %>%
       summarise_if(is.numeric, sum) %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value"
-      )),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
       names_sep = "_",
-      names_to = c("scenario","measure", "year"),
+      names_to = c("measure","year", "scenario"),
       values_to = "value") %>%
       pivot_wider(id_cols = c(state,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
-      group_by(state, measure, scenario) %>%
+      group_by(state, measure, scenario) %>% 
       summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
       filter(measure == "tons") %>%
       left_join(state_join) %>%
       rename(label = state_lab)
     
-    dot_plot(df_temp) })
+    dot_plot(df_temp) 
+    })
 
   output$stab2_value_state_growth_dotplot <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: tonnage value state dot")
     
     df_temp <- stab2_data() %>%
+      mutate(tons_2017_s1 = tons_2017_s0,
+             tons_2017_s2 = tons_2017_s0,
+             tons_2017_s3 = tons_2017_s0,
+             value_2017_s1 = value_2017_s0,
+             value_2017_s2 = value_2017_s0,
+             value_2017_s3 = value_2017_s0)  %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(state) %>%
       summarise_if(is.numeric, sum) %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value"
-      )),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
       names_sep = "_",
-      names_to = c("scenario","measure", "year"),
+      names_to = c("measure","year", "scenario"),
       values_to = "value") %>%
       pivot_wider(id_cols = c(state,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(state, measure, scenario) %>%
@@ -359,55 +326,60 @@ dot_plot <- function(df_in, meas = "Tonnage"){
 
   output$stab2_tons_mode_growth_dotplot <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: tonnage mode dot")
     
     df_temp <- stab2_data() %>%
+      mutate(tons_2017_s1 = tons_2017_s0,
+             tons_2017_s2 = tons_2017_s0,
+             tons_2017_s3 = tons_2017_s0,
+             value_2017_s1 = value_2017_s0,
+             value_2017_s2 = value_2017_s0,
+             value_2017_s3 = value_2017_s0)  %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(dms_mode) %>%
       summarise_if(is.numeric, sum) %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value"
-      )),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
       names_sep = "_",
-      names_to = c("scenario","measure", "year"),
+      names_to = c("measure","year", "scenario"),
       values_to = "value") %>%
       pivot_wider(id_cols = c(dms_mode,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(dms_mode, measure, scenario) %>%
       summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
       filter(measure == "tons") %>%
-      left_join(ini_modecolors) %>%
+      left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
       rename(label = mode_group)
+    
     dot_plot(df_temp) 
     
     })
 
   output$stab2_value_mode_growth_dotplot <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: tonnage value dot")
     
     df_temp <- stab2_data() %>%
+      mutate(tons_2017_s1 = tons_2017_s0,
+             tons_2017_s2 = tons_2017_s0,
+             tons_2017_s3 = tons_2017_s0,
+             value_2017_s1 = value_2017_s0,
+             value_2017_s2 = value_2017_s0,
+             value_2017_s3 = value_2017_s0)  %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(dms_mode) %>%
       summarise_if(is.numeric, sum) %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value"
-      )),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
       names_sep = "_",
-      names_to = c("scenario","measure", "year"),
+      names_to = c("measure","year", "scenario"),
       values_to = "value") %>%
       pivot_wider(id_cols = c(dms_mode,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(dms_mode, measure, scenario) %>%
       summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
       filter(measure == "value") %>%
-      left_join(ini_modecolors) %>%
+      left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
       rename(label = mode_group)
     
     dot_plot(df_temp, meas = "Value USD") 
@@ -416,21 +388,23 @@ dot_plot <- function(df_in, meas = "Tonnage"){
   
   output$stab2_tons_com_growth_dotplot <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: tonnage com dot")
     
     df_temp <- stab2_data() %>%
+      mutate(tons_2017_s1 = tons_2017_s0,
+             tons_2017_s2 = tons_2017_s0,
+             tons_2017_s3 = tons_2017_s0,
+             value_2017_s1 = value_2017_s0,
+             value_2017_s2 = value_2017_s0,
+             value_2017_s3 = value_2017_s0)  %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(Grouped_sctg2) %>%
       summarise_if(is.numeric, sum) %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value"
-      )),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
       names_sep = "_",
-      names_to = c("scenario","measure", "year"),
+      names_to = c("measure","year", "scenario"),
       values_to = "value") %>%
       pivot_wider(id_cols = c(Grouped_sctg2,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(Grouped_sctg2, measure, scenario) %>%
@@ -444,22 +418,24 @@ dot_plot <- function(df_in, meas = "Tonnage"){
 
   output$stab2_value_com_growth_dotplot <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: value com dot")
     
     #browser()
     df_temp <- stab2_data() %>%
-      filter(nchar(origin) == 5) %>%
-      mutate(state = str_sub(origin,1,2)) %>%
+      mutate(tons_2017_s1 = tons_2017_s0,
+             tons_2017_s2 = tons_2017_s0,
+             tons_2017_s3 = tons_2017_s0,
+             value_2017_s1 = value_2017_s0,
+             value_2017_s2 = value_2017_s0,
+             value_2017_s3 = value_2017_s0)  %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      #filter(nchar(origin) == 5) %>%
+      #mutate(state = str_sub(origin,1,2)) %>%
       group_by(Grouped_sctg2) %>%
       summarise_if(is.numeric, sum) %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value"
-      )),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
       names_sep = "_",
-      names_to = c("scenario","measure", "year"),
+      names_to = c("measure","year", "scenario"),
       values_to = "value") %>%
       pivot_wider(id_cols = c(Grouped_sctg2,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(Grouped_sctg2, measure, scenario) %>%
@@ -499,21 +475,16 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2017', sourceName = sourc
 
   output$stab2_mode_bar <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: mode bar")
     
     
     dir_temp <- stab2_data() %>%
       filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s3_value",
-                                        "s4_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value")),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
-                   names_to = c("scenario","measure", "year"),
-                   values_to = "value") %>%
-      left_join(ini_modecolors) %>%
+                   names_to = c("measure","year", "scenario"),
+                   values_to = "value") %>% 
+      left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
       filter(measure == stringr::str_split(input$stab2_value_opts, "_")[[1]][1]) %>%
       filter(year == stringr::str_split(input$stab2_value_opts, "_")[[1]][2]) %>%
       group_by(mode_group, scenario) %>%
@@ -530,18 +501,13 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2017', sourceName = sourc
 
   output$stab2_dir_bar <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: direction bar")
     
     
     dir_temp <- stab2_data() %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s3_value",
-                                        "s4_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value")),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
-                   names_to = c("scenario","measure", "year"),
+                   names_to = c("measure","year", "scenario"),
                    values_to = "value") %>%
       filter(measure == stringr::str_split(input$stab2_value_opts, "_")[[1]][1]) %>%
       filter(year == stringr::str_split(input$stab2_value_opts, "_")[[1]][2])
@@ -560,17 +526,12 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2017', sourceName = sourc
 
   output$stab2_com_bar <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: com bar")
     
     dir_temp <- stab2_data() %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s3_value",
-                                        "s4_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value")),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
-                   names_to = c("scenario","measure", "year"),
+                   names_to = c("measure","year", "scenario"),
                    values_to = "value") %>%
       filter(measure == stringr::str_split(input$stab2_value_opts, "_")[[1]][1]) %>%
       filter(year == stringr::str_split(input$stab2_value_opts, "_")[[1]][2])
@@ -588,52 +549,11 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2017', sourceName = sourc
     
   })
   
-# #slope charts ----------
-# slope_chart <- function(df_in, meas = "tons"){
-# 
-# 
-#   lplot <- plot_ly(df_in, x = ~scen_name, 
-#                    y = ~com_rank, type = 'scatter', mode = 'lines+markers', color = ~Grouped_sctg2, line = list(shape = 'hvh')) %>%
-#     layout(yaxis = list(title = 'Rank',
-#                         nticks = 13,
-#                         tick0 = 1,
-#                         dtick = 1),
-#            xaxis = list(title = '')) %>%
-#     config(displayModeBar = FALSE)
-# 
-#   return(lplot)
-# 
-# }
-# 
-# observeEvent(ignoreInit = TRUE, input$stab2_mainbutt, {
-# 
-#   df_temp <- stab2_data() %>%
-#     pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-#                                       "s2_tons","s2_value",
-#                                       "s3_tons","s3_value",
-#                                       "s0_tons","s0_value")),
-#                  names_sep = "_",
-#                  names_to = c("scenario","measure", "year"),
-#                  values_to = "value") %>%
-#     filter(measure == stringr::str_split(input$stab2_value_opts, "_")[[1]][1]) %>%
-#     filter(year == stringr::str_split(input$stab2_value_opts, "_")[[1]][2]) %>%
-#     group_by(Grouped_sctg2, scenario) %>%
-#     summarise(value = sum(value)) %>%
-#     ungroup() %>% left_join(scen_colors) %>%
-#     mutate(rand = sample(0:2, n(), replace = TRUE)) %>%
-#     group_by(scen_name) %>%
-#     mutate(com_rank = rank(value*rand)) %>% ungroup() %>%
-#     #filter(com_rank <= 5) %>%
-#     select(scen_name, value, Grouped_sctg2, com_rank)
-#   output$stab2_top_coms <- renderPlotly({
-#    slope_chart(df_temp)
-#     })
-# })
 
 #saney diagram-----------
 
 sankey_diagram <- function(df_in, meas = "Tonnage"){
-
+  
   blabs <- c("Alabama", "Arkansas", "Florida", "Georgia", "Kentucky",
              "Louisiana", "Mississippi", "Missouri", "North Carolina", "South Carolina",
              "Tennessee", "Texas", "Virginia",
@@ -686,12 +606,14 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   link_1t2 <- df_in %>% 
     #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>%
     left_join(state_join) %>% rename(source1 = state_lab) %>%
-    left_join(ini_modecolors) %>% rename(source2 = mode_group) %>%
+    left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
+    rename(source2 = mode_group) %>%
     group_by(source1, source2) %>% summarise(value = sum(value))
   
 
   link_2t3 <- df_in %>%
-    left_join(ini_modecolors) %>% rename(source2 = mode_group) %>%
+    left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
+    rename(source2 = mode_group) %>%
     rename(source3 = Grouped_sctg2) %>%
     group_by(source2, source3) %>% summarise(value = sum(value))
   
@@ -752,16 +674,12 @@ return(snkey)
 
   output$stab2_sankey <- renderPlotly({
     req(stab2_data())
+    print("RUNNING SCEN_COMP: sankey")
+    
     dat_temp<-stab2_data() %>%
-      pivot_longer(cols = starts_with(c("s1_tons","s1_value",
-                                        "s2_tons","s2_value",
-                                        "s3_tons","s3_value",
-                                        "s4_tons","s4_value",
-                                        "s5_tons","s5_value",
-                                        "s6_tons","s6_value",
-                                        "s0_tons","s0_value")),
+      pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
-                   names_to = c("scenario","measure", "year"),
+                   names_to = c("measure","year", "scenario"),
                    values_to = "value") %>%
       filter(measure == stringr::str_split(input$stab2_value_opts, "_")[[1]][1]) %>%
       filter(year == stringr::str_split(input$stab2_value_opts, "_")[[1]][2]) %>%

@@ -61,10 +61,10 @@ scenario_choices <- c(
                                            pickerInput(
                                              inputId= "stab2_comps",
                                              label = "Scenario(s)",
-                                             choices = c("Baseline" = "s0",
-                                                         "Respond to Heightened Supply Chain Risks"= "s1",
-                                                         "Leverage Multi-State Strength"= "s2",
-                                                         "Embrace Technology Transformations"= "s3"),
+                                             choices = c("Baseline" = "_s0",
+                                                         "Respond to Heightened Supply Chain Risks"= "_s1",
+                                                         "Leverage Multi-State Strength"= "_s2",
+                                                         "Embrace Technology Transformations"= "_s3"),
                                              multiple = TRUE,
                                              options = list(
                                                size = 4,

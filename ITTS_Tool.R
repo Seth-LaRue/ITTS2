@@ -43,10 +43,10 @@ library(networkD3)
 #load("ITTS_Initial_Data_03012024_v1_1.Rdata")
 
 
-#Source scripts ---- same as orig
+#Source scripts ----
 source("gral_parameters.R")
 source("ini_map_load.R")
-source('function/scenario_process.R') #this is new
+source('function/scenario_process_v3.R')
 #Load modules ----
 source('ui-components/ui_welcome.R', encoding = "utf8")
 source('ui-components/ui_maps.R', encoding = "utf8")
