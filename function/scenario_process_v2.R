@@ -1,6 +1,6 @@
 #county to county and state to county/state
 process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col_list, all_flag){
-ratio <- read.csv('/ratio_2017.csv')
+ratio <- read.csv('ratio_2017.csv')
   # data_temp_cs: the filtered datatable
   # Value_opts_cs: which value/tonnage year is selected
   # curr: the geography selection 

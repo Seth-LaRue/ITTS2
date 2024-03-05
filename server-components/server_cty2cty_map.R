@@ -13,14 +13,12 @@ dat_ini <- dat %>%
   mutate(dms_imp_exp = if_else(origin == '48453', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>%
-  summarise(tons_2017 = sum(tons_2017), 
-            tons_2022 = sum(tons_2022),
+  summarise(tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
-            value_2017 = sum(value_2017),
             value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)) %>%
   ungroup() %>%
-  mutate(rank = rank(desc(value_2017)))
+  mutate(rank = rank(desc(value_2022)))
 
 ln_select_ini <- county_selected %>%
   select(GEOID,county_lab) %>%
@@ -35,7 +33,7 @@ observeEvent(input$county_opts, {
   cnty = county_selected$GEOID[county_selected$GEOID == input$county_opts]
   
   click_counties$curr <- cnty
-
+  
 })
 
 observeEvent(input$odmap_shape_click, {
@@ -51,21 +49,18 @@ observeEvent(input$odmap_shape_click, {
   
   
   updateSelectizeInput(session, 'county_opts', choices = cty_ch, selected = c(cnty, value = val), server = TRUE)#cbind(county_choices, value = county_choices$GEOID), selected = c(cnty, value = val), server = TRUE)
-
   
-  })
+  
+})
 
 observeEvent(input$Value_opts,{
-  if(grepl('2017',input$Value_opts)){
+  if(grepl('2022',input$Value_opts)){
     updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else if (grepl(c('2020','2050'),input$Value_opts)) {
+  } else if (grepl(c('2050'),input$Value_opts)) {
     updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline',
-                                                                                             'Scenario 1' = '_s1',
-                                                                                             'Scenario 2' = '_s2',
-                                                                                             'Scenario 3' = '_s3',
-                                                                                             'Scenario 4' = '_s4',
-                                                                                             'Scenario 5' = '_s5',
-                                                                                             'Scenario 6' = '_s6'),
+                                                                                          'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                          'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                          'Scenario 3: Embrace Technology Transformations' = '_s3'),
                          selected = 'Baseline',server = TRUE)
   }
 })
@@ -73,22 +68,22 @@ observeEvent(input$Value_opts,{
 
 output$odmap <- renderLeaflet({
   
-  pal_factor_ini <- colorQuantile(palette = "Blues",domain = ln_select_ini$value_2017,probs = seq(0, 1, .2))
+  pal_factor_ini <- colorQuantile(palette = "Blues",domain = ln_select_ini$value_2022,probs = seq(0, 1, .2))
   pulsecolor_ini='red'
   
-  pal_factor_colors_ini <- unique(pal_factor_ini(sort(ln_select_ini$value_2017)))
-  pal_factor_labs_ini <- round(quantile(round(ln_select_ini$value_2017, 1), probs = seq(0, 1, .2)), 1)
+  pal_factor_colors_ini <- unique(pal_factor_ini(sort(ln_select_ini$value_2022)))
+  pal_factor_labs_ini <- round(quantile(round(ln_select_ini$value_2022, 1), probs = seq(0, 1, .2)), 1)
   pal_factor_labs_ini <- paste(scales::comma(lag(pal_factor_labs_ini)), scales::comma(pal_factor_labs_ini), sep = " - ")[-1]
   
   con_name_ini=county_selected$county_lab[county_selected$GEOID == '48453']
-  titl_ini = paste0("Inbound & Outbound to </br>", con_name_ini, " county </br>", str_replace(str_to_title('value_2017'),'_',' '), " ($Million)")
+  titl_ini = paste0("Inbound & Outbound to </br>", con_name_ini, " county </br>", str_replace(str_to_title('value_2022'),'_',' '), " ($Million)")
   
   
   
   m %>%
     addPolygons(data = ln_select_ini,
                 layerId = ~paste(ln_select_ini$GEOID),
-                fillColor = ~pal_factor_ini(value_2017),
+                fillColor = ~pal_factor_ini(value_2022),
                 stroke=TRUE,
                 smoothFactor = 0.3,
                 color = cty_border_color,#~hili,
@@ -202,47 +197,45 @@ data_ss_click<- reactive({
     # 
     if(input$sctg2_opts == "All" | input$dms_mode_opts == "All"){
       
-      if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
-  
-      dat_temp = dat_temp %>%
-        group_by(origin, destination, GEOID)%>%
-        summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
-                  tons_2022 = sum(tons_2022),
-                  tons_2050 = sum(tons_2050),
-                  value_2017 = sum(value_2017),
-                  value_2022 = sum(value_2022),
-                  value_2050 = sum(value_2050)) %>%
-        ungroup()
-      selected_col = input$Value_opts
-      
+      if(input$Scenario_opt == 'Baseline' |grepl('2022',input$Value_opts)){
+        
+        dat_temp = dat_temp %>%
+          group_by(origin, destination, GEOID)%>%
+          summarise(tons_2022 = sum(tons_2022),
+                    tons_2050 = sum(tons_2050),
+                    value_2022 = sum(value_2022),
+                    value_2050 = sum(value_2050)) %>%
+          ungroup()
+        selected_col = input$Value_opts
+        
       } else{
         dat_temp = process_scenario(dat_temp,
-                                       input$Value_opts,
-                                       input$Scenario_opt,
-                                       click_counties$curr,
-                                       c('origin', 'destination', 'GEOID'),
-                                       1)
+                                    input$Value_opts,
+                                    input$Scenario_opt,
+                                    click_counties$curr,
+                                    c('origin', 'destination', 'GEOID'),
+                                    1)
         selected_col <- paste0(input$Value_opts, input$Scenario_opt)}
-      }
-  else {
-    
-    if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
-      dat_temp = dat_temp %>%
-        select(origin, destination, GEOID, contains('tons_'),contains('value_'))
-      selected_col = input$Value_opts
+    }
+    else {
       
-    }
-    else{
-
-      dat_temp = process_scenario(dat_temp,
-                                     input$Value_opts,
-                                     input$Scenario_opt,
-                                     click_counties$curr,
-                                     c('origin', 'destination', 'GEOID','Grouped_sctg2','dms_mode'),
-                                     1)
-      selected_col <- paste0(input$Value_opts, input$Scenario_opt)
-    }
-    
+      if(input$Scenario_opt == 'Baseline' |grepl('2022',input$Value_opts)){
+        dat_temp = dat_temp %>%
+          select(origin, destination, GEOID, contains('tons_'),contains('value_'))
+        selected_col = input$Value_opts
+        
+      }
+      else{
+        
+        dat_temp = process_scenario(dat_temp,
+                                    input$Value_opts,
+                                    input$Scenario_opt,
+                                    click_counties$curr,
+                                    c('origin', 'destination', 'GEOID','Grouped_sctg2','dms_mode'),
+                                    1)
+        selected_col <- paste0(input$Value_opts, input$Scenario_opt)
+      }
+      
     }
     #this is in case someone select origin and destination for import/export
   } else {
@@ -296,30 +289,28 @@ data_ss_click<- reactive({
     #                          sourceName = "c2c_cf_topOutbound")
     #   })
     
-    if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
+    if(input$Scenario_opt == 'Baseline' |grepl('2022',input$Value_opts)){
       
-    dat_temp = dat_temp %>%
-      mutate(dms_imp_exp = ifelse(origin == click_counties$curr, destination, origin),
-             GEOID = dms_imp_exp) %>% #you actually don't need this could just group by lineid, but then the map is missing
-      group_by(dms_imp_exp, GEOID)%>%
-      summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
-                tons_2022 = sum(tons_2022),
-                tons_2050 = sum(tons_2050),
-                value_2017 = sum(value_2017),
-                value_2022 = sum(value_2022),
-                value_2050 = sum(value_2050)) %>%
-      ungroup()
-    selected_col = input$Value_opts
-    
+      dat_temp = dat_temp %>%
+        mutate(dms_imp_exp = ifelse(origin == click_counties$curr, destination, origin),
+               GEOID = dms_imp_exp) %>% #you actually don't need this could just group by lineid, but then the map is missing
+        group_by(dms_imp_exp, GEOID)%>%
+        summarise( tons_2022 = sum(tons_2022),
+                   tons_2050 = sum(tons_2050),
+                   value_2022 = sum(value_2022),
+                   value_2050 = sum(value_2050)) %>%
+        ungroup()
+      selected_col = input$Value_opts
+      
     }else{
-
+      
       dat_temp_input = dat_temp
       dat_temp = process_scenario(dat_temp_input,
-                                     input$Value_opts,
-                                     input$Scenario_opt,
-                                     click_counties$curr,
-                                     col_list = c('dms_imp_exp', 'GEOID'),
-                                     0)
+                                  input$Value_opts,
+                                  input$Scenario_opt,
+                                  click_counties$curr,
+                                  col_list = c('dms_imp_exp', 'GEOID'),
+                                  0)
       
       selected_col <- paste0(input$Value_opts, input$Scenario_opt)
     }
@@ -332,10 +323,10 @@ data_ss_click<- reactive({
     mutate(rank = rank(desc(factor_lab))) 
   
   if(nrow(dat_temp)>0){
-  ln_select <- county_selected %>%
-    select(GEOID,county_lab) %>%
-    inner_join(dat_temp,by = "GEOID") %>%
-    mutate(tranp=ifelse(rank <= input$n_top, 1,.25))
+    ln_select <- county_selected %>%
+      select(GEOID,county_lab) %>%
+      inner_join(dat_temp,by = "GEOID") %>%
+      mutate(tranp=ifelse(rank <= input$n_top, 1,.25))
   } else {ln_select=NULL}
   
   return(ln_select)
@@ -367,7 +358,7 @@ observeEvent(eventExpr = map_update(), {
   
   ln_select=data_ss_click()
   
-
+  
   
   con_name = county_selected$county_lab[county_selected$GEOID == click_counties$curr]
   
@@ -423,9 +414,9 @@ observeEvent(eventExpr = map_update(), {
     pal_factor_labs <- round(quantile(round(ln_select$factor_lab[!duplicated(ln_select$factor_lab)], 1), probs = seq(0, 1, steps)), 1)
     pal_factor_labs <- paste(scales::comma(lag(pal_factor_labs)), scales::comma(pal_factor_labs), sep = " - ")[-1]
     
-   #ctysel_labels <- ln_select$county_lab %>% lapply(htmltools::HTML)
+    #ctysel_labels <- ln_select$county_lab %>% lapply(htmltools::HTML)
     
-
+    
     
     leafletProxy(mapId = "odmap",session = session) %>%
       addPolygons(data = ln_select,
@@ -542,17 +533,11 @@ output$table_title <- renderText({
 output$scenario_title <- renderText({
   
   if (input$Scenario_opt == '_s1'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 1')
+    sencario = paste0("Selected Scenario: ", 'Scenario 1- Respond to Heightened Supply Chain Risks')
   }else if (input$Scenario_opt == '_s2'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 2')
+    sencario = paste0("Selected Scenario: ", 'Scenario 2- Leverage Multi-State Strength')
   }else if (input$Scenario_opt == '_s3'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 3')
-  }else if (input$Scenario_opt == '_s4'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 4')
-  }else if (input$Scenario_opt == '_s5'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 5')
-  }else if (input$Scenario_opt == '_s6'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 6')
+    sencario = paste0("Selected Scenario: ", 'Scenario 3- Embrace Technology Transformations')
   }else{
     sencario = paste0("Selected Scenario: ", input$Scenario_opt)}
   return(sencario)
@@ -561,10 +546,10 @@ output$scenario_title <- renderText({
 
 
 output$subsetSETTS<-renderDataTable({#server = FALSE,{
-
-    
+  
+  
   if(input$Scenario_opt == 'Baseline' &
-     grepl('2017',input$Value_opts) &
+     grepl('2022',input$Value_opts) &
      input$dms_mode_opts == 'All' &
      input$sctg2_opts == 'All' &
      input$OD_opts == 'Both'){
@@ -578,95 +563,6 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     names(ln_select)[names(ln_select)=='factor_lab']=paste0(input$Value_opts, input$Scenario_opt)
   }
   
-    
-    SETTS_ss<-ln_select %>% 
-      st_drop_geometry() 
-    
-    if(input$OD_opts == "Both"){
-      SETTS_ss<-SETTS_ss %>% 
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-    } else if(input$OD_opts == "dms_orig"){
-      SETTS_ss<-SETTS_ss %>%
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
-    } else if(input$OD_opts == "dms_dest"){
-      SETTS_ss<-SETTS_ss %>%
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
-    }
-    
-    SETTS_ss<-SETTS_ss %>%
-      arrange(rank) %>% 
-      select(contains('county'),starts_with('tons_'), starts_with('value_')) %>% 
-      rename('County' = 'county_lab')
-    
-    SETTS_ss_r$SETTS_ss=SETTS_ss
-    
-    SETTS_ss<-SETTS_ss %>%
-      mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
-      rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-             'Tons 2022</br>(Thousand Tons)'='tons_2022',
-             'Tons 2050</br>(Thousand Tons)'='tons_2050',
-             'Value 2017</br>($Million)'='value_2017',
-             'Value 2022</br>($Million)'='value_2022',
-             'Value 2050</br>($Million)'='value_2050')
-    names(SETTS_ss)[grepl('_',names(SETTS_ss))] <- str_to_title(gsub("_"," ",names(SETTS_ss)[grepl('_',names(SETTS_ss))]))
-      #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
-    
-    
-        #SETTS_ss<-SETTS_ss %>%
-        #rename('Partner'='County Lab')
-
-  SETTS_tbl=datatable(SETTS_ss,
-                          filter = list(position = 'top', clear = FALSE),
-                          extensions = 'Buttons',
-                          options = list(lengthMenu=c(5,10,100),
-                                         pageLength=10, 
-                                         scrollX = TRUE,
-                                         dom = 'lftp'#, 
-                                         #buttons = list(list(extend = "copy", 
-                                                        #      text = "Copy Table", 
-                                                        #      exportOptions = list(
-                                                        #        modifier = list(page = "all")
-                                                        #      )),
-                                                        # list(extend = "excel", 
-                                                        #      text = "Export to Excel", 
-                                                        #      filename = "SETTS_Tool_Data",
-                                                        #             exportOptions = list(
-                                                        #               modifier = list(page = "all")
-                                                        #             )))
-                                         ), 
-                          rownames=FALSE,
-                          escape = FALSE
-  ) %>% 
-    DT::formatRound(grepl("20", colnames(SETTS_ss)),digits = 1,mark = ",")
-
-  return(SETTS_tbl)
-  
-    })
-  
-
-
-
-  proxy_cty2cty_tbl = dataTableProxy('subsetSETTS')
-  
-  
-  observe({
-    
-     req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
-         input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
-    ln_select=data_ss_click()
-
-    # validate(need(!is.null(ln_select),
-    #               'There is no data for the selected subset.'),
-    #          need(nrow(ln_select)>0,
-    #               'There is no data for the selected subset.'))
-    if(!is.null(ln_select)){
-      
-      if(input$Scenario_opt == 'Baseline' |grepl('2017',input$Value_opts)){
-        names(ln_select)[names(ln_select)=='factor_lab']=input$Value_opts}
-      else{
-        names(ln_select)[names(ln_select)=='factor_lab']=str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
-      }
-
   
   SETTS_ss<-ln_select %>% 
     st_drop_geometry() 
@@ -684,125 +580,209 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   
   SETTS_ss<-SETTS_ss %>%
     arrange(rank) %>% 
-    filter(rank <= input$n_top) %>% 
     select(contains('county'),starts_with('tons_'), starts_with('value_')) %>% 
     rename('County' = 'county_lab')
   
-  SETTS_ss<-SETTS_ss %>%
-    mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
-    rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-           'Tons 2022</br>(Thousand Tons)'='tons_2022',
-           'Tons 2050</br>(Thousand Tons)'='tons_2050',
-           'Value 2017</br>($Million)'='value_2017',
-           'Value 2022</br>($Million)'='value_2022',
-           'Value 2050</br>($Million)'='value_2050')
-  
-  SETTS_ss <- SETTS_ss %>% rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
-  
-
   SETTS_ss_r$SETTS_ss=SETTS_ss
   
+  SETTS_ss<-SETTS_ss %>%
+    mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
+    rename( 'Tons 2022</br>(Thousand Tons)'='tons_2022',
+            'Tons 2050</br>(Thousand Tons)'='tons_2050',
+            'Value 2022</br>($Million)'='value_2022',
+            'Value 2050</br>($Million)'='value_2050')
+  
+   names(SETTS_ss)[grepl('_',names(SETTS_ss))] <- str_to_title(gsub("_"," ",names(SETTS_ss)[grepl('_',names(SETTS_ss))])) 
+  #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
+  
+  
+  #SETTS_ss<-SETTS_ss %>%
+  #rename('Partner'='County Lab')
+  
+  SETTS_tbl=datatable(SETTS_ss,
+                      filter = list(position = 'top', clear = FALSE),
+                      extensions = 'Buttons',
+                      options = list(lengthMenu=c(5,10,100),
+                                     pageLength=10, 
+                                     scrollX = TRUE,
+                                     dom = 'lftp'#, 
+                                     #buttons = list(list(extend = "copy", 
+                                     #      text = "Copy Table", 
+                                     #      exportOptions = list(
+                                     #        modifier = list(page = "all")
+                                     #      )),
+                                     # list(extend = "excel", 
+                                     #      text = "Export to Excel", 
+                                     #      filename = "SETTS_Tool_Data",
+                                     #             exportOptions = list(
+                                     #               modifier = list(page = "all")
+                                     #             )))
+                      ), 
+                      rownames=FALSE,
+                      escape = FALSE
+  ) %>% 
+    DT::formatRound(grepl("20", colnames(SETTS_ss)),digits = 1,mark = ",")
+  
+  return(SETTS_tbl)
+  
+})
+
+
+
+
+proxy_cty2cty_tbl = dataTableProxy('subsetSETTS')
+
+
+observe({
+  
+  req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
+      input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
+  ln_select=data_ss_click()
+  
+  # validate(need(!is.null(ln_select),
+  #               'There is no data for the selected subset.'),
+  #          need(nrow(ln_select)>0,
+  #               'There is no data for the selected subset.'))
+  if(!is.null(ln_select)){
+    
+    if(input$Scenario_opt == 'Baseline' |grepl('2022',input$Value_opts)){
+      names(ln_select)[names(ln_select)=='factor_lab']=input$Value_opts}
+    else{
+      names(ln_select)[names(ln_select)=='factor_lab']=str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
+    }
+    
+    
+    SETTS_ss<-ln_select %>% 
+      st_drop_geometry() 
+    
+    if(input$OD_opts == "Both"){
+      SETTS_ss<-SETTS_ss %>% 
+        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
+    } else if(input$OD_opts == "dms_orig"){
+      SETTS_ss<-SETTS_ss %>%
+        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
+    } else if(input$OD_opts == "dms_dest"){
+      SETTS_ss<-SETTS_ss %>%
+        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
+    }
+    
+    SETTS_ss<-SETTS_ss %>%
+      arrange(rank) %>% 
+      filter(rank <= input$n_top) %>% 
+      select(contains('county'),starts_with('tons_'), starts_with('value_')) %>% 
+      rename('County' = 'county_lab')
+    
+    SETTS_ss<-SETTS_ss %>%
+      mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
+      rename('Tons 2022</br>(Thousand Tons)'='tons_2022',
+             'Tons 2050</br>(Thousand Tons)'='tons_2050',
+             'Value 2022</br>($Million)'='value_2022',
+             'Value 2050</br>($Million)'='value_2050')
+    
+    SETTS_ss <- SETTS_ss %>% rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
+    
+    
+    SETTS_ss_r$SETTS_ss=SETTS_ss
+    
     replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)} else {
       SETTS_ss <- data.frame('County'=c(),
-                            'Tons 2017</br>(Thousand Tons)'=c(),
-                            'Tons 2020</br>(Thousand Tons)'=c(),
-                            'Tons 2050</br>(Thousand Tons)'=c(),
-                            'Value 2017</br>($Million)'=c(),
-                            'Value 2020</br>($Million)'=c(),
-                            'Value 2050</br>($Million)'=c())
+                             'Tons 2022</br>(Thousand Tons)'=c(),
+                             'Tons 2050</br>(Thousand Tons)'=c(),
+                             'Value 2022</br>($Million)'=c(),
+                             'Value 2050</br>($Million)'=c())
       
       replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)
     }
-    
   
-  })
-    
-    outputOptions(output, 'subsetSETTS', suspendWhenHidden = FALSE)  
   
-  output$download_cc <- downloadHandler(
-    filename = function(){
-      paste("data_export",Sys.Date(), ".csv", sep="")},
-    content = function(file) {
-      tbl_out=SETTS_ss_r$SETTS_ss %>% 
-        rename()
-      write.csv(tbl_out, file,row.names = F)
-    })
+})
 
-  
-  observe({
-    req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
-        input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
+outputOptions(output, 'subsetSETTS', suspendWhenHidden = FALSE)  
 
-    if (input$OD_opts == 'Both'){
-      dat_in <- dat %>% filter(origin %in% input$county_opts | destination %in% input$county_opts)
-    } else if (input$OD_opts == 'dms_orig'){
-      dat_in <- dat %>% filter(origin %in% input$county_opts)
-    }else if (input$OD_opts == 'dms_dest'){
-      dat_in <- dat %>% filter(destination %in% input$county_opts)}
-
-    #filter for mode
-    if(input$dms_mode_opts != "All" & nrow(dat_in) >=1) {
-      dat_in = dat_in %>%
-        filter(dms_mode == input$dms_mode_opts)}
-    #filter for commodity
-    if(input$sctg2_opts != "All" & nrow(dat_in) >=1) {
-      dat_in = dat_in %>%
-        filter(Grouped_sctg2==input$sctg2_opts)}
-    
-    selected_value = input$Value_opts
-    
-    # if scenario applied
-    if (input$Scenario_opt != 'Baseline'){
-      dat_in = process_scenario(dat_in,
-                                input$Value_opts,
-                                input$Scenario_opt,
-                                click_counties$curr,
-                                c('origin', 'destination','Grouped_sctg2','dms_mode'),
-                                1)
-      selected_value = paste0(input$Value_opts,input$Scenario_opt)
-    }
-    #str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
-
-
-    output$c2c_flowDirection <- renderPlotly({
-      direction_pie_graph_countyselected(dat_in,
-                     county = input$county_opts,
-                     tons_value_selection = selected_value,
-                     commcolors = init_commcolors,
-                     sourceName = "c2c_flowDirection")
-    })
-
-    output$c2c_mode <- renderPlotly({
-      mode_pie_graph(dat_in,
-                     #county = input$county_opts,
-                     tons_value_selection = selected_value,
-                     ini_modecolors = ini_modecolors,
-                     sourceName = "c2c_mode")
-    })
-
-    output$c2c_cf_commodity <- renderPlotly({
-      tile_graph(dat_in,
-                 tons_value_selection = selected_value,
-                 sourceName = "c2c_cf_commodity")
-    })
-
-    output$c2c_cf_topInbound <- renderPlotly({
-      top_importing_all(dat_in,
-                           tons_value_selection = selected_value,
-                           ton_color = "#66c2a5",
-                           value_color = "#3288bd",
-                           location = click_counties$curr,
-                           sourceName = "c2c_cf_topInbound")
-
+output$download_cc <- downloadHandler(
+  filename = function(){
+    paste("data_export",Sys.Date(), ".csv", sep="")},
+  content = function(file) {
+    tbl_out=SETTS_ss_r$SETTS_ss %>% 
+      rename()
+    write.csv(tbl_out, file,row.names = F)
   })
 
-    output$c2c_cf_topOutbound <- renderPlotly({
-      top_exporting_all(dat_in,
-                           tons_value_selection = selected_value,
-                           ton_color = "#66c2a5",
-                           value_color = "#3288bd",
-                           location = click_counties$curr,
-                           sourceName = "c2c_cf_topOutbound")
-    })
-    })
+
+observe({
+  req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
+      input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
+  
+  if (input$OD_opts == 'Both'){
+    dat_in <- dat %>% filter(origin %in% input$county_opts | destination %in% input$county_opts)
+  } else if (input$OD_opts == 'dms_orig'){
+    dat_in <- dat %>% filter(origin %in% input$county_opts)
+  }else if (input$OD_opts == 'dms_dest'){
+    dat_in <- dat %>% filter(destination %in% input$county_opts)}
+  
+  #filter for mode
+  if(input$dms_mode_opts != "All" & nrow(dat_in) >=1) {
+    dat_in = dat_in %>%
+      filter(dms_mode == input$dms_mode_opts)}
+  #filter for commodity
+  if(input$sctg2_opts != "All" & nrow(dat_in) >=1) {
+    dat_in = dat_in %>%
+      filter(Grouped_sctg2==input$sctg2_opts)}
+  
+  selected_value = input$Value_opts
+  
+  # if scenario applied
+  if (input$Scenario_opt != 'Baseline'){
+    dat_in = process_scenario(dat_in,
+                              input$Value_opts,
+                              input$Scenario_opt,
+                              click_counties$curr,
+                              c('origin', 'destination','Grouped_sctg2','dms_mode'),
+                              1)
+    selected_value = paste0(input$Value_opts,input$Scenario_opt)
+  }
+  #str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
+  
+  
+  output$c2c_flowDirection <- renderPlotly({
+    direction_pie_graph_countyselected(dat_in,
+                                       county = input$county_opts,
+                                       tons_value_selection = selected_value,
+                                       commcolors = init_commcolors,
+                                       sourceName = "c2c_flowDirection")
+  })
+  
+  output$c2c_mode <- renderPlotly({
+    mode_pie_graph(dat_in,
+                   #county = input$county_opts,
+                   tons_value_selection = selected_value,
+                   ini_modecolors = ini_modecolors,
+                   sourceName = "c2c_mode")
+  })
+  
+  output$c2c_cf_commodity <- renderPlotly({
+    tile_graph(dat_in,
+               tons_value_selection = selected_value,
+               sourceName = "c2c_cf_commodity")
+  })
+  
+  output$c2c_cf_topInbound <- renderPlotly({
+    top_importing_all(dat_in,
+                      tons_value_selection = selected_value,
+                      ton_color = "#66c2a5",
+                      value_color = "#3288bd",
+                      location = click_counties$curr,
+                      sourceName = "c2c_cf_topInbound")
+    
+  })
+  
+  output$c2c_cf_topOutbound <- renderPlotly({
+    top_exporting_all(dat_in,
+                      tons_value_selection = selected_value,
+                      ton_color = "#66c2a5",
+                      value_color = "#3288bd",
+                      location = click_counties$curr,
+                      sourceName = "c2c_cf_topOutbound")
+  })
+})
 

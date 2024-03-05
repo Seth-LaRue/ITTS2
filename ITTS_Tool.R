@@ -47,6 +47,8 @@ library(networkD3)
 source("gral_parameters.R")
 source("ini_map_load.R")
 source('function/scenario_process_v3.R')
+source('function/scenario_process_v2.R')
+
 #Load modules ----
 source('ui-components/ui_welcome.R', encoding = "utf8")
 source('ui-components/ui_maps.R', encoding = "utf8")
@@ -230,10 +232,10 @@ server <- function(input, output, session) {
   onFlush(function(){
     runjs('
           $("#tab-maps_tabs").click();
-          $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click();
           //$("#tabset_maps-ITTSInternationalTrade-tab").click();
           $("#tabset_maps-ITTSCountytoCountyTrade-tab").click();
-
+          $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click();
+          
           $("#tabset_maps-ITTSCountytoCountyTrade-tab").click(function(){$("#odmap").trigger("shown");});
           $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click(function(){$("#odmap_cs").trigger("shown");});
           //$("#tabset_maps-ITTSInternationalTrade-tab").click(function(){$("#odmap_in").trigger("shown");}); #add this back for international trade remove this comment!
@@ -258,7 +260,7 @@ server <- function(input, output, session) {
   source('server-components/server_cty2cty_map.R', local = TRUE)
   source('server-components/server_cty2state_map.R', local = TRUE)
   #source('server-components/server_intn_map.R', local = TRUE)
-  #source('server-components/server_BaselineSummary.R', local = TRUE)
+  source('server-components/server_BaselineSummary.R', local = TRUE)
   source('server-components/server_BaselineScenarioComparison.R', local = TRUE)
   
   

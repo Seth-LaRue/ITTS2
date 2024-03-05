@@ -46,7 +46,7 @@ dircolors <- data.frame(Direction = c("Inbound", "Outbound"),
 #necessary for function testing-----
 # df_in <- dat
 # df_in <- dat_cs
-# tons_value_selection <- "tons_2017"
+# tons_value_selection <- "tons_2022"
 # county_test <- county <- "01001"
 # sourceName <- 'test'
 # county_test <- county <- "48031"
@@ -57,7 +57,7 @@ dircolors <- data.frame(Direction = c("Inbound", "Outbound"),
 # test <- top_export_partners(dat, county = county_test)
 #import graph
 
-top_importing_county <- function(df_in, tons_value_selection = "tons_2017",  
+top_importing_county <- function(df_in, tons_value_selection = "tons_2022",  
                                 ton_color = "#66c2a5", 
                                 value_color = "#3288bd", 
                                 sourceName = sourceName){
@@ -103,7 +103,7 @@ top_importing_county <- function(df_in, tons_value_selection = "tons_2017",
 
 
 ## exclude the internal flows within the selected geography
-top_importing_all <- function(df_in, tons_value_selection = "tons_2017",  
+top_importing_all <- function(df_in, tons_value_selection = "tons_2022",  
                                  ton_color = "#66c2a5", 
                                  value_color = "#3288bd",
                               location,
@@ -151,7 +151,7 @@ top_importing_all <- function(df_in, tons_value_selection = "tons_2017",
 
 
 
-top_exporting_county <- function(df_in, tons_value_selection = "tons_2017",  
+top_exporting_county <- function(df_in, tons_value_selection = "tons_2022",  
                                 ton_color = "#66c2a5", 
                                 value_color = "#3288bd", 
                                 sourceName = sourceName){
@@ -195,7 +195,7 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2017",
   
 }
 
-top_exporting_all <- function(df_in, tons_value_selection = "tons_2017",  
+top_exporting_all <- function(df_in, tons_value_selection = "tons_2022",  
                                  ton_color = "#66c2a5", 
                                  value_color = "#3288bd", 
                                  location,
@@ -241,7 +241,7 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2017",
   
 }
 
-mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
+mode_pie_graph <- function(df_in, tons_value_selection = "tons_2022",
                            ini_modecolors = ini_modecolors,
                            sourceName = sourceName){
   #browser()
@@ -250,7 +250,6 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
   #modecolors = data frame with two columns ("Mode_Group" and "color") that crosswalks between modes and their color on the graph
   #saveName, saveWidth, saveHeight = arguments passed to the Plotly configu function to customize file saving
 
-  
   mode_df <- df_in %>% 
     #dplyr::filter(origin %in% county | destination %in% county) %>%
     dplyr::rename(factor_lab = tons_value_selection) %>% 
@@ -258,7 +257,7 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
     #rbind(data.frame(dms_mode = c("1","2","3","4","5","6","7"), factor_lab = rep(0,7))) %>% #this fills any zero modes
     dplyr::group_by(dms_mode) %>% 
     dplyr::summarise(factor_lab = sum(factor_lab, na.rm = TRUE)) %>% ungroup() %>%
-    left_join(ini_modecolors)
+    left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode)))
 
       mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
       add_pie(values = ~factor_lab, 
@@ -269,7 +268,7 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
                             line = list(color = "#595959", width = 1)),
               hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"),
               text = ~mode_group, key=~mode_group, hole = 0.6, #textfont = list(family = "Arial"),
-              textposition = "outside") %>%
+              textposition = "outside")
   
     mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
       add_pie(values = ~factor_lab,  textinfo='none', labels = ~str_wrap(mode_group,14), automargin = TRUE, marker = list(colors = ~color, line = list(color = "#595959", width = 1)),
@@ -289,7 +288,7 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
   return(mode_plot)
 }
 
-commodity_pie_graph <- function(df_in, tons_value_selection = "tons_2017", 
+commodity_pie_graph <- function(df_in, tons_value_selection = "tons_2022", 
                                 commcolors = init_commcolors, 
                                 sourceName = sourceName){
   
@@ -327,7 +326,7 @@ commodity_pie_graph <- function(df_in, tons_value_selection = "tons_2017",
   
 }
 
-direction_pie_graph_countyselected <- function(df_in, county, tons_value_selection = "tons_2017", 
+direction_pie_graph_countyselected <- function(df_in, county, tons_value_selection = "tons_2022", 
                                 commcolors = init_commcolors, 
                                 sourceName = sourceName){
   
@@ -370,7 +369,7 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
 }
 
 
-direction_pie_graph <- function(df_in, tons_value_selection = "tons_2017", 
+direction_pie_graph <- function(df_in, tons_value_selection = "tons_2022", 
                                                commcolors = init_commcolors, 
                                                sourceName = sourceName){
   

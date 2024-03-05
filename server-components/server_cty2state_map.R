@@ -12,30 +12,26 @@ dat_ini_cs <- dat_cs %>%
   mutate(dms_imp_exp = if_else(origin == '48453', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
-  summarise(tons_2017 = sum(tons_2017), 
-            tons_2022 = sum(tons_2022),
+  summarise(tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
-            value_2017 = sum(value_2017),
             value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
-            ) %>%
+  ) %>%
   ungroup() %>%
-  mutate(rank = rank(desc(value_2017)))
+  mutate(rank = rank(desc(value_2022)))
 
 dat_ini_ss <- dat_ss %>%
   filter(origin == '48'|destination == '48') %>%
   mutate(dms_imp_exp = if_else(origin == '48', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
-  summarise(tons_2017 = sum(tons_2017), 
-            tons_2022 = sum(tons_2022),
+  summarise(tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
-            value_2017 = sum(value_2017),
             value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
   ) %>%
   ungroup() %>%
-  mutate(rank = rank(desc(value_2017)))
+  mutate(rank = rank(desc(value_2022)))
 
 dat_ini_rs <- dat_ss %>%
   mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',origin),
@@ -45,15 +41,13 @@ dat_ini_rs <- dat_ss %>%
   mutate(dms_imp_exp = if_else(origin == 'ITTS', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
-  summarise(tons_2017 = sum(tons_2017), 
-            tons_2022 = sum(tons_2022),
+  summarise(tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
-            value_2017 = sum(value_2017),
             value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
   ) %>%
   ungroup() %>%
-  mutate(rank = rank(desc(value_2017)))
+  mutate(rank = rank(desc(value_2022)))
 
 dat_ini_se <- dat_ss %>%
   mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',origin),
@@ -62,60 +56,58 @@ dat_ini_se <- dat_ss %>%
   mutate(dms_imp_exp = if_else(origin == 'Southeast Region', destination, origin),
          GEOID = dms_imp_exp) %>%
   group_by(dms_imp_exp, GEOID)%>%
-  summarise(tons_2017 = sum(tons_2017),
-            tons_2022 = sum(tons_2022),
+  summarise(tons_2022 = sum(tons_2022),
             tons_2050 = sum(tons_2050),
-            value_2017 = sum(value_2017),
             value_2022 = sum(value_2022),
             value_2050 = sum(value_2050)
   ) %>%
   ungroup() %>%
-  mutate(rank = rank(desc(value_2017)))
+  mutate(rank = rank(desc(value_2022)))
 
 ln_select_cs_ini<- reactive({
   #req(n_lines_disp$curr)
   req(input$cors_opts)
   req(input$county_opts_cs)
   if(input$cors_opts == 'c2c'){
-  ln_select_cs_ini <- state_base %>%
-    select(GEOID, NAME) %>%
-    inner_join(dat_ini_cs,by = "GEOID")} 
+    ln_select_cs_ini <- state_base %>%
+      select(GEOID, NAME) %>%
+      inner_join(dat_ini_cs,by = "GEOID")} 
   else if (input$cors_opts == 's2s'){
     
-  ln_select_cs_ini <- state_base %>%
-    select(GEOID, NAME) %>%
-    inner_join(dat_ini_ss,by = "GEOID")}
+    ln_select_cs_ini <- state_base %>%
+      select(GEOID, NAME) %>%
+      inner_join(dat_ini_ss,by = "GEOID")}
   else if (input$cors_opts == 'r2s'){
     if(input$county_opts_cs == 'ITTS'){
       ln_select_cs_ini <- ITTS_base %>%
         select(GEOID, NAME) %>%
         inner_join(dat_ini_rs,by = "GEOID")
     } else {
-    ln_select_cs_ini <- SE_base %>%
-      select(GEOID, NAME) %>%
-      inner_join(dat_ini_se,by = "GEOID")}
-
+      ln_select_cs_ini <- SE_base %>%
+        select(GEOID, NAME) %>%
+        inner_join(dat_ini_se,by = "GEOID")}
+    
   }
-
+  
 })
 
 output$odmap_cs <- renderLeaflet({
   ln_select_cs_ini = ln_select_cs_ini()
-  pal_factor_ini_cs <- colorQuantile(palette = "Blues",domain = ln_select_cs_ini$value_2017,probs = seq(0, 1, .2))
+  pal_factor_ini_cs <- colorQuantile(palette = "Blues",domain = ln_select_cs_ini$value_2022,probs = seq(0, 1, .2))
   pulsecolor_ini_cs='red'
   
-  pal_factor_colors_ini_cs <- unique(pal_factor_ini_cs(sort(ln_select_cs_ini$value_2017)))
-  pal_factor_labs_ini_cs <- round(quantile(round(ln_select_cs_ini$value_2017, 1), probs = seq(0, 1, .2)), 1)
+  pal_factor_colors_ini_cs <- unique(pal_factor_ini_cs(sort(ln_select_cs_ini$value_2022)))
+  pal_factor_labs_ini_cs <- round(quantile(round(ln_select_cs_ini$value_2022, 1), probs = seq(0, 1, .2)), 1)
   pal_factor_labs_ini_cs <- paste(scales::comma(lag(pal_factor_labs_ini_cs)), scales::comma(pal_factor_labs_ini_cs), sep = " - ")[-1]
   
   con_name_ini_cs=ITTS_base$NAME[ITTS_base$GEOID == 'ITTS']
-  titl_ini_cs = paste0("Inbound & Outbound to </br>", con_name_ini_cs, str_replace(str_to_title('value_2017'),'_',' '), " (Thousand tons)")
+  titl_ini_cs = paste0("Inbound & Outbound to </br>", con_name_ini_cs, str_replace(str_to_title('value_2022'),'_',' '), " (Thousand tons)")
   
   
   m_cs %>%
     addPolygons(data = ln_select_cs_ini,
                 layerId = ~paste("data", ln_select_cs_ini$GEOID),
-                fillColor = ~pal_factor_ini_cs(value_2017),
+                fillColor = ~pal_factor_ini_cs(value_2022),
                 stroke=TRUE,
                 smoothFactor = 0.3,
                 color = '#5a5a5a',#~hili,
@@ -170,7 +162,7 @@ output$odmap_cs <- renderLeaflet({
 observeEvent(input$cors_opts, {
   
   req(input$cors_opts)
-
+  
   if(input$cors_opts=="c2c"){
     updateSelectizeInput(session, 'county_opts_cs', label = "County", choices = cty_ch, selected = c("Travis County, TX", value = "48453"), server = TRUE)
     click_counties_cs$curr <- "48453"
@@ -180,7 +172,7 @@ observeEvent(input$cors_opts, {
   } else if(input$cors_opts=="r2s"){
     updateSelectizeInput(session, 'county_opts_cs', label = "Region", choices = c('ITTS', 'Southeast Region'), selected = "ITTS", server = TRUE)
     click_counties_cs$curr <- "ITTS"
-
+    
   }
   
 },ignoreInit = TRUE)
@@ -196,14 +188,14 @@ observeEvent(input$Value_opts_cs,{
   req(input$Value_opts_cs)
   req(input$Scenario_opt_cs)
   
-  if(grepl('2017',input$Value_opts_cs)){
+  if(grepl('2022',input$Value_opts_cs)){
     updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else if (grepl(c('2020','2050'),input$Value_opts_cs)) {
+  } else if (grepl(c('2050'),input$Value_opts_cs)) {
     updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline',
                                                                                              'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
                                                                                              'Scenario 2: Leverage Multi-State Strength' = '_s2',
                                                                                              'Scenario 3: Embrace Technology Transformations' = '_s3'),
-                      selected = 'Baseline',server = TRUE)
+                         selected = 'Baseline',server = TRUE)
   }
 }#,ignoreInit = TRUE
 )
@@ -255,7 +247,7 @@ data_ss_click_cs<- reactive({
       dat_temp_cs <- dat_ss %>%
         mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',origin),
                destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',destination))
-  }
+    }
   }
   
   if(input$OD_opts_cs != "Both"){
@@ -278,43 +270,41 @@ data_ss_click_cs<- reactive({
       dat_temp_cs = dat_temp_cs %>%
         filter(Grouped_sctg2==input$sctg2_opts_cs)}
     if(input$sctg2_opts_cs == "All" | input$dms_mode_opts_cs == "All"){
-      if(input$Scenario_opt_cs == 'Baseline' |grepl('2017',input$Value_opts_cs)){
-      dat_temp_cs = dat_temp_cs %>%
-        group_by(origin, destination, GEOID)%>%
-        summarise(tons_2017 = sum(tons_2017), # do we need the tons 2017?
-                  tons_2022 = sum(tons_2022),
-                  tons_2050 = sum(tons_2050),
-                  value_2017 = sum(value_2017),
-                  value_2022 = sum(value_2022),
-                  value_2050 = sum(value_2050)
-                  ) %>%
-        ungroup()
-      selected_col = input$Value_opts_cs
-    } else{
-          dat_temp_cs = process_scenario(dat_temp_cs,
-                                     input$Value_opts_cs,
-                                     input$Scenario_opt_cs,
-                                     click_counties_cs$curr,
-                                     c('origin', 'destination', 'GEOID'),
-                                     1)
-      selected_col <- paste0(input$Value_opts_cs, input$Scenario_opt_cs)}
+      if(input$Scenario_opt_cs == 'Baseline' |grepl('2022',input$Value_opts_cs)){
+        dat_temp_cs = dat_temp_cs %>%
+          group_by(origin, destination, GEOID)%>%
+          summarise( tons_2022 = sum(tons_2022),
+                     tons_2050 = sum(tons_2050),
+                     value_2022 = sum(value_2022),
+                     value_2050 = sum(value_2050)
+          ) %>%
+          ungroup()
+        selected_col = input$Value_opts_cs
+      } else{
+        dat_temp_cs = process_scenario(dat_temp_cs,
+                                       input$Value_opts_cs,
+                                       input$Scenario_opt_cs,
+                                       click_counties_cs$curr,
+                                       c('origin', 'destination', 'GEOID'),
+                                       1)
+        selected_col <- paste0(input$Value_opts_cs, input$Scenario_opt_cs)}
     }
-      else {
-        if(input$Scenario_opt_cs == 'Baseline' |grepl('2017',input$Value_opts_cs)){
-      dat_temp_cs = dat_temp_cs %>%
-        select(origin, destination, GEOID, contains('tons_'),contains('value_'))
-      selected_col = input$Value_opts_cs
-      
+    else {
+      if(input$Scenario_opt_cs == 'Baseline' |grepl('2022',input$Value_opts_cs)){
+        dat_temp_cs = dat_temp_cs %>%
+          select(origin, destination, GEOID, contains('tons_'),contains('value_'))
+        selected_col = input$Value_opts_cs
+        
       }
-        else{
-          dat_temp_cs = process_scenario(dat_temp_cs,
-                                         input$Value_opts_cs,
-                                         input$Scenario_opt_cs,
-                                         click_counties_cs$curr,
-                                         c('origin', 'destination', 'GEOID','Grouped_sctg2','dms_mode'),
-                                         1)
-          selected_col <- paste0(input$Value_opts_cs, input$Scenario_opt_cs)
-        }
+      else{
+        dat_temp_cs = process_scenario(dat_temp_cs,
+                                       input$Value_opts_cs,
+                                       input$Scenario_opt_cs,
+                                       click_counties_cs$curr,
+                                       c('origin', 'destination', 'GEOID','Grouped_sctg2','dms_mode'),
+                                       1)
+        selected_col <- paste0(input$Value_opts_cs, input$Scenario_opt_cs)
+      }
     }
     #this is in case someone select origin and destination for import/export
   } else if (input$OD_opts_cs == "Both") {
@@ -329,38 +319,36 @@ data_ss_click_cs<- reactive({
       dat_temp_cs = dat_temp_cs %>%
         filter(Grouped_sctg2==input$sctg2_opts_cs)}
     
-    if(input$Scenario_opt_cs == 'Baseline' |grepl('2017',input$Value_opts_cs)){
-    dat_temp_cs = dat_temp_cs %>%
-      mutate(dms_imp_exp = ifelse(origin == click_counties_cs$curr, destination, origin),
-             GEOID = dms_imp_exp) %>% 
-      group_by(dms_imp_exp, GEOID)%>%
-      summarise(tons_2017 = sum(tons_2017), 
-                tons_2022 = sum(tons_2022),
-                tons_2050 = sum(tons_2050),
-                value_2017 = sum(value_2017),
-                value_2022 = sum(value_2022),
-                value_2050 = sum(value_2050)
-                ) %>%
-      ungroup()
-    
-    selected_col = input$Value_opts_cs
-
+    if(input$Scenario_opt_cs == 'Baseline' |grepl('2022',input$Value_opts_cs)){
+      dat_temp_cs = dat_temp_cs %>%
+        mutate(dms_imp_exp = ifelse(origin == click_counties_cs$curr, destination, origin),
+               GEOID = dms_imp_exp) %>% 
+        group_by(dms_imp_exp, GEOID)%>%
+        summarise(tons_2022 = sum(tons_2022),
+                  tons_2050 = sum(tons_2050),
+                  value_2022 = sum(value_2022),
+                  value_2050 = sum(value_2050)
+        ) %>%
+        ungroup()
+      
+      selected_col = input$Value_opts_cs
+      
     } else {
       dat_temp_cs_input = dat_temp_cs
-        dat_temp_cs = process_scenario(dat_temp_cs_input,
-                                       input$Value_opts_cs,
-                                       input$Scenario_opt_cs,
-                                       click_counties_cs$curr,
-                                       col_list = c('dms_imp_exp', 'GEOID'),
-                                       0)
-
-         selected_col <- paste0(input$Value_opts_cs, input$Scenario_opt_cs)
-
-      }
+      dat_temp_cs = process_scenario(dat_temp_cs_input,
+                                     input$Value_opts_cs,
+                                     input$Scenario_opt_cs,
+                                     click_counties_cs$curr,
+                                     col_list = c('dms_imp_exp', 'GEOID'),
+                                     0)
+      
+      selected_col <- paste0(input$Value_opts_cs, input$Scenario_opt_cs)
+      
+    }
     
-
+    
   }
- 
+  
   dat_temp_cs = dat_temp_cs %>%
     rename(factor_lab = selected_col) %>%
     mutate(rank = rank(desc(factor_lab)))
@@ -371,27 +359,27 @@ data_ss_click_cs<- reactive({
       mutate(tranp=ifelse(rank <= input$n_top_cs, 1,.25))
   } else if (nrow(dat_temp_cs)>0 & input$cors_opts == 'r2s') {
     if (input$county_opts_cs == 'ITTS'){
-
-    ln_select_cs <- ITTS_base %>%
-      select(GEOID, NAME) %>%
-      inner_join(dat_temp_cs,by = "GEOID") %>%
-      mutate(tranp=ifelse(rank <= input$n_top_cs, 1,.25))
-    
-
+      
+      ln_select_cs <- ITTS_base %>%
+        select(GEOID, NAME) %>%
+        inner_join(dat_temp_cs,by = "GEOID") %>%
+        mutate(tranp=ifelse(rank <= input$n_top_cs, 1,.25))
+      
+      
     }else {
       ln_select_cs <- SE_base %>%
         select(GEOID, NAME) %>%
         inner_join(dat_temp_cs,by = "GEOID") %>%
         mutate(tranp=ifelse(rank <= input$n_top_cs, 1,.25))
-
+      
       
     }
     
-
+    
     
   }else {ln_select_cs=NULL}
   
-
+  
   return(ln_select_cs)
   
   
@@ -436,12 +424,12 @@ observeEvent(eventExpr = map_update_cs(),{
       removeShape(layerId = 'pulsemarker')}
   else if(is.null(ln_select_cs)&input$cors_opts=='r2s') {
     if (input$county_opts_cs == 'ITTS'){
-    leafletProxy(mapId = "odmap_cs",session = session) %>%
-      removeShape(layerId = paste("data", ITTS_base$GEOID)) %>%
-      #removeShape(layerId = paste(all_selected$GEOID)) %>%
-      #removeShape(layerId = 'leg') %>%
-      clearControls() %>%
-      removeShape(layerId = 'pulsemarker')
+      leafletProxy(mapId = "odmap_cs",session = session) %>%
+        removeShape(layerId = paste("data", ITTS_base$GEOID)) %>%
+        #removeShape(layerId = paste(all_selected$GEOID)) %>%
+        #removeShape(layerId = 'leg') %>%
+        clearControls() %>%
+        removeShape(layerId = 'pulsemarker')
     }else {
       leafletProxy(mapId = "odmap_cs",session = session) %>%
         removeShape(layerId = paste("data", SE_base$GEOID)) %>%
@@ -450,31 +438,31 @@ observeEvent(eventExpr = map_update_cs(),{
         clearControls() %>%
         removeShape(layerId = 'pulsemarker')
     }
-
+    
   }
   
-
+  
   
   
   
   
   if(!is.null(ln_select_cs)) {
     if(input$cors_opts %in% c('s2s','c2c')){
-    leafletProxy(mapId = "odmap_cs",session = session) %>%
-      removeShape(layerId = paste("data", state_base$GEOID)) %>%
-      removeShape(layerId = paste(all_selected$GEOID)) %>%
-      #removeShape(layerId = 'leg') %>%
-      clearControls() %>%
-      removeShape(layerId = 'pulsemarker')}
-    else if(input$cors_opts == 'r2s'){
-      if (input$county_opts_cs == 'ITTS'){
-
       leafletProxy(mapId = "odmap_cs",session = session) %>%
         removeShape(layerId = paste("data", ITTS_base$GEOID)) %>%
         removeShape(layerId = paste(all_selected$GEOID)) %>%
         #removeShape(layerId = 'leg') %>%
         clearControls() %>%
-        removeShape(layerId = 'pulsemarker')
+        removeShape(layerId = 'pulsemarker')}
+    else if(input$cors_opts == 'r2s'){
+      if (input$county_opts_cs == 'ITTS'){
+        
+        leafletProxy(mapId = "odmap_cs",session = session) %>%
+          removeShape(layerId = paste("data", ITTS_base$GEOID)) %>%
+          removeShape(layerId = paste(all_selected$GEOID)) %>%
+          #removeShape(layerId = 'leg') %>%
+          clearControls() %>%
+          removeShape(layerId = 'pulsemarker')
       } else {
         leafletProxy(mapId = "odmap_cs",session = session) %>%
           removeShape(layerId = paste("data", SE_base$GEOID)) %>%
@@ -651,65 +639,65 @@ observeEvent(eventExpr = map_update_cs(),{
                                color=pulsecolor))
     }else if(input$cors_opts == "r2s"){
       if (input$county_opts_cs == 'ITTS'){
-      
-      # all_states_centr_sel=all_states_centr %>% 
-      #   filter(GEOID==click_counties_cs$curr)
-       pulse_name = click_counties_cs$curr
-      
-      leafletProxy(mapId = "odmap_cs",session = session) %>%
-        addPolygons(data = ln_select_cs,
-                    layerId = ~paste("data", GEOID),
-                    fillColor = ~pal_factor(factor_lab),
-                    stroke=TRUE,
-                    color = st_border_color,
-                    weight = 1,
-                    #opacity  = .85,#~rank/max(rank),
-                    fillOpacity  =  ~tranp,
-                    label = ~NAME,
-                    labelOptions = labelOptions(
-                      style = list("front-weight" = "normal", padding = "3px 8px"),
-                      textsize = "15px",
-                      direction = "auto")
-        ) %>%
-        addPolygons(data = ITTS_hatch,
-                    color = st_border_color,
-                    weight = 1,
-                    opacity = 1
-        ) %>%
-        addPolygons(data = all_selected[all_selected$GEOID == 'ITTS',],
-                    layerId = ~GEOID,
-                    #fillColor = NULL,
-                    stroke=TRUE,
-                    color = '#27A570',      
-                    weight = 6,
-                    #opacity  = .85,#~rank/max(rank),
-                    fillOpacity  = 0,#,#~rank/max(rank),
-                    label = ~NAME,
-                    labelOptions = labelOptions(
-                      style = list("front-weight" = "normal", padding = "3px 8px"),
-                      textsize = "15px",
-                      direction = "auto"),
-                    highlightOptions = highlightOptions(
-                      weight = 2,
-                      color = "red",
-                      fillOpacity = 0)#,
-                    #bringToFront = TRUE)
-        ) %>%
-        addLegend(position = "bottomright",
-                  layerId = 'leg',
-                  colors = pal_factor_colors,
-                  labels = pal_factor_labs,
-                  title = titl) %>%
-        addPulseMarkers(
-          layerId = 'pulsemarker',
-          lng = -88.69515507554627, lat = 34.67670663249491,
-          label = pulse_name,
-          labelOptions = labelOptions(
-            style = list("front-weight" = "normal", padding = "3px 8px"),
-            textsize = "15px",
-            direction = "auto"),
-          icon = makePulseIcon(heartbeat = 1,iconSize=10,
-                               color=pulsecolor))
+        
+        # all_states_centr_sel=all_states_centr %>% 
+        #   filter(GEOID==click_counties_cs$curr)
+        pulse_name = click_counties_cs$curr
+        
+        leafletProxy(mapId = "odmap_cs",session = session) %>%
+          addPolygons(data = ln_select_cs,
+                      layerId = ~paste("data", GEOID),
+                      fillColor = ~pal_factor(factor_lab),
+                      stroke=TRUE,
+                      color = st_border_color,
+                      weight = 1,
+                      #opacity  = .85,#~rank/max(rank),
+                      fillOpacity  =  ~tranp,
+                      label = ~NAME,
+                      labelOptions = labelOptions(
+                        style = list("front-weight" = "normal", padding = "3px 8px"),
+                        textsize = "15px",
+                        direction = "auto")
+          ) %>%
+          addPolygons(data = ITTS_hatch,
+                      color = st_border_color,
+                      weight = 1,
+                      opacity = 1
+          ) %>%
+          addPolygons(data = all_selected[all_selected$GEOID == 'ITTS',],
+                      layerId = ~GEOID,
+                      #fillColor = NULL,
+                      stroke=TRUE,
+                      color = '#27A570',      
+                      weight = 6,
+                      #opacity  = .85,#~rank/max(rank),
+                      fillOpacity  = 0,#,#~rank/max(rank),
+                      label = ~NAME,
+                      labelOptions = labelOptions(
+                        style = list("front-weight" = "normal", padding = "3px 8px"),
+                        textsize = "15px",
+                        direction = "auto"),
+                      highlightOptions = highlightOptions(
+                        weight = 2,
+                        color = "red",
+                        fillOpacity = 0)#,
+                      #bringToFront = TRUE)
+          ) %>%
+          addLegend(position = "bottomright",
+                    layerId = 'leg',
+                    colors = pal_factor_colors,
+                    labels = pal_factor_labs,
+                    title = titl) %>%
+          addPulseMarkers(
+            layerId = 'pulsemarker',
+            lng = -88.69515507554627, lat = 34.67670663249491,
+            label = pulse_name,
+            labelOptions = labelOptions(
+              style = list("front-weight" = "normal", padding = "3px 8px"),
+              textsize = "15px",
+              direction = "auto"),
+            icon = makePulseIcon(heartbeat = 1,iconSize=10,
+                                 color=pulsecolor))
       } else {
         # all_states_centr_sel=all_states_centr %>% 
         #   filter(GEOID==click_counties_cs$curr)
@@ -769,7 +757,7 @@ observeEvent(eventExpr = map_update_cs(),{
               direction = "auto"),
             icon = makePulseIcon(heartbeat = 1,iconSize=10,
                                  color=pulsecolor))
-    }
+      }
     }
   }
   
@@ -792,7 +780,7 @@ observe({
   } else {
     output$table_title_cs = renderText(paste0("Selected: ", all_selected$NAME[all_selected$GEOID == click_counties_cs$curr]))
   }
-
+  
 })
 #output$table_title_cs <- renderText({ table_titl() })
 
@@ -811,7 +799,7 @@ output$scenario_title_cs <- renderText({
 
 output$scenario_text_output <- renderText({
   req(input$Scenario_opt_cs)
-
+  
   if(input$Scenario_opt_cs == '_s1'){
     return('In Scenario 1, due to the resilience and readiness of the region’s supply chains, the Southeast
            region increases its production of consumer goods and agricultural goods over time. The Southeast
@@ -841,10 +829,11 @@ output$scenario_text_output <- renderText({
   
 })
 
+
 output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
   if(input$Scenario_opt_cs == 'Baseline' &
-     grepl('2017',input$Value_opts_cs) &
+     grepl('2022',input$Value_opts_cs) &
      input$dms_mode_opts_cs == 'All' &
      input$sctg2_opts_cs == 'All' &
      input$OD_opts_cs == 'Both'){
@@ -862,17 +851,17 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   SETTS_ss_cs<-ln_select_cs %>% 
     st_drop_geometry() 
   
-
+  
   if(input$OD_opts_cs == "Both"){
-  SETTS_ss_cs<-SETTS_ss_cs %>% 
-    left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-   } else if(input$OD_opts_cs == "dms_orig"){
-     
-
+    SETTS_ss_cs<-SETTS_ss_cs %>% 
+      left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
+  } else if(input$OD_opts_cs == "dms_orig"){
+    
+    
     SETTS_ss_cs<-SETTS_ss_cs %>%
       left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))
   } else if(input$OD_opts_cs == "dms_dest"){
-
+    
     SETTS_ss_cs<-SETTS_ss_cs %>%
       left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("origin" = "GEOID"))
   }
@@ -884,10 +873,8 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
   SETTS_ss_cs<-SETTS_ss_cs %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
-    rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-           'Tons 2022</br>(Thousand Tons)'='tons_2022',
+    rename('Tons 2022</br>(Thousand Tons)'='tons_2022',
            'Tons 2050</br>(Thousand Tons)'='tons_2050',
-           'Value 2017</br>($Million)'='value_2017',
            'Value 2022</br>($Million)'='value_2022',
            'Value 2050</br>($Million)'='value_2050')
   names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))] <- str_to_title(gsub("_"," ",names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))]))
@@ -902,6 +889,7 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
     SETTS_ss_cs<-SETTS_ss_cs %>%
       rename('State'='NAME') #%>%
     #filter(rank <= input$n_top_cs)
+    
   }
   
   
@@ -942,15 +930,15 @@ observe({
   
   req(click_counties_cs$curr,input$dms_mode_opts_cs,input$county_opts_cs,input$n_top_cs,
       input$OD_opts_cs, input$sctg2_opts_cs, input$Value_opts_cs,input$Scenario_opt_cs) #
-
-    ln_select_cs=data_ss_click_cs()
+  
+  ln_select_cs=data_ss_click_cs()
   
   # validate(need(nrow(ln_select_cs)>0,
   #               'There is no data for the selected subset.'))
   
   if(!is.null(ln_select_cs)){
     
-    if(input$Scenario_opt_cs == 'Baseline' |grepl('2017',input$Value_opts_cs)){
+    if(input$Scenario_opt_cs == 'Baseline' |grepl('2022',input$Value_opts_cs)){
       names(ln_select_cs)[names(ln_select_cs)=='factor_lab']=input$Value_opts_cs}
     else{
       names(ln_select_cs)[names(ln_select_cs)=='factor_lab']=paste0(input$Value_opts_cs, input$Scenario_opt_cs)
@@ -981,10 +969,8 @@ observe({
     
     SETTS_ss_cs<-SETTS_ss_cs %>%
       mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>%
-      rename('Tons 2017</br>(Thousand Tons)'='tons_2017',
-             'Tons 2022</br>(Thousand Tons)'='tons_2022',
+      rename('Tons 2022</br>(Thousand Tons)'='tons_2022',
              'Tons 2050</br>(Thousand Tons)'='tons_2050',
-             'Value 2017</br>($Million)'='value_2017',
              'Value 2022</br>($Million)'='value_2022',
              'Value 2050</br>($Million)'='value_2050')
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
@@ -993,11 +979,9 @@ observe({
     
   } else {
     SETTS_ss_cs <- data.frame('EmptyData'=c(),
-                              'Tons 2017</br>(Thousand Tons)'=c(),
-                              'Tons 2020</br>(Thousand Tons)'=c(),
+                              'Tons 2022</br>(Thousand Tons)'=c(),
                               'Tons 2050</br>(Thousand Tons)'=c(),
-                              'Value 2017</br>($Million)'=c(),
-                              'Value 2020</br>($Million)'=c(),
+                              'Value 2022</br>($Million)'=c(),
                               'Value 2050</br>($Million)'=c())
     SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs
     replaceData(proxy_cty2state_tbl, SETTS_ss_cs, rownames = FALSE)
