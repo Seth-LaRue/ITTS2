@@ -233,7 +233,7 @@ server <- function(input, output, session) {
     runjs('
           $("#tab-maps_tabs").click();
           //$("#tabset_maps-ITTSInternationalTrade-tab").click();
-          $("#tabset_maps-ITTSCountytoCountyTrade-tab").click();
+          //$("#tabset_maps-ITTSCountytoCountyTrade-tab").click();
           $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click();
           
           $("#tabset_maps-ITTSCountytoCountyTrade-tab").click(function(){$("#odmap").trigger("shown");});

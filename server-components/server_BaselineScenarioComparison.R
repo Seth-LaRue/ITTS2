@@ -90,21 +90,7 @@ return <- return %>%
          tons_2050_s0 = tons_2050,
          value_2017_s0 = value_2017,
          value_2022_s0 = value_2022,
-          value_2050_s0 = value_2050) #%>%
-  # mutate(tons_2022_s1 = tons_2022_s0,
-  #        tons_2022_s2 = tons_2022_s0,
-  #        tons_2022_s3 = tons_2022_s0,
-  #        value_2022_s1 = value_2022_s0,
-  #        value_2022_s2 = value_2022_s0,
-  #        value_2022_s3 = value_2022_s0) %>%
-  # mutate(tons_2017_s1 = tons_2017_s0,
-  #        tons_2017_s2 = tons_2017_s0,
-  #        tons_2017_s3 = tons_2017_s0,
-  #        value_2017_s1 = value_2017_s0,
-  #        value_2017_s2 = value_2017_s0,
-  #        value_2017_s3 = value_2017_s0)  %>%
-  # select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) 
-
+          value_2050_s0 = value_2050)
   return(return)
   }) %>% 
   bindCache(input$stab2_states, input$stab2_OD, input$stab2_commodity, input$stab2_mode) %>%
@@ -193,14 +179,16 @@ line_plot <- function(df_in, meas = "Tonnage"){
 
 output$stab2_line_tons <- renderPlotly({
   req(stab2_data())
+  
   print("RUNNING SCEN_COMP: tonnage lineplot")
+  
     df_temp <- stab2_data() %>%
       mutate(tons_2022_s1 = tons_2022_s0,
-                     tons_2022_s2 = tons_2022_s0,
-                     tons_2022_s3 = tons_2022_s0,
-                     value_2022_s1 = value_2022_s0,
-                     value_2022_s2 = value_2022_s0,
-                     value_2022_s3 = value_2022_s0) %>%
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0) %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
       pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
