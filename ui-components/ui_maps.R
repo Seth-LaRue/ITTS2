@@ -92,6 +92,8 @@ domestic_tab <-
           
           width = 12, 
           
+          selected = "ITTS County/State/Region to State Trade",
+          
           #ITTS County/State/Region to State Trade: TOP-----------------------------------
           argonTab(tabName = "ITTS County/State/Region to State Trade",
                    active = T,
@@ -440,7 +442,7 @@ domestic_tab <-
                                 h2("Top 10 Outbound Trading Partners", align = "center"),
                                 plotlyOutput("c2c_cf_topOutbound",width = "auto", height = "auto"))
                   ))
-              ))) #, #<- you need to uncomment this for international
+              ))) , #<- you need to uncomment this for international
           
           #ITTS International Trade: TOP--------------------------------------------------
           # 

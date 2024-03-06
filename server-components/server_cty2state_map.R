@@ -64,35 +64,39 @@ dat_ini_se <- dat_ss %>%
   ungroup() %>%
   mutate(rank = rank(desc(value_2022)))
 
-ln_select_cs_ini<- reactive({
-  #req(n_lines_disp$curr)
-  req(input$cors_opts)
-  req(input$county_opts_cs)
-  if(input$cors_opts == 'c2c'){
-    ln_select_cs_ini <- state_base %>%
-      select(GEOID, NAME) %>%
-      inner_join(dat_ini_cs,by = "GEOID")} 
-  else if (input$cors_opts == 's2s'){
-    
-    ln_select_cs_ini <- state_base %>%
-      select(GEOID, NAME) %>%
-      inner_join(dat_ini_ss,by = "GEOID")}
-  else if (input$cors_opts == 'r2s'){
-    if(input$county_opts_cs == 'ITTS'){
-      ln_select_cs_ini <- ITTS_base %>%
-        select(GEOID, NAME) %>%
-        inner_join(dat_ini_rs,by = "GEOID")
-    } else {
-      ln_select_cs_ini <- SE_base %>%
-        select(GEOID, NAME) %>%
-        inner_join(dat_ini_se,by = "GEOID")}
-    
-  }
-  
-})
+# ln_select_cs_ini<- reactive({
+#   #req(n_lines_disp$curr)
+#   req(input$cors_opts)
+#   req(input$county_opts_cs)
+#   if(input$cors_opts == 'c2c'){
+#     ln_select_cs_ini <- state_base %>%
+#       select(GEOID, NAME) %>%
+#       inner_join(dat_ini_cs,by = "GEOID")} 
+#   else if (input$cors_opts == 's2s'){
+#     
+#     ln_select_cs_ini <- state_base %>%
+#       select(GEOID, NAME) %>%
+#       inner_join(dat_ini_ss,by = "GEOID")}
+#   else if (input$cors_opts == 'r2s'){
+#     if(input$county_opts_cs == 'ITTS'){
+#       ln_select_cs_ini <- ITTS_base %>%
+#         select(GEOID, NAME) %>%
+#         inner_join(dat_ini_rs,by = "GEOID")
+#     } else {
+#       ln_select_cs_ini <- SE_base %>%
+#         select(GEOID, NAME) %>%
+#         inner_join(dat_ini_se,by = "GEOID")}
+#     
+#   }
+#   
+# })
+
+ln_select_cs_ini <- ITTS_base %>%
+  select(GEOID, NAME) %>%
+  inner_join(dat_ini_rs,by = "GEOID")
 
 output$odmap_cs <- renderLeaflet({
-  ln_select_cs_ini = ln_select_cs_ini()
+  ln_select_cs_ini = ln_select_cs_ini
   pal_factor_ini_cs <- colorQuantile(palette = "Blues",domain = ln_select_cs_ini$value_2022,probs = seq(0, 1, .2))
   pulsecolor_ini_cs='red'
   
@@ -449,7 +453,7 @@ observeEvent(eventExpr = map_update_cs(),{
   if(!is.null(ln_select_cs)) {
     if(input$cors_opts %in% c('s2s','c2c')){
       leafletProxy(mapId = "odmap_cs",session = session) %>%
-        removeShape(layerId = paste("data", ITTS_base$GEOID)) %>%
+        removeShape(layerId = paste("data", state_base$GEOID)) %>%
         removeShape(layerId = paste(all_selected$GEOID)) %>%
         #removeShape(layerId = 'leg') %>%
         clearControls() %>%
@@ -837,7 +841,7 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
      input$dms_mode_opts_cs == 'All' &
      input$sctg2_opts_cs == 'All' &
      input$OD_opts_cs == 'Both'){
-    ln_select_cs=ln_select_cs_ini()
+    ln_select_cs=ln_select_cs_ini
     
     names(ln_select_cs)[names(ln_select_cs)=='factor_lab']=input$Value_opts_cs}
   else if(input$Scenario_opt_cs == 'Baseline' ){
