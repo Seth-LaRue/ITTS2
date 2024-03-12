@@ -844,3 +844,4 @@ SETTS_sandbox/.Rproj.user/21579B0C/rmd-outputs
 app_tester.R
 .RData
 .Rhistory
+*.Rdata

@@ -26,7 +26,7 @@ ln_select_ini <- county_selected %>%
 
 
 
-
+#observeEvent(input$county_opts,{browser()})
 
 observeEvent(input$county_opts, {
   req(input$county_opts)

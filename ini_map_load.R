@@ -113,24 +113,24 @@ m_cs<-leaflet() %>%
               labelOptions = labelOptions(
                 style = list("front-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
-                direction = "auto")) %>%
-  addPolygons(data = county_selected,
-              layerId = 'base_county',
-              color = cty_border_color,
-              weight = .5,
-              smoothFactor = 0.3,
-              opacity = .4,
-              fillOpacity = 0,
-              label = cty_labels,
-              labelOptions = labelOptions(
-                style = list("front-weight" = "normal", padding = "3px 8px"),
-                textsize = "15px",
-                direction = "auto"),
-              highlightOptions = highlightOptions(
-                weight = 2,
-                color = "red",
-                fillOpacity = 0,
-                bringToFront = TRUE))
+                 direction = "auto")) #%>%
+  # addPolygons(data = county_selected,
+  #             layerId = 'base_county',
+  #             color = cty_border_color,
+  #             weight = .5,
+  #             smoothFactor = 0.3,
+  #             opacity = .4,
+  #             fillOpacity = 0,
+  #             label = cty_labels,
+  #             labelOptions = labelOptions(
+  #               style = list("front-weight" = "normal", padding = "3px 8px"),
+  #               textsize = "15px",
+  #               direction = "auto"),
+  #             highlightOptions = highlightOptions(
+  #               weight = 2,
+  #               color = "red",
+  #               fillOpacity = 0,
+  #               bringToFront = TRUE))
 #international_map
 m_in<-leaflet() %>%
   addProviderTiles(providers$CartoDB.Positron,#providers$CartoDB.DarkMatter,

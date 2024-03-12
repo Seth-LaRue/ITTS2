@@ -18,30 +18,66 @@ library(plotly)
 library(data.table)
 library(networkD3)
 #Initialize Data ----
-                                                                         
-# load("ITTS_Hatch.RData")
-# load(".Rdata")
-# load("New_Groupped_Commodity_wtih2022.Rdata")
-# 
-# objects_old <- read.csv("names_of_old_objects.csv")
-# objects_new <- read.csv("names_of_new_objects.csv")
-# 
-# objects_old$index <- objects_old$X
-# objects_old$name <- objects_old$x
-# 
-# objects_new$index <- objects_new$X
-# objects_new$name <- objects_new$x
-# 
-# keep <- objects_old$name[!(objects_old$name %in% objects_new$name)]
-# remove_list <- objects_old$name[(objects_old$name %in% objects_new$name)]
-# 
-# load(".Rdata")
-# rm(list = remove_list)
-# load("ITTS_Hatch.RData")
-# load("New_Groupped_Commodity_wtih2022.Rdata")
-#save.image(file = "ITTS_Initial_Data_03012024_v1_1.Rdata")
-#load("ITTS_Initial_Data_03012024_v1_1.Rdata")
 
+
+#load(file = "ITTS_Initial_Data_03112024_v1_6.Rdata")
+
+#check zero
+#dat_cs[,5:ncol(dat_cs)] <- lapply(dat_cs[,5:ncol(dat_cs)] ,as.numeric)
+#
+# colnames(dat_pin)[colnames(dat_pin) %in% c('Tons_2019','Tons_2021','Value_2019','Value_2021')] = c('tons_2019','tons_2021','value_2019','value_2021')
+# colnames(dat_sin)[colnames(dat_sin) %in% c('Tons_2019','Tons_2021','Value_2019','Value_2021')] = c('tons_2019','tons_2021','value_2019','value_2021')
+
+#check one
+
+ITTS_base <- state_base %>%
+  mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',NAME),
+         GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',GEOID)) %>%
+  group_by(NAME, GEOID) %>%
+  summarise(NAME = unique(NAME),
+            GEOID = unique(GEOID))%>%
+  ungroup()
+
+ITTS_boundary <- ITTS_base %>% filter(GEOID == 'ITTS') %>%
+  select('GEOID','NAME') %>%
+  mutate(type = '',
+         mode_nm = '')
+
+all_selected = rbind(all_selected,ITTS_boundary)
+
+SE_base <- state_base %>%
+  mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',NAME),
+         GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',GEOID)) %>%
+  group_by(NAME, GEOID) %>%
+  summarise(NAME = unique(NAME),
+            GEOID = unique(GEOID))%>%
+  ungroup()
+
+SE_boundary <- SE_base %>% filter(GEOID == 'Southeast Region') %>%
+  select('GEOID','NAME') %>%
+  mutate(type = '',
+         mode_nm = '')
+
+all_selected = rbind(all_selected,SE_boundary)
+#
+other_states = state_base %>%
+  filter(!(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))) %>%
+  select(-'state_lab',-'STATEFP') %>%
+  mutate(type = "",
+         mode_nm = "")
+
+all_selected <- rbind(all_selected,other_states)  ## add all geographical boundaries to this layer, used in graphs.
+
+international_base <- international_base %>%
+  mutate(type = "",
+         mode_nm = "")
+all_selected <- rbind(all_selected,international_base)
+# this is for hatch pattern on ITTS and SE_hatch
+# ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
+# SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
+remove(ITTS_boundary)
+remove(SE_boundary)
+remove(other_states)
 
 #Source scripts ----
 source("gral_parameters.R")
