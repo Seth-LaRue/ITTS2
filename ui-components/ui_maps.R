@@ -187,10 +187,13 @@ domestic_tab <-
                                    
                                    tags$div(
                                      title = "Select a scenario for freight movement to display on the map",
-                                     selectizeInput(inputId = "Scenario_opt_cs", label = "Scenario Options", choices = c('Baseline',
-                                                                                                                         'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
-                                                                                                                         'Scenario 2: Leverage Multi-State Strength' = '_s2',
-                                                                                                                         'Scenario 3: Embrace Technology Transformations' = '_s3'),
+                                     selectizeInput(inputId = "Scenario_opt_cs", 
+                                                    label = "Scenario Options",
+                                                    choices = c('Baseline' = 'Baseline'#,
+                                                                # 'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                # 'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                # 'Scenario 3: Embrace Technology Transformations' = '_s3'
+                                                                ),
                                                     selected = 'Baseline')
                                    )
                        ))), #end of column/row
@@ -227,7 +230,7 @@ domestic_tab <-
                            width = 12,
                            argonColumn(width=10,h2(textOutput('table_title_cs'))),
                            argonColumn(width = 10, h2(textOutput('scenario_title_cs'))),
-                           argonColumn(width = 10, p(textOutput("scenario_text_output"))),
+                           argonColumn(width = 10, p(textOutput("scenario_text_output_cs"))),
                            argonColumn(width=2,downloadButton('download_cs','Selected Data')),#, class = "butt_down_cs")),
                            br(),br(),br()
                          ),
@@ -353,13 +356,15 @@ domestic_tab <-
                                                                                                          "Value 2022" = "value_2022",
                                                                                                          "Value 2050" = "value_2050"),
                                           selected ='value_2022')
-                            ),
+                            )
+                            ,
                             tags$div(
                               title = "Select a scenario for freight movement to display on the map",
-                              selectInput(inputId = "Scenario_opt", label = "Scenario Options", choices = c('Baseline',
-                                                                                                            'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
-                                                                                                            'Scenario 2: Leverage Multi-State Strength' = '_s2',
-                                                                                                            'Scenario 3: Embrace Technology Transformations' = '_s3'),
+                              selectInput(inputId = "Scenario_opt", label = "Scenario Options", choices = c('Baseline' = 'Baseline'#,
+                                                                                                            # 'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                                            # 'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                                            # 'Scenario 3: Embrace Technology Transformations' = '_s3'
+                                                                                                            ),
                                           selected = 'Baseline')
                             )
                             
@@ -397,6 +402,7 @@ domestic_tab <-
                                 )),
                     argonColumn(width=10,h2(textOutput('table_title'))),
                     argonColumn(width = 10, h2(textOutput('scenario_title'))),
+                    argonColumn(width = 10, p(textOutput("scenario_text_output"))),
                     argonColumn(width=2,downloadButton('download_cc','Selected Data')),# class = "butt1")),
                     br(),br(),br()
                   ),

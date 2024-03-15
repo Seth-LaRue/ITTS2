@@ -32,10 +32,10 @@ od <- c("Inbound","Outbound","Within ITTS")
 
 
 scenario_choices <- c(
-  "Baseline" = "s0",
-  "Scenario 1: Respond to Heightened Supply Chain Risks"= "s1",
-  "Scenario 2: Leverage Multi-State Strength"= "s2",
-  "Scenario 3: Embrace Technology Transformations"= "s3"
+  "Baseline" = "_s0",
+  "Scenario 1: Respond to Heightened Supply Chain Risks"= "_s1",
+  "Scenario 2: Leverage Multi-State Strength"= "_s2",
+  "Scenario 3: Embrace Technology Transformations"= "_s3"
 )
 
 

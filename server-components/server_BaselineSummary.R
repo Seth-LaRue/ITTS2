@@ -288,6 +288,61 @@ mode_pie_graph <- function(df_in, tons_value_selection = "tons_2022",
   return(mode_plot)
 }
 
+
+
+mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
+                           ini_modecolors = ini_modecolors,
+                           sourceName = sourceName){
+  #arguments: cf_db = Transearch database, yrSelection = Year, flowUnit = Tons or Value,
+  #counties = counties selected by the user;
+  #modecolors = data frame with two columns ("Mode_Group" and "color") that crosswalks between modes and their color on the graph
+  #saveName, saveWidth, saveHeight = arguments passed to the Plotly configu function to customize file saving
+  
+  
+  mode_df <- df_in %>% 
+    #dplyr::filter(origin %in% county | destination %in% county) %>%
+    dplyr::rename(factor_lab = tons_value_selection) %>% 
+    #select(factor_lab, dms_mode) %>% 
+    #rbind(data.frame(dms_mode = c("1","2","3","4","5","6","7"), factor_lab = rep(0,7))) %>% #this fills any zero modes
+    dplyr::group_by(dms_mode) %>% 
+    dplyr::summarise(factor_lab = sum(factor_lab, na.rm = TRUE)) %>% ungroup() %>%
+    left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode)))
+  
+  browser()
+  
+  if (length(strsplit(tons_value_selection, "_")[[1]]) == 1) {
+    formatted_label <- str_to_title(str_replace(tons_value_selection,"_", " "))
+  } else {
+    formatted_label <- str_to_title(str_replace_all(tons_value_selection, "_", " "))
+  }
+  
+  mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
+    add_pie(values = ~factor_lab, 
+            #textinfo='none', 
+            labels = ~mode_group, 
+            automargin = TRUE, 
+            marker = list(colors = ~color, 
+                          line = list(color = "#595959", width = 1)),
+            hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"),
+            text = ~mode_group, key=~mode_group, hole = 0.6, #textfont = list(family = "Arial"),
+            textposition = "outside") %>%
+    layout(#font = list(family = "Arial, "Source Sans Pro", \"Helvetica Neue\", Helvetica, sans-serif", color = "#333"),
+      #showlegend = T, autosize = T, 
+      annotations = list(text = HTML(paste0(formatted_label, "</i>")), "showarrow"=F,font=list(size = 20))) %>% 
+    layout(legend = list(font = list(size = 20))) %>%
+    config(displaylogo = FALSE, 
+           modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
+           # toImageButtonOptions= list(filename = saveName,
+           #                            width = saveWidth,
+           #                            height =  saveHeight)
+    )
+  
+  return(mode_plot)
+}
+
+
+
+
 commodity_pie_graph <- function(df_in, tons_value_selection = "tons_2022", 
                                 commcolors = init_commcolors, 
                                 sourceName = sourceName){
@@ -343,6 +398,12 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
   
   dir_temp$color <- a[1:nrow(dir_temp)]
   
+  if (length(strsplit(tons_value_selection, "_")[[1]]) == 1) {
+    formatted_label <- str_to_title(str_replace(tons_value_selection,"_", " "))
+  } else {
+    formatted_label <- str_to_title(str_replace_all(tons_value_selection, "_", " "))
+  }
+  
 
   dir_plot <- dir_temp %>% plot_ly(source = sourceName, 
                                    labels = ~direction, 
@@ -356,7 +417,7 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
                                                                     textposition = "bottom center") %>%
     layout(
       #showlegend = TRUE, autosize = T, 
-      annotations = list(text = HTML(paste0( str_to_title(str_replace(tons_value_selection,"_", " ")), "</i>")), "showarrow"=F),font=list(size = 20)) #%>% 
+      annotations = list(text = HTML(paste0( formatted_label, "</i>")), "showarrow"=F),font=list(size = 20)) #%>% 
     # config(displaylogo = FALSE, 
     #        modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
     #        # toImageButtonOptions= list(filename = saveName,

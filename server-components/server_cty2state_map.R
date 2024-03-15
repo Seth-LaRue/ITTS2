@@ -104,16 +104,14 @@ output$odmap_cs <- renderLeaflet({
 observeEvent(input$cors_opts, {
   
   print("UPDATING: input$county_ops_cs")
-  req(input$cors_opts)
-  
   if(input$cors_opts=="c2c"){
-    updateSelectizeInput(session, 'county_opts_cs', label = "County", choices = cty_ch, selected = c("Travis County, TX", value = "48453"), server = TRUE)
+    updateSelectizeInput(session, 'county_opts_cs', label = "County", choices = cty_ch, selected = c("Travis County, TX", value = "48453"), server = FALSE)
     click_counties_cs$curr <- "48453"
   } else if(input$cors_opts=="s2s"){
-    updateSelectizeInput(session, 'county_opts_cs', label = "State", choices = state_ch, selected = c("Texas", value = "48"), server = TRUE)
+    updateSelectizeInput(session, 'county_opts_cs', label = "State", choices = state_ch, selected = c("Texas", value = "48"), server = FALSE)
     click_counties_cs$curr <- "48"
   } else if(input$cors_opts=="r2s"){
-    updateSelectizeInput(session, 'county_opts_cs', label = "Region", choices = c('ITTS', 'Southeast Region'), selected = "ITTS", server = TRUE)
+    updateSelectizeInput(session, 'county_opts_cs', label = "Region", choices = c('ITTS', 'Southeast Region'), selected = "ITTS", server = FALSE)
     click_counties_cs$curr <- "ITTS"
   }
   
@@ -132,21 +130,29 @@ observeEvent(input$county_opts_cs, {
 })
 
 #this updates scenario selection
-observeEvent(input$Value_opts_cs,{
-  req(input$county_opts_cs)
-  req(input$Value_opts_cs)
-  req(input$Scenario_opt_cs)
-  
-  if(grepl('2022',input$Value_opts_cs)|grepl('2017',input$Value_opts_cs)){
-    updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else if (grepl(c('2050'),input$Value_opts_cs)) {
-    updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline',
-                                                                                             'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
-                                                                                             'Scenario 2: Leverage Multi-State Strength' = '_s2',
-                                                                                             'Scenario 3: Embrace Technology Transformations' = '_s3'),
-                         selected = 'Baseline',server = TRUE)
-  }
-})
+observeEvent(input$Value_opts_cs, {
+  req(input$county_opts_cs, input$Value_opts_cs, input$Scenario_opt_cs)
+  isolate({
+    if (grepl('2022', input$Value_opts_cs)) {
+      updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline', server = TRUE)
+    } else {
+      # Check if the current selection is not "Baseline"
+      if (input$Scenario_opt_cs != "Baseline") {
+        # No need to update, as it's already set to a scenario option
+        return(NULL)
+      } else {
+        # Update to the selected scenario
+        updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline' = 'Baseline',
+                                                                                                 'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                                 'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                                 'Scenario 3: Embrace Technology Transformations' = '_s3'),
+                             selected = 'Baseline', server = FALSE)
+      }
+    }
+  })
+},ignoreInit = TRUE)
+
+
 
 observeEvent(input$odmap_cs_shape_click, {
   req(input$odmap_cs_shape_click)
@@ -207,6 +213,7 @@ data_ss_click_cs<- reactive({
   req(input$county_opts_cs)
   req(input$n_top_cs)
   req(input$cors_opts)
+  
   #browser()
   print('Running: data_ss_click_cs')
   #additional filtering can go here
@@ -366,10 +373,12 @@ observeEvent(eventExpr = data_ss_click_cs(),{
       input$dms_mode_opts_cs, 
       input$sctg2_opts_cs, 
       input$Value_opts_cs,
-      input$Scenario_opt_cs, 
-      input$n_top_cs,
+      #input$Scenario_opt_cs, 
+      input$n_top_cs#,
+      #input$cors_opts
       #input$county_opts_cs
       )
+  #browser()
   print("RUNNING: Observe of map_update_cs()")
   #do we have to use the entire line file to remove?
   #Print Running Observe event based on map_update_cs
@@ -378,7 +387,7 @@ observeEvent(eventExpr = data_ss_click_cs(),{
   if(is.null(ln_select_cs)&input$cors_opts=='c2c'){
     leafletProxy(mapId = "odmap_cs",session = session) %>%
       removeShape(layerId = paste("data", state_base$GEOID)) %>%
-      #removeShape(layerId = paste(all_selected$GEOID)) %>%
+      removeShape(layerId = paste(all_selected$GEOID)) %>%
       #removeShape(layerId = 'leg') %>%
       clearControls() %>%
       removeShape(layerId = 'pulsemarker')
@@ -386,7 +395,7 @@ observeEvent(eventExpr = data_ss_click_cs(),{
     
     leafletProxy(mapId = "odmap_cs",session = session) %>%
       removeShape(layerId = paste("data", state_base$GEOID)) %>%
-      #removeShape(layerId = paste(all_selected$GEOID)) %>%
+      removeShape(layerId = paste(all_selected$GEOID)) %>%
       #removeShape(layerId = 'leg') %>%
       clearControls() %>%
       removeShape(layerId = 'pulsemarker')}
@@ -394,14 +403,14 @@ observeEvent(eventExpr = data_ss_click_cs(),{
     if (input$county_opts_cs == 'ITTS'){
       leafletProxy(mapId = "odmap_cs",session = session) %>%
         removeShape(layerId = paste("data", ITTS_base$GEOID)) %>%
-        #removeShape(layerId = paste(all_selected$GEOID)) %>%
+        removeShape(layerId = paste(all_selected$GEOID)) %>%
         #removeShape(layerId = 'leg') %>%
         clearControls() %>%
         removeShape(layerId = 'pulsemarker')
     }else {
       leafletProxy(mapId = "odmap_cs",session = session) %>%
         removeShape(layerId = paste("data", SE_base$GEOID)) %>%
-        #removeShape(layerId = paste(all_selected$GEOID)) %>%
+        removeShape(layerId = paste(all_selected$GEOID)) %>%
         #removeShape(layerId = 'leg') %>%
         clearControls() %>%
         removeShape(layerId = 'pulsemarker')
@@ -764,7 +773,7 @@ output$scenario_title_cs <- renderText({
   return(sencario)
 })
 
-output$scenario_text_output <- renderText({
+output$scenario_text_output_cs <- renderText({
   req(input$Scenario_opt_cs)
   
   if(input$Scenario_opt_cs == '_s1'){
@@ -899,8 +908,14 @@ proxy_cty2state_tbl = dataTableProxy('subsetSETTS_cs')
 
 
 observeEvent(eventExpr = data_ss_click_cs(), {
-  req(click_counties_cs$curr,input$dms_mode_opts_cs,input$county_opts_cs,input$n_top_cs,
-      input$OD_opts_cs, input$sctg2_opts_cs, input$Value_opts_cs,input$Scenario_opt_cs) #
+  req(click_counties_cs$curr,
+      input$dms_mode_opts_cs,
+      input$county_opts_cs,
+      input$n_top_cs,
+      input$OD_opts_cs,
+      input$sctg2_opts_cs, 
+      input$Value_opts_cs,
+      input$Scenario_opt_cs) #
   
   print("RUNNING: eventless observe")
   print("CALLING: data_ss_click_cs()")
@@ -1039,7 +1054,7 @@ observe({
   
   output$c2s_mode <- renderPlotly({
     #browser()
-    mode_pie_graph(dat_in,
+    mode_pie_graph_v2(dat_in,
                    #county = input$county_opts,
                    tons_value_selection = selected_value_cs,
                    ini_modecolors = ini_modecolors2,
