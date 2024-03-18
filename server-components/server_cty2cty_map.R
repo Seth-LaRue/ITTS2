@@ -53,17 +53,26 @@ observeEvent(input$odmap_shape_click, {
   
 })
 
-observeEvent(input$Value_opts,{
-  if(grepl('2022',input$Value_opts)){
-    updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else if (grepl(c('2050'),input$Value_opts)) {
-    updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline',
-                                                                                          'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
-                                                                                          'Scenario 2: Leverage Multi-State Strength' = '_s2',
-                                                                                          'Scenario 3: Embrace Technology Transformations' = '_s3'),
-                         selected = 'Baseline',server = FALSE)
-  }
-},ignoreInit = TRUE)
+observeEvent(input$Value_opts, {
+  req(input$county_opts, input$Value_opts, input$Scenario_opt)
+  isolate({
+    if (grepl('2022', input$Value_opts)) {
+      updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline', server = FALSE)
+    } else {
+      # Check if the current selection is not "Baseline"
+      if (input$Scenario_opt != "Baseline") {
+        return(NULL)
+      } else {
+        # Update to the selected scenario
+        updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline' = 'Baseline',
+                                                                                                 'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+                                                                                                 'Scenario 2: Leverage Multi-State Strength' = '_s2',
+                                                                                                 'Scenario 3: Embrace Technology Transformations' = '_s3'),
+                             selected = 'Baseline', server = FALSE)
+      }
+    }
+  })
+})
 
 
 output$odmap <- renderLeaflet({
@@ -215,6 +224,12 @@ data_ss_click<- reactive({
                                     click_counties$curr,
                                     c('origin', 'destination', 'GEOID'),
                                     1)
+        col_name <-  tail(names(dat_temp), 5)
+        dat_temp = dat_temp %>% 
+          group_by(GEOID) %>%
+          summarise(
+            across(col_name, sum, na.rm = TRUE)
+          )
         selected_col <- paste0(input$Value_opts, input$Scenario_opt)}
     }
     else {
@@ -626,8 +641,7 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   
    names(SETTS_ss)[grepl('_',names(SETTS_ss))] <- str_to_title(gsub("_"," ",names(SETTS_ss)[grepl('_',names(SETTS_ss))])) 
   #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
-  
-  
+
   #SETTS_ss<-SETTS_ss %>%
   #rename('Partner'='County Lab')
   
