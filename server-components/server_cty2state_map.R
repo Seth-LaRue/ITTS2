@@ -150,7 +150,7 @@ observeEvent(input$Value_opts_cs, {
       }
     }
   })
-},ignoreInit = TRUE)
+})
 
 
 
@@ -811,8 +811,8 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
   if(input$Scenario_opt_cs == 'Baseline'){
     print("CALLING: data_ss_click_cs point 1")
-    #browser()
-    #ln_select_cs=ln_select_cs_ini()
+
+        #ln_select_cs=ln_select_cs_ini()
     ln_select_cs=data_ss_click_cs()
     
     print(paste0("Printing Names: ", names(ln_select_cs)))
@@ -872,8 +872,6 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
     #filter(rank <= input$n_top_cs)
     
   }
-  
-  
   
   
   SETTS_tbl_cs=datatable(SETTS_ss_cs,
