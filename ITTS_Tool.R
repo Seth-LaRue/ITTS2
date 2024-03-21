@@ -38,12 +38,12 @@ ITTS_base <- state_base %>%
             GEOID = unique(GEOID))%>%
   ungroup()
 
-ITTS_boundary <- ITTS_base %>% filter(GEOID == 'ITTS') %>%
-  select('GEOID','NAME') %>%
-  mutate(type = '',
-         mode_nm = '')
-
-all_selected = rbind(all_selected,ITTS_boundary)
+# ITTS_boundary <- ITTS_base %>% filter(GEOID == 'ITTS') %>%
+#   select('GEOID','NAME') %>%
+#   mutate(type = '',
+#          mode_nm = '')
+# 
+# all_selected = rbind(all_selected,ITTS_boundary)
 
 SE_base <- state_base %>%
   mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',NAME),
@@ -53,31 +53,34 @@ SE_base <- state_base %>%
             GEOID = unique(GEOID))%>%
   ungroup()
 
-SE_boundary <- SE_base %>% filter(GEOID == 'Southeast Region') %>%
-  select('GEOID','NAME') %>%
-  mutate(type = '',
-         mode_nm = '')
-
-all_selected = rbind(all_selected,SE_boundary)
+# SE_boundary <- SE_base %>% filter(GEOID == 'Southeast Region') %>%
+#   select('GEOID','NAME') %>%
+#   mutate(type = '',
+#          mode_nm = '')
+# 
+# all_selected = rbind(all_selected,SE_boundary)
 #
-other_states = state_base %>%
-  filter(!(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))) %>%
-  select(-'state_lab',-'STATEFP') %>%
-  mutate(type = "",
-         mode_nm = "")
-
-all_selected <- rbind(all_selected,other_states)  ## add all geographical boundaries to this layer, used in graphs.
+# other_states = state_base %>%
+#   filter(!(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))) %>%
+#   select(-'state_lab',-'STATEFP') %>%
+#   mutate(type = "",
+#          mode_nm = "")
+# 
+# all_selected <- rbind(all_selected,other_states)  ## add all geographical boundaries to this layer, used in graphs.
 
 international_base <- international_base %>%
   mutate(type = "",
          mode_nm = "")
-all_selected <- rbind(all_selected,international_base)
+# all_selected <- rbind(all_selected,international_base)
+all_selected <- st_transform(all_selected, crs = st_crs(4326))
+county_selected <- st_transform(county_selected, crs = st_crs(4326))
+
 # this is for hatch pattern on ITTS and SE_hatch
 # ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
 # SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
-remove(ITTS_boundary)
-remove(SE_boundary)
-remove(other_states)
+#remove(ITTS_boundary)
+#remove(SE_boundary)
+#remove(other_states)
 
 #Source scripts ----
 source("gral_parameters.R")

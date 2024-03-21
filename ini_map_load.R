@@ -51,8 +51,8 @@ county_choices <- county_selected %>%
 state_choices <- state_base %>%
   filter(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))
 
-all_selected <- rbind(select(mutate(county_choices, NAME = county_lab),-c(county_lab,statename)), select(state_choices, -c(state_lab, STATEFP))) %>%
-  bind_rows(ports_base)
+# all_selected <- rbind(select(mutate(county_choices, NAME = county_lab),-c(county_lab,statename)), select(state_choices, -c(state_lab, STATEFP))) %>%
+#   bind_rows(ports_base)
 
 all_counties_centr <- county_base %>% 
   st_centroid() %>%

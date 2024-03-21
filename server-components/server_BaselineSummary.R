@@ -308,8 +308,7 @@ mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
     dplyr::summarise(factor_lab = sum(factor_lab, na.rm = TRUE)) %>% ungroup() %>%
     left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode)))
   
-  browser()
-  
+
   if (length(strsplit(tons_value_selection, "_")[[1]]) == 1) {
     formatted_label <- str_to_title(str_replace(tons_value_selection,"_", " "))
   } else {

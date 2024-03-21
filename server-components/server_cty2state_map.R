@@ -127,6 +127,8 @@ observeEvent(input$county_opts_cs, {
   
   click_counties_cs$prev = click_counties_cs$curr
   click_counties_cs$curr <- cnty_cs
+  
+  browser()
 })
 
 #this updates scenario selection
@@ -256,7 +258,6 @@ data_ss_click_cs<- reactive({
     dat_temp_cs <- dat_temp_cs %>%
       filter(origin == click_counties_cs$curr|destination == click_counties_cs$curr) %>%
       mutate(GEOID = ifelse(origin == click_counties_cs$curr, destination, origin))
-
   }
   
     #filtering for mode
@@ -368,7 +369,6 @@ data_ss_click_cs<- reactive({
   
   
   return(ln_select_cs)
-  
 })
 
 #cs map update
@@ -812,13 +812,13 @@ output$scenario_text_output_cs <- renderText({
 
 output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   print("RENDERING: subsetSETTS_cs")
-  
-  if(input$Scenario_opt_cs == 'Baseline'){
+
+    if(input$Scenario_opt_cs == 'Baseline'){
     print("CALLING: data_ss_click_cs point 1")
 
         #ln_select_cs=ln_select_cs_ini()
     ln_select_cs=data_ss_click_cs()
-    
+
     print(paste0("Printing Names: ", names(ln_select_cs)))
     
     names(ln_select_cs)[names(ln_select_cs)=='factor_lab'] = input$Value_opts_cs
