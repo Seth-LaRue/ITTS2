@@ -163,6 +163,15 @@ body > div.container-fluid > div.main-content > div.container-fluid.mt--1, #shin
   padding-bottom: .5rem !important;
 }
 
+.tab-content {
+  overflow: visible;
+}
+
+.dropdown-menu {
+  position: relative; 
+  z-index: 999999; /*why not working sad face
+}
+
 .table td, .table th {
   padding: .25rem !important;
 }

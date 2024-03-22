@@ -17,6 +17,7 @@ library(shinyWidgets)
 library(plotly)
 library(data.table)
 library(networkD3)
+library(waiter)
 #Initialize Data ----
 
 
@@ -106,6 +107,7 @@ flush_waiter_message <- function(){
 
 #UI ----
 ui <- fluidPage(
+  use_waiter(),
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css"),
     

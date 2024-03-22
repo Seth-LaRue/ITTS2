@@ -53,6 +53,8 @@ scenario_choices <- c(
                    h1("Scenario Comparison"),
                    p("This tab is to help users compare differences between the scenarios. Please select which commodities, directions, modes, and scenarios you would like to see displayed and press the button to the right to run the analysis."))),
           #First Card w inputs/button --------------
+          tabsetPanel(id = "InputSet",
+                      tabPanel(id = "InputPanel",
           argonCard(width = 12,
                     argonRow(width = 12,
                              argonColumn(width = 2,
@@ -138,130 +140,10 @@ scenario_choices <- c(
                                            title = "Run based on selected filter",
                                            actionButton("stab2_mainbutt", "Run based on Page Filters"))
                              )
-                    )), #end of input card
-          #second card line graphs ---------
-          argonCard(width = 12, 
-                    argonRow(width = 12,h1("Growth year over year", align = 'center')),
-                    argonRow(width = 12, p("The total tonnage and value for each chosen scenario for the base and future years.")),
-                    argonRow(width = 12, 
-                             argonColumn(width = 10, p(textOutput("scen_select"))),
-                             argonColumn(width = 10, p(textOutput("state_select"))),
-                             argonColumn(width = 10, p(textOutput("dir_select"))),
-                             argonColumn(width = 10, p(textOutput("mode_select"))),
-                             argonColumn(width = 10, p(textOutput("comm_select")))
-                             ),
-                    argonRow(width = 12,
-                             argonColumn(width = 6, 
-                                         #h2("Tons Growth", align = "center"), 
-                                         plotlyOutput("stab2_line_tons", width = "auto", height = "auto")
-                             ),
-                             argonColumn(width = 6, 
-                                         #h2("Value Growth", align = "center"), 
-                                         plotlyOutput("stab2_line_value", width = "auto", height = "auto")
-                             )
-                    )),
-          #third card ----
-          argonCard(width = 12,
-                    argonRow(width = 12,h1("Percent Growth")),
-                    argonRow(width = 12, p("This section compares the percent growth for key measures from the base (2019) and future year (2050) by tonnage on the right and value on the left.
-                                           The first row of graph compares the growth for each mode and the second each commodity selected above. Each dot represents a scenario with a higher growth for that scenario the further right the dot is on the line.")),
-                    argonRow(width = 12, 
-                             argonColumn(width = 10, p(textOutput("scen_select_pw"))),
-                             argonColumn(width = 10, p(textOutput("state_select_pw"))),
-                             argonColumn(width = 10, p(textOutput("dir_select_pw"))),
-                             argonColumn(width = 10, p(textOutput("mode_select_pw"))),
-                             argonColumn(width = 10, p(textOutput("comm_select_pw")))
-                    ),
-                    argonRow(width = 12,h2("Percent Growth by State")),
-                    argonRow(width = 12,
-                             argonColumn(width = 6, 
-                                         #h2("State Growth Tons", align = "center"), 
-                                         plotlyOutput("stab2_tons_state_growth_dotplot", width = "auto", height = "auto")
-                             ),
-                             argonColumn(width = 6, 
-                                         #h2("State Growth Value", align = "center"), 
-                                         plotlyOutput("stab2_value_state_growth_dotplot", width = "auto", height = "auto")
-                             )),
-                    argonRow(width = 12,h2("Percent Growth by Mode", align = 'center')),
-                    argonRow(width = 12,
-                             argonColumn(width = 6, 
-                                         #h2("Mode Growth Tons", align = "center"), 
-                                         plotlyOutput("stab2_tons_mode_growth_dotplot", width = "auto", height = "auto")
-                             ),
-                             argonColumn(width = 6, 
-                                         #h2("Mode Growth Value", align = "center"), 
-                                         plotlyOutput("stab2_value_mode_growth_dotplot", width = "auto", height = "auto")
-                             )),
-                    argonRow(width = 12,h2("Percent Growth by Commodity", align = "center")),
-                    argonRow(width = 12,
-                             argonColumn(width = 12, 
-                                         #h2("Commodity Growth Tons", align = "center"), 
-                                         plotlyOutput("stab2_tons_com_growth_dotplot", width = "auto", height = "auto")
-                             )),
-                    argonRow(width = 12, 
-                             argonColumn(width = 12, 
-                                         #h2("Commodity Growth Value", align = "center"), 
-                                         plotlyOutput("stab2_value_com_growth_dotplot", width = "auto", height = "auto")
-                             ))
-          ), #end of card
-          
-          argonCard(width = 12, 
-                    argonRow(width = 12, h1("Trends by year")),
-                    argonRow(width = 12, p("This section shows the total amount of tonnage (left) and value (right) for different measures (mode, direction, and commodity) for the selected year, see below.")),
-                    argonRow(width = 12, 
-                             argonColumn(width = 10, p(textOutput("scen_select_ty"))),
-                             argonColumn(width = 10, p(textOutput("state_select_ty"))),
-                             argonColumn(width = 10, p(textOutput("dir_select_ty"))),
-                             argonColumn(width = 10, p(textOutput("mode_select_ty"))),
-                             argonColumn(width = 10, p(textOutput("comm_select_ty")))
-                    ),
-                    argonRow(width = 12, 
-                    argonColumn(width = 2,
-                                         tags$div(
-                                           title = "Select a measurement of freight movement to display on the map",
-                                           selectInput(inputId = "stab2_value_opts", label = "Freight Measure", choices = c("Tons 2017"="tons_2017",
-                                                                                                                            "Tons 2022" = "tons_2022",
-                                                                                                                            "Tons 2050" = "tons_2050",
-                                                                                                                            "Value 2017" = "value_2017",
-                                                                                                                            "Value 2022" = "value_2022",
-                                                                                                                            "Value 2050" = "value_2050"),
-                                                       selected ='value_2017'))
-                                         
-                             )),
-                    argonRow(width = 12,
-                             argonColumn(width = 6, 
-                                         h2("Trends in Mode Share", align = "center"), 
-                                         plotlyOutput("stab2_mode_bar", width = "auto", height = "auto")
-                             ),
-                             argonColumn(width = 6, 
-                                         h2("Trends in Direction", align = "center"), 
-                                         plotlyOutput("stab2_dir_bar", width = "auto", height = "auto")
-                             )
-                    ),
-                    argonRow(width = 12,
-                             argonColumn(width = 12, 
-                                         h2("Trends in Commodities", align = "center"), 
-                                         plotlyOutput("stab2_com_bar", width = "auto", height = "auto")
-                             )
-                    )),
-          argonCard(width = 12,
-                    argonRow(width = 12, h1("Flow Diagram")),
-                    argonRow(width = 12, p("This section shows the overall flow of tonnage for the selected scenario. Flow lines represent the amount of tonnage moving from one category to another.")),
-                    argonRow(width = 12,
-                             selectInput(
-                               inputId= "stab2_sankey_filt",
-                               label = "Scenario(s)",
-                               choices = c("Baseline" = "s0",
-                                           "Scenario 1: Respond to Heightened Supply Chain Risks"= "s1",
-                                           "Scenario 2: Leverage Multi-State Strength"= "s2",
-                                           "Scenario 3: Embrace Technology Transformations"= "s3")),
-                             argonColumn(width = 12, 
-                                         h2("Commodity Flow Breakdown", align = "center"), 
-                                         plotlyOutput("stab2_sankey", width = "auto", height = "auto")
-                             )
-                    )
-                    #Commodity Flow Trends Graphs argonCard
-          )
-        )
+                    )))), #end of input card
+uiOutput("output_panel_1"),
+uiOutput("output_panel_2"),
+uiOutput("output_panel_3"),
+uiOutput("output_panel_4"))
      
   
