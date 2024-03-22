@@ -127,6 +127,8 @@ observeEvent(input$county_opts_cs, {
   
   click_counties_cs$prev = click_counties_cs$curr
   click_counties_cs$curr <- cnty_cs
+  
+  browser()
 })
 
 #this updates scenario selection
@@ -134,11 +136,10 @@ observeEvent(input$Value_opts_cs, {
   req(input$county_opts_cs, input$Value_opts_cs, input$Scenario_opt_cs)
   isolate({
     if (grepl('2022', input$Value_opts_cs)) {
-      updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline', server = TRUE)
+      updateSelectizeInput(session, 'Scenario_opt_cs', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline', server = FALSE)
     } else {
       # Check if the current selection is not "Baseline"
       if (input$Scenario_opt_cs != "Baseline") {
-        # No need to update, as it's already set to a scenario option
         return(NULL)
       } else {
         # Update to the selected scenario
@@ -150,7 +151,7 @@ observeEvent(input$Value_opts_cs, {
       }
     }
   })
-},ignoreInit = TRUE)
+})
 
 
 
@@ -254,11 +255,9 @@ data_ss_click_cs<- reactive({
     }
     
   } else {
-    
     dat_temp_cs <- dat_temp_cs %>%
       filter(origin == click_counties_cs$curr|destination == click_counties_cs$curr) %>%
       mutate(GEOID = ifelse(origin == click_counties_cs$curr, destination, origin))
-    
   }
   
     #filtering for mode
@@ -299,6 +298,12 @@ data_ss_click_cs<- reactive({
                                        click_counties_cs$curr,
                                        c('origin', 'destination', 'GEOID'),
                                        1) 
+        col_name <-  tail(names(dat_temp_cs), 5)
+        dat_temp_cs = dat_temp_cs %>% 
+          group_by(GEOID) %>%
+          summarise(
+            across(col_name, sum, na.rm = TRUE)
+          )
         
         selected_col <- paste0(input$Value_opts_cs, input$Scenario_opt_cs)
         
@@ -364,7 +369,6 @@ data_ss_click_cs<- reactive({
   
   
   return(ln_select_cs)
-  
 })
 
 #cs map update
@@ -808,13 +812,13 @@ output$scenario_text_output_cs <- renderText({
 
 output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   print("RENDERING: subsetSETTS_cs")
-  
-  if(input$Scenario_opt_cs == 'Baseline'){
+
+    if(input$Scenario_opt_cs == 'Baseline'){
     print("CALLING: data_ss_click_cs point 1")
-    #browser()
-    #ln_select_cs=ln_select_cs_ini()
+
+        #ln_select_cs=ln_select_cs_ini()
     ln_select_cs=data_ss_click_cs()
-    
+
     print(paste0("Printing Names: ", names(ln_select_cs)))
     
     names(ln_select_cs)[names(ln_select_cs)=='factor_lab'] = input$Value_opts_cs
@@ -862,19 +866,17 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
   #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
   
-  if(input$cors_opts=="c2c"){
-    SETTS_ss_cs<-SETTS_ss_cs %>%
-      rename('State'='NAME')#%>%
-    #filter(rank <= input$n_top_cs)
-  } else if(input$cors_opts=="s2s"){
-    SETTS_ss_cs<-SETTS_ss_cs %>%
-      rename('State'='NAME') #%>%
-    #filter(rank <= input$n_top_cs)
-    
-  }
-  
-  
-  
+  # if(input$cors_opts=="c2c"){
+  #   SETTS_ss_cs<-SETTS_ss_cs %>%
+  #     rename('State'='NAME')#%>%
+  #   #filter(rank <= input$n_top_cs)
+  # } else if(input$cors_opts=="s2s"){
+  #   SETTS_ss_cs<-SETTS_ss_cs %>%
+  #     rename('State'='NAME') #%>%
+  #   #filter(rank <= input$n_top_cs)
+  # }
+  SETTS_ss_cs<-SETTS_ss_cs %>%
+         rename('State'='NAME')
   
   SETTS_tbl_cs=datatable(SETTS_ss_cs,
                          filter = list(position = 'top', clear = FALSE),
