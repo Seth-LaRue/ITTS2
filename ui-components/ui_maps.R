@@ -33,8 +33,8 @@
 #                  "Waste and Scrap"
 #                  )
 
-# od <- c("Both" = "Both","Inbound" = "dms_dest", "Outbound" = "dms_orig")
-# od_in <- c("Both" = "Both","Import" = "dms_dest", "Export" = "dms_orig")
+od <- c("Both" = "Both","Inbound" = "dms_dest", "Outbound" = "dms_orig")
+#od_in <- c("Both" = "Both","Import" = "dms_dest", "Export" = "dms_orig")
 # 
 # ITTS_states <- data.frame(state = c("Arkansas","Florida","Georgia","Kentucky","Louisiana","Mississippi","Missouri","South Carolina","Texas","Virginia", "Alabama","Tennessee","North Carolina"),
 #                           FIPS = c("05","12","13","21","22","28","29","45","48","51","01","47","37"))

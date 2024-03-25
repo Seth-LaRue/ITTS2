@@ -761,7 +761,8 @@ output$download_cc <- downloadHandler(
 observe({
   req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
       input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
-  
+  print("Observe: cnty2cnty")
+  #browser()
   if (input$OD_opts == 'Both'){
     dat_in <- dat %>% filter(origin %in% input$county_opts | destination %in% input$county_opts)
   } else if (input$OD_opts == 'dms_orig'){

@@ -237,6 +237,7 @@ data_ss_click_cs<- reactive({
     }
   }
   
+  #browser()
   #filter for direction
   if(input$OD_opts_cs != "Both"){
     
