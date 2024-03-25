@@ -362,6 +362,7 @@ map_update <- reactive({
 observeEvent(eventExpr = map_update(), {
   req(click_counties$curr,input$dms_mode_opts,
       input$sctg2_opts, input$Value_opts,input$Scenario_opt, input$n_top)
+  show_waiter_message()
   
   #do we have to use the entire line file to remove?
   leafletProxy(mapId = "odmap",session = session) %>%
@@ -523,7 +524,9 @@ observeEvent(eventExpr = map_update(), {
         icon = makePulseIcon(heartbeat = 1,iconSize=10,
                              color=pulsecolor))
   }
-  
+  onFlushed(function() {
+    flush_waiter_message()
+  })
 })
 
 outputOptions(output, 'odmap', suspendWhenHidden = FALSE)
