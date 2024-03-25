@@ -129,6 +129,7 @@ observeEvent(input$county_opts_cs, {
   click_counties_cs$curr <- cnty_cs
   
   #browser()
+
 })
 
 #this updates scenario selection
@@ -369,17 +370,34 @@ data_ss_click_cs<- reactive({
   return(ln_select_cs)
 })
 
+
+map_update_cs <- reactive({
+  req(click_counties_cs$curr)
+  req(input$dms_mode_opts_cs)
+  req(input$sctg2_opts_cs)
+  req(input$Value_opts_cs)
+  req(input$OD_opts_cs)
+  req(input$n_top_cs)
+  req(input$cors_opts)
+  req(input$Scenario_opt_cs)
+  paste(click_counties_cs$curr,input$dms_mode_opts_cs,input$sctg2_opts_cs,
+        input$Value_opts_cs, input$OD_opts_cs, input$n_top_cs, input$cors_opts,input$Scenario_opt_cs) 
+})
+
 #cs map update
-observeEvent(eventExpr = data_ss_click_cs(),{
+observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
+             { 
   req(click_counties_cs$curr,
       input$dms_mode_opts_cs, 
       input$sctg2_opts_cs, 
       input$Value_opts_cs,
-      #input$Scenario_opt_cs, 
-      input$n_top_cs#,
-      #input$cors_opts
-      #input$county_opts_cs
+      input$Scenario_opt_cs, 
+      input$n_top_cs,
+      input$cors_opts,
+      input$county_opts_cs,
+      input$OD_opts_cs
       )
+  show_waiter_message()
   #browser()
   print("RUNNING: Observe of map_update_cs()")
   #do we have to use the entire line file to remove?
@@ -738,6 +756,10 @@ observeEvent(eventExpr = data_ss_click_cs(),{
                                  color=pulsecolor))
       }
     }
+    onFlushed(function() {
+      flush_waiter_message()
+    })
+    
   }
   print("END: Observe")
 },ignoreInit = TRUE)
