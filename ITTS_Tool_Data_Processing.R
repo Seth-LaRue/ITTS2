@@ -568,13 +568,13 @@ colnames(dat_pin)[colnames(dat_pin) %in% c('Tons_2019','Tons_2021','Value_2019',
 colnames(dat_sin)[colnames(dat_sin) %in% c('Tons_2019','Tons_2021','Value_2019','Value_2021')] = c('tons_2019','tons_2021','value_2019','value_2021')
 
 
-ITTS_base <- state_base %>%
-  mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',NAME),
-         GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',GEOID)) %>%
-  group_by(NAME, GEOID) %>%
-  summarise(NAME = unique(NAME),
-            GEOID = unique(GEOID))%>%
-  ungroup()
+# ITTS_base <- state_base %>%
+#   mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',NAME),
+#          GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',GEOID)) %>%
+#   group_by(NAME, GEOID) %>%
+#   summarise(NAME = unique(NAME),
+#             GEOID = unique(GEOID))%>%
+#   ungroup()
 
 ITTS_boundary <- ITTS_base %>% filter(GEOID == 'ITTS') %>% 
   select('GEOID','NAME') %>%

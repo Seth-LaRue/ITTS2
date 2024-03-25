@@ -1,42 +1,42 @@
 
 # 
-cty_ch= county_choices$GEOID
-state_ch = state_choices$GEOID
-port_ch = ports_base$GEOID
-names(port_ch) = ports_base$NAME
-names(cty_ch)=  county_choices$county_lab
-names(state_ch)= state_choices$NAME
-
-commodities <- c("Agriculture and Fish",
-                 "Energy Products", 
-                 "Food, Alcohol and Tobacco",
-                 "Machinery, Electric, and Precision Instruments",
-                 "Mixed Freight",
-                 "Waste and Scrap",
-                 "Nonmetallic Mineral and Base Metal Products",
-                 "Raw and Finished Wood Products",
-                 "Chemicals, Pharmaceuticals, Plastics, and Rubber",
-                 "Vehicles and Transportation Equipment",
-                 "Textiles and Leather",
-                 "Aggregates")
-
-modes <- c("Truck"="1",
-           "Rail" ="2",
-           "Water"="3",
-           "Air (Includes truck-air)"="4",
-           "Multiple Modes and Mail"="5",
-           "Pipeline"="6",
-           "Other and Unknown"="7")
-
-od <- c("Inbound","Outbound","Within ITTS")
-
-
-scenario_choices <- c(
-  "Baseline" = "_s0",
-  "Scenario 1: Respond to Heightened Supply Chain Risks"= "_s1",
-  "Scenario 2: Leverage Multi-State Strength"= "_s2",
-  "Scenario 3: Embrace Technology Transformations"= "_s3"
-)
+# cty_ch= county_choices$GEOID
+# state_ch = state_choices$GEOID
+# port_ch = ports_base$GEOID
+# names(port_ch) = ports_base$NAME
+# names(cty_ch)=  county_choices$county_lab
+# names(state_ch)= state_choices$NAME
+# 
+# commodities <- c("Agriculture and Fish",
+#                  "Energy Products", 
+#                  "Food, Alcohol and Tobacco",
+#                  "Machinery, Electric, and Precision Instruments",
+#                  "Mixed Freight",
+#                  "Waste and Scrap",
+#                  "Nonmetallic Mineral and Base Metal Products",
+#                  "Raw and Finished Wood Products",
+#                  "Chemicals, Pharmaceuticals, Plastics, and Rubber",
+#                  "Vehicles and Transportation Equipment",
+#                  "Textiles and Leather",
+#                  "Aggregates")
+# 
+# modes <- c("Truck"="1",
+#            "Rail" ="2",
+#            "Water"="3",
+#            "Air (Includes truck-air)"="4",
+#            "Multiple Modes and Mail"="5",
+#            "Pipeline"="6",
+#            "Other and Unknown"="7")
+# 
+# od <- c("Inbound","Outbound","Within ITTS")
+# 
+# 
+# scenario_choices <- c(
+#   "Baseline" = "_s0",
+#   "Scenario 1: Respond to Heightened Supply Chain Risks"= "_s1",
+#   "Scenario 2: Leverage Multi-State Strength"= "_s2",
+#   "Scenario 3: Embrace Technology Transformations"= "_s3"
+# )
 
 
 #TAB 1 ---------------

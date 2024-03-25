@@ -128,7 +128,7 @@ observeEvent(input$county_opts_cs, {
   click_counties_cs$prev = click_counties_cs$curr
   click_counties_cs$curr <- cnty_cs
   
-  browser()
+  #browser()
 })
 
 #this updates scenario selection
@@ -152,8 +152,6 @@ observeEvent(input$Value_opts_cs, {
     }
   })
 })
-
-
 
 observeEvent(input$odmap_cs_shape_click, {
   req(input$odmap_cs_shape_click)
@@ -819,11 +817,11 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
         #ln_select_cs=ln_select_cs_ini()
     ln_select_cs=data_ss_click_cs()
 
-    print(paste0("Printing Names: ", names(ln_select_cs)))
+    #print(paste0("Printing Names: ", names(ln_select_cs)))
     
     names(ln_select_cs)[names(ln_select_cs)=='factor_lab'] = input$Value_opts_cs
     
-    print('is the issue here 0?')
+    #print('is the issue here 0?')
   }else{
     
     print("CALLING: data_ss_click_cs point 2")

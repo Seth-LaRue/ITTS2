@@ -1,40 +1,40 @@
 #load inputs#--------------------------------------
-state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", 
-                                   "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27",
-                                   "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
-                                   "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53",
-                                   "54", "55", "56", "60", "66", "69","72", "78","99","99000"),
-                         state_lab =c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", 
-                                        "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
-                                      "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
-                                      "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
-                                      "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
-                                      "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", 
-                                      "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", 
-                                      "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "U.S. Virgin Islands","All States","All States"))
-
-scen_colors <- data.frame(
-  scenario = c("s0","s1","s2","s3"),
-  scen_name = c("Baseline",
-                "Scenario 1: Respond to Heightened Supply Chain Risks",
-                "Scenario 2: Leverage Multi-State Strength",
-                "Scenario 3: Embrace Technology Transformations"),
-  scen_color = c("#EE4B2B","#7752FE","#495E57","#99B080"),
-  lntype = c("dash","solid","solid","solid"),
-  dotmrk = c("square","circle","circle","circle"))
-
-ini_modecolors <- data.frame(
-  dms_mode = c("1","2","3","4","5","6","7","99"),
-  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","Unknown"),
-  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#E11111"))
-
-ini_international <- data.frame(
-  country_lab = c("Africa","Asia","Australia and Oceania",
-              "North America",
-              "South/Central America",
-              "Antarctica","Europe"),
-  country = c("1","2","3","4","6","7","8")
-)
+# state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", 
+#                                    "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27",
+#                                    "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
+#                                    "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53",
+#                                    "54", "55", "56", "60", "66", "69","72", "78","99","99000"),
+#                          state_lab =c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", 
+#                                         "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
+#                                       "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
+#                                       "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
+#                                       "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
+#                                       "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", 
+#                                       "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", 
+#                                       "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "U.S. Virgin Islands","All States","All States"))
+# 
+# scen_colors <- data.frame(
+#   scenario = c("s0","s1","s2","s3"),
+#   scen_name = c("Baseline",
+#                 "Scenario 1: Respond to Heightened Supply Chain Risks",
+#                 "Scenario 2: Leverage Multi-State Strength",
+#                 "Scenario 3: Embrace Technology Transformations"),
+#   scen_color = c("#EE4B2B","#7752FE","#495E57","#99B080"),
+#   lntype = c("dash","solid","solid","solid"),
+#   dotmrk = c("square","circle","circle","circle"))
+# 
+# ini_modecolors <- data.frame(
+#   dms_mode = c("1","2","3","4","5","6","7","99"),
+#   mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","Unknown"),
+#   color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#E11111"))
+# 
+# ini_international <- data.frame(
+#   country_lab = c("Africa","Asia","Australia and Oceania",
+#               "North America",
+#               "South/Central America",
+#               "Antarctica","Europe"),
+#   country = c("1","2","3","4","6","7","8")
+# )
 
 #funcitons -----------------------
 line_plot <- function(df_in, meas = "Tonnage"){

@@ -323,7 +323,6 @@ observeEvent(input$Value_opts_in,{
 
 SETTS_ss_in_r <- reactiveValues(SETTS_ss_in=ln_select_in_ini %>% st_drop_geometry())
 
-
 data_ss_click_in<- reactive({
   #req(n_lines_disp$curr)
   req(click_counties_in$curr)
@@ -467,8 +466,6 @@ map_update_in <- reactive({
         input$sctg2_opts_in,
         input$Value_opts_in,input$Scenario_opt_in, input$OD_opts_in, input$n_top_in, input$cors_opts_in) 
 })
-
-
 
 #cs map update
 observeEvent(eventExpr = map_update_in(), {
@@ -819,7 +816,6 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
 
 proxy_cty2state_tbl = dataTableProxy('subsetSETTS_in')
 
-
 observe({
   
   req(click_counties_in$curr,input$dms_mode_opts_in,
@@ -893,10 +889,7 @@ observe({
   }
 })
 
-
-
 outputOptions(output, 'subsetSETTS_in', suspendWhenHidden = FALSE)
-
 
 output$download_in <- downloadHandler(
   filename = function(){
@@ -906,8 +899,6 @@ output$download_in <- downloadHandler(
       rename()
     write.csv(tbl_out, file,row.names = F)
   })
-
-
 
 observe({
   req(click_counties_in$curr,input$dms_mode_opts_in,input$county_opts_in,input$n_top_in,

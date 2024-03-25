@@ -19,29 +19,29 @@
 
 # geoinput <- reactiveVal(value = c(county_base$COUNTYFP))
 
-ini_modecolors2 <- data.frame(
-  dms_mode = c("1","2","3","4","5","6","7","8"),
-  mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","Non-Domestic Mode"),
-  color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#E11111"))
-
-ini_commcolors <- data.frame(commodities = c("Agriculture and Fish",
-                                                        "Energy Products", 
-                                                        "Food, Alcohol and Tobacco",
-                                                        "Machinery, Electric, and Precision Instruments",
-                                                        "Mixed Freight",
-                                                        "Waste and Scrap",
-                                                        "Nonmetallic Mineral and Base Metal Products",
-                                                        "Raw and Finished Wood Products",
-                                                        "Chemicals, Pharmaceuticals, Plastics, and Rubber",
-                                                        "Vehicles and Transportation Equipment",
-                                                        "Textiles and Leather",
-                                                        "Aggregates"),
-                         color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4",
-                                   "#66c2a5","#3288bd", "#ec4500", "#195c99","#f69081", "#a3171c"))
-
-
-dircolors <- data.frame(Direction = c("Inbound", "Outbound"), 
-                        color = c("#66c2a5","#3288bd"))
+# ini_modecolors2 <- data.frame(
+#   dms_mode = c("1","2","3","4","5","6","7","8"),
+#   mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","Non-Domestic Mode"),
+#   color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#E11111"))
+# 
+# ini_commcolors <- data.frame(commodities = c("Agriculture and Fish",
+#                                                         "Energy Products", 
+#                                                         "Food, Alcohol and Tobacco",
+#                                                         "Machinery, Electric, and Precision Instruments",
+#                                                         "Mixed Freight",
+#                                                         "Waste and Scrap",
+#                                                         "Nonmetallic Mineral and Base Metal Products",
+#                                                         "Raw and Finished Wood Products",
+#                                                         "Chemicals, Pharmaceuticals, Plastics, and Rubber",
+#                                                         "Vehicles and Transportation Equipment",
+#                                                         "Textiles and Leather",
+#                                                         "Aggregates"),
+#                          color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4",
+#                                    "#66c2a5","#3288bd", "#ec4500", "#195c99","#f69081", "#a3171c"))
+# 
+# 
+# dircolors <- data.frame(Direction = c("Inbound", "Outbound"), 
+#                         color = c("#66c2a5","#3288bd"))
 
 #necessary for function testing-----
 # df_in <- dat
