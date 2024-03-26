@@ -1,16 +1,16 @@
 #load inputs#--------------------------------------
-# state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", 
+# state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15",
 #                                    "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27",
 #                                    "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
 #                                    "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53",
 #                                    "54", "55", "56", "60", "66", "69","72", "78","99","99000"),
-#                          state_lab =c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", 
-#                                         "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
-#                                       "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
-#                                       "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
-#                                       "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
-#                                       "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", 
-#                                       "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", 
+#                          state_lab =c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+#                                         "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana",
+#                                       "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+#                                       "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
+#                                       "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
+#                                       "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas",
+#                                       "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
 #                                       "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "U.S. Virgin Islands","All States","All States"))
 # 
 # scen_colors <- data.frame(
@@ -250,7 +250,7 @@ stab2_data <- eventReactive(input$stab2_mainbutt,{
 return<-dat_cs %>% 
     #select(-c(tons_2017, value_2017)) %>%
     #state filter
-    mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>%
+    mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>% 
     filter(state %in% input$stab2_states) %>%
     
     #inbound, outbound, within ITTS
@@ -302,10 +302,6 @@ return <- return %>%
 observeEvent(input$stab2_mainbutt, {
   #browser()
   
-  waiter_show( # show the waiter
-    spin_fading_circles() # use a spinner
-  )
-  
   #Warning list ------
   warning <- c()
   if(is.null(input$stab2_comps)){
@@ -341,8 +337,8 @@ observeEvent(input$stab2_mainbutt, {
   }
   
   #Render UI ----
+  show_waiter_message()
   if(input$stab2_mainbutt >= 1 & length(warning) == 0 & is.na(stop_check_page())){
-    print('please work')
     stop_check_page("yes")
     output$output_panel_1 <-  renderUI({
       #first card ----
@@ -482,9 +478,9 @@ observeEvent(input$stab2_mainbutt, {
     if (length(input$stab2_states) == 0) {
       return("No state selected.")
     } else if (length(input$stab2_states) == 1) {
-      return(paste0("State selected: ", names(state_ch)[state_ch %in% input$stab2_states]))
+      return(paste0("State selected: ",  state_join$state_lab[state_join$state %in% input$stab2_states]))
     } else if (length(input$stab2_states) > 1) {
-      return(paste0("States selected: ", paste(names(state_ch)[state_ch %in% input$stab2_states], collapse = "; ")))
+      return(paste0("States selected: ", paste(state_join$state_lab[state_join$state %in% input$stab2_states], collapse = "; ")))
     }
   })
   
@@ -859,5 +855,9 @@ output$stab2_line_value <- renderPlotly({
 
   waiter_hide() # hide the waiter  
   } else {showNotification("Your filter selection does not include any freight flows.", type = "warning")}
+  
+  onFlushed(function() {
+    flush_waiter_message()
+  })
   
   })

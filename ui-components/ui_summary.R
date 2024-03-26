@@ -72,8 +72,7 @@
                                                size = 4,
                                                title = "Please select the Scenario(s) to compare",
                                                'actions-box' = TRUE,
-                                               'selected-text-format' = "count > 1"
-                                             )))
+                                               'selected-text-format' = "count > 1")))
                              ),
                              
                              argonColumn(width = 2,
@@ -96,7 +95,7 @@
                                            #title = "Select whether the analysis is inbound, outbound, or within ITTS trades",
                                            pickerInput(inputId = "stab2_OD", 
                                                        label = "Inbound/Outbound", 
-                                                       choices = od, multiple = TRUE, 
+                                                       choices = c("Inbound","Outbound","Within ITTS"), multiple = TRUE, 
                                                        options = list(
                                                          size = 7,
                                                          title = "Please select the Direction(s) to include",
@@ -141,9 +140,10 @@
                                            actionButton("stab2_mainbutt", "Run based on Page Filters"))
                              )
                     )))), #end of input card
+          tags$div(style = 'z-index:1000;',
 uiOutput("output_panel_1"),
 uiOutput("output_panel_2"),
 uiOutput("output_panel_3"),
 uiOutput("output_panel_4"))
-     
+        )
   
