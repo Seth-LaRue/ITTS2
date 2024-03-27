@@ -12,6 +12,7 @@
   justify-content: center;
 }
 
+
 #loading-content {
     opacity: 1;
 }
@@ -169,7 +170,7 @@ body > div.container-fluid > div.main-content > div.container-fluid.mt--1, #shin
 
 .dropdown-menu {
   position: relative; 
-  z-index: 999999; /*why not working sad face
+  z-index: 999999; /*why not working sad face*/
 }
 
 .table td, .table th {
