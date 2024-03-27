@@ -246,3 +246,115 @@ p {
   color: #1a1d25 !important; /* Change this color to any dark color you prefer for paragraphs */
 }
 
+/* CSS changes -Terry */
+ 
+@media (min-width: 768px) { /* CSS rules before the mobile breakpoint */
+  .navbar-vertical.navbar-expand-md.fixed-left {
+    overflow-y: hidden; /* Removes vertical scrolling for nav bar */
+  }
+  
+  .copyright a {
+    margin-left: 2rem !important; /* footer padding */
+  }
+  
+  #tabset_maps-ITTSCountyStateRegiontoStateTrade > .col-sm-12 { /* width consistency */
+    padding: 0;
+  }
+  
+  #shiny-tab-maps_tabs > .row > .col-sm-12 > .col-sm-12 {
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) { /* CSS rules after the mobile breakpoint */
+  .tab-content {
+    padding:0 1em; /* padding */
+  }
+  
+  .header .header-body h2 { /* header text padding */
+    padding-left:1em;
+  }
+  
+}
+
+#shiny-tab-summary_tab main {
+  overflow: visible; /* allows overflow for Scenario Analyzer */
+}
+
+.overlay-message {
+  overflow: none;
+}
+
+.header h2 {
+  color: #fff; /* header color */
+}
+
+.main-content {
+    overflow: hidden; /* Remove horizontal scrolling for main content */
+  }
+  
+
+.nav-pills .nav-link.active h2 { /* color consistency in Senario Explorer buttons - active */
+  color: #fff;
+}
+
+.navbar-vertical .navbar-heading { /* left navbar grey text padidng */
+  padding: .25rem .5rem;
+}
+
+.card {
+  box-shadow: 0 4px 6px rgba(50,50,93,.11),0 1px 3px rgba(0,0,0,.08); /* box shadow to cards */
+}
+
+.card .row {
+  margin: 1rem 0 !important;  /* added some padding to cards */
+}
+
+
+/* Various Color Consistency Changes */
+/* ---------------------------------- */
+
+:root {
+  --main-color: #5e72e4; /* CHANGE THIS VARAIBLE IF YOU WANT TO CHANGE COLOR */
+}
+
+.nav-pills .nav-link h2{ /* Senario Explorer buttons */
+  color: var(--main-color); 
+}
+
+#download_cs, #download_cc {
+  background-color:var(--main-color)!important; /* Download Selected Data button in Scenario Explorer color consistency (it was sky blue, I don't know if that was intention. Delete if it is) */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      background: linear-gradient(to bottom, #808dd9 0%, var(--main-color) 100%) !important;
+      color: white !important;
+      border: 1px solid transparent !important;
+}
+.row .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { /* table page # buttons */
+      background: linear-gradient(to bottom, #808dd9 0%, var(--main-color) 100%) !important;
+      color: white !important;
+      border-color: transparent;
+}
+
+.row .dataTables_wrapper .dataTables_paginate .paginate_button.current { /* table prev/next buttons */
+      background: linear-gradient(to bottom, #808dd9 0%, var(--main-color) 100%) !important;
+      color: white !important;
+      border-color: transparent;
+
+}
+
+.irs--shiny .irs-bar { /* state trade map */
+      border-top: 1px solid var(--main-color);
+      border-bottom: 1px solid var(--main-color);
+      background: var(--main-color);
+}
+
+.irs--shiny .irs-from, .irs--shiny .irs-to, .irs--shiny .irs-single { /* state trade map */
+  background-color:var(--main-color);
+}
+
+.bootstrap-select>.dropdown-toggle.bs-placeholder:active, .bootstrap-select>.dropdown-toggle.bs-placeholder:focus, .bootstrap-select>.dropdown-toggle.bs-placeholder:hover{ 
+   color: #fff; /* changed Scenario Analyzer dropdown so it's not grey on grey */
+}
+
