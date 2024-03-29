@@ -130,20 +130,30 @@ ui <- fluidPage(
           text-align: center;
         }"
     ),
-
+    
     tags$script(HTML("
-    $(document).ready(function() {
-      var counter = 0;
-      var counter_analyzer = 0;
-      var interval = setInterval(function() {
-        counter++;
-        $('#counter').text(counter + ' seconds');
-        counter_analyzer++;
-          $('#counter_analyzer').text(counter_analyzer + ' seconds');
-        if (counter >= 60 || counter_analyzer >= 60) {
-          clearInterval(interval);
-        }
-      }, 1000);
+   $(document).ready(function() {
+  // Counter for overall time
+  var counter = 0;
+  var counterInterval = setInterval(function() {
+    counter++;
+    $('#counter').text(counter + ' seconds');
+    if (counter >= 60) {
+      clearInterval(counterInterval);
+    }
+  }, 1000);
+});
+
+ $(document).on('click', '#stab2_mainbutt', function() {
+ clearInterval(analyzerInterval);
+  var counter_analyzer = 0; 
+    var analyzerInterval = setInterval(function() {
+      counter_analyzer++;
+      $('#counter_analyzer').text(counter_analyzer + ' seconds');
+      if (counter_analyzer >= 120) {
+        clearInterval(analyzerInterval);
+      }
+  }, 1000);
     });
   ")),
   

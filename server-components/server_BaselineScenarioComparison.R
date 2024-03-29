@@ -301,6 +301,7 @@ return <- return %>%
 
 observeEvent(input$stab2_mainbutt, {
   #browser()
+  show_waiter_message()
   
   #Warning list ------
   warning <- c()
