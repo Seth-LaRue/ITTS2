@@ -1,6 +1,19 @@
 #county to county and state to county/state
+
+scen1_comm_list1 <- c('Other Chemicals, Plastics, and Rubber',
+                      'Raw and Finished Wood Products',
+                      'Textiles and Leather',
+                      'Mixed Freight') # change increase by 2.9% annually
+
+scen1_comm_list2 <- c('Agriculture and Fish') # agriculture increase by 1.3% annually. 
+
+scen2_comm_list <- c('Non-coal Energy Products')
+
+#scen3_comm_list1 <- c('Coal')
+scen3_comm_list2 <- c('Machinery, Electric, and Precision Instruments','Transportation Equipment')
+
+
 process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col_list, all_flag){
-ratio <- read.csv('ratio_2017.csv')
   # data_temp_cs: the filtered datatable
   # Value_opts_cs: which value/tonnage year is selected
   # curr: the geography selection 
@@ -9,26 +22,19 @@ ratio <- read.csv('ratio_2017.csv')
     dat_temp_cs = dat_temp_cs %>%
       mutate(dms_imp_exp = ifelse(origin %in% curr, destination, origin),
              GEOID = dms_imp_exp) %>% 
-      left_join(ratio, by = c('dms_mode','Grouped_sctg2'))
-    }
+      mutate(ratio_2017 = value_2017/tons_2017)
+  }
   else{
     
     dat_temp_cs = dat_temp_cs %>% 
-      left_join(ratio, by = c('dms_mode','Grouped_sctg2'))
+      mutate(ratio_2017 = value_2017/tons_2017)
   }
   
-  scen1_comm_list1 <- c('Other Chemicals, Plastics, and Rubber',
-                        'Raw and Finished Wood Products',
-                        'Textiles and Leather',
-                        'Mixed Freight') # change increase by 2.9% annually
+  year_diff <- 2050 - 2022
   
-  scen1_comm_list2 <- c('Agriculture and Fish') # agriculture increase by 1.3% annually. 
+  year_selected <- as.numeric(gsub("\\D", "", Value_opts_cs))
+  parameter_sel <- gsub("[0-9_]", "", Value_opts_cs)
   
-    year_diff <- 2050 - 2022
-    
-    year_selected <- as.numeric(gsub("\\D", "", Value_opts_cs))
-    parameter_sel <- gsub("[0-9_]", "", Value_opts_cs)
-    
   if(Scenario_opt_cs == '_s1'){
     
     # for consumer goods:
@@ -49,7 +55,7 @@ ratio <- read.csv('ratio_2017.csv')
         
         # Condition 1
         tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^ year_diff,
-    
+        
         ifelse(
           origin %in% curr & 
             !(destination %in% curr ) &
@@ -70,7 +76,7 @@ ratio <- read.csv('ratio_2017.csv')
             
             # Condition 3
             tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^ year_diff * ratio_2017,
-          
+            
             ifelse(
               origin %in% curr & 
                 !(destination %in% curr ) &
@@ -98,8 +104,7 @@ ratio <- read.csv('ratio_2017.csv')
       ungroup()
     
   } else if (Scenario_opt_cs == '_s2'){
-    scen2_comm_list <- c('Non-coal Energy Products')
-   
+    
     # for import non-energy 
     group1_new_rate = 0.029
     group1_base_rate = 0.023
@@ -159,9 +164,6 @@ ratio <- read.csv('ratio_2017.csv')
     
   } else if (Scenario_opt_cs == '_s3'){
     
-    scen3_comm_list1 <- c('Coal')
-    scen3_comm_list2 <- c('Machinery, Electric, and Precision Instruments','Transportation Equipment')
-    
     # for Coal goods:
     group1_new_rate = -0.045
     ## no base rate for coal
@@ -171,42 +173,25 @@ ratio <- read.csv('ratio_2017.csv')
     
     dat_temp_cs = dat_temp_cs %>%
       mutate(temp = ifelse(
-          Grouped_sctg2 %in% scen3_comm_list1 & 
+        Grouped_sctg2 %in% scen3_comm_list2 & 
           year_selected == 2050 & 
           parameter_sel == 'tons',
         
-        # Condition 1
-        tons_2022 * (1 + group1_new_rate)^year_diff,
+        # Condition 2
+        tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff,
         
         ifelse(
-            Grouped_sctg2 %in% scen3_comm_list2 & 
+          Grouped_sctg2 %in% scen3_comm_list2 & 
             year_selected == 2050 & 
-            parameter_sel == 'tons',
+            parameter_sel == 'value',
           
-          # Condition 2
-          tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff, 
-          
-          ifelse(
-              Grouped_sctg2 %in% scen3_comm_list1 & 
-              year_selected == 2050 & 
-              parameter_sel == 'value',
-            
-            # Condition 3
-            tons_2022 * (1 + group1_new_rate)^year_diff *ratio_2017,
-            
-            ifelse(
-                Grouped_sctg2 %in% scen3_comm_list2 & 
-                year_selected == 2050 & 
-                parameter_sel == 'value',
-              
-              # Condition 4
-              tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff*ratio_2017,
-              # Default case
-              dat_temp_cs[[Value_opts_cs]]
-            )
-          )
+          # Condition 4
+          tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff*ratio_2017,
+          # Default case
+          dat_temp_cs[[Value_opts_cs]]
         )
-      ))%>%
+      )
+      )%>%
       mutate(temp = ifelse(temp < 0, 0 , temp)) %>% # avoid negative numbers. 
       group_by(across(all_of(col_list)))%>%
       summarise(tons_2022 = sum(tons_2022),
@@ -219,4 +204,3 @@ ratio <- read.csv('ratio_2017.csv')
     
   }
 }
-

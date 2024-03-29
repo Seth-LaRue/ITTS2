@@ -334,6 +334,7 @@ data_ss_click<- reactive({
   
   
   dat_temp = dat_temp %>%
+    select(!contains("2017")) %>%
     rename(factor_lab = selected_col) %>%
     mutate(rank = rank(desc(factor_lab))) 
   
@@ -570,7 +571,7 @@ output$scenario_text_output <- renderText({
            grows its production of consumer goods at a 2.9% annual rate. For agriculture, the tonnage of 
            these goods originating in the Southeast will increase by about 1.3% annually.')
   } else if (input$Scenario_opt == '_s2'){
-    return('Recognizing that economies are cyclic, production occurs throughout the world, and weather and 
+    return('Recognizing that economies are cyclic, production occurs throughout the world, weather and 
     other events can cause major shocks to the system, and that production (particularly resource-based) depends
     on weather and other high-variability factors, no region of the US can be self-sufficient. For reasons of 
     regional protection (from disruption and negative change) and also economic competitiveness and opportunity, 
@@ -586,9 +587,8 @@ output$scenario_text_output <- renderText({
     technologies are rapidly evolving, impacting the movement of various commodities. Comparable technology 
     transformations in agriculture and other resource industries may occur, and distributed manufacturing (3-D 
     printing) may “flatten” or simplify the traditional three-tiered (resources, intermediate products, final 
-    products) supply chain. In Scenario 3, coal shipments in the Southeast are projected to decline by approximately
-    -4.5% annually until they vanish from the network. And high-tech durable manufacturing goods will grow by 
-    2.8% annually through 2050.')
+    products) supply chain. In Scenario 3, while coal shipments in the Southeast continue their historical decline,
+    high-tech durable manufacturing goods will grow at a faster rate that historically observed - 2.8% annually through 2050.')
   }
   
 })
@@ -596,7 +596,7 @@ output$scenario_text_output <- renderText({
 
 
 output$subsetSETTS<-renderDataTable({#server = FALSE,{
-  
+  req(data_ss_click)
   
   if(input$Scenario_opt == 'Baseline' &
      grepl('2022',input$Value_opts) &
@@ -612,7 +612,6 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     ln_select=data_ss_click()
     names(ln_select)[names(ln_select)=='factor_lab']=paste0(input$Value_opts, input$Scenario_opt)
   }
-  
   
   SETTS_ss<-ln_select %>% 
     st_drop_geometry() 
@@ -641,14 +640,13 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
             'Tons 2050</br>(Thousand Tons)'='tons_2050',
             'Value 2022</br>($Million)'='value_2022',
             'Value 2050</br>($Million)'='value_2050')
-  
+
    names(SETTS_ss)[grepl('_',names(SETTS_ss))] <- str_to_title(gsub("_"," ",names(SETTS_ss)[grepl('_',names(SETTS_ss))])) 
   #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
 
   #SETTS_ss<-SETTS_ss %>%
   #rename('Partner'='County Lab')
-  
-  SETTS_tbl=datatable(SETTS_ss,
+    SETTS_tbl=datatable(SETTS_ss,
                       filter = list(position = 'top', clear = FALSE),
                       extensions = 'Buttons',
                       options = list(lengthMenu=c(5,10,100),
@@ -671,7 +669,6 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
                       escape = FALSE
   ) %>% 
     DT::formatRound(grepl("20", colnames(SETTS_ss)),digits = 1,mark = ",")
-  
   return(SETTS_tbl)
   
 })

@@ -363,7 +363,7 @@ observeEvent(input$stab2_mainbutt, {
       
       argonCard(width = 12,
                 argonRow(width = 12,h1("Percent Growth")),
-                argonRow(width = 12, p("This section compares the percent growth for key measures from the base (2019) and future year (2050) by tonnage on the right and value on the left.
+                argonRow(width = 12, p("This section compares the percent growth for key measures from the base (2022) and future year (2050) by tonnage on the right and value on the left.
                                            The first row of graph compares the growth for each mode and the second each commodity selected above. Each dot represents a scenario with a higher growth for that scenario the further right the dot is on the line.")),
                 argonRow(width = 12, 
                          argonColumn(width = 10, p(textOutput("scen_select_pw"))),

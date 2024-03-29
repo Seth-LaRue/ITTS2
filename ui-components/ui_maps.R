@@ -4,34 +4,34 @@
 
 #int_ports_mode_no_selelect <- data.frame(mode = c("3","4","99"), use = c("3006","4111","99144"))
 
-# modes <- c("Truck"="1",
-#            "Rail" ="2",
-#            "Water"="3",
-#            "Air (Includes truck-air)"="4",
-#            "Multiple Modes and Mail"="5",
-#            "Pipeline"="6",
-#            "Other and Unknown"="7")
+modes <- c("Truck"="1",
+           "Rail" ="2",
+           "Water"="3",
+           "Air (Includes truck-air)"="4",
+           "Multiple Modes and Mail"="5",
+           "Pipeline"="6",
+           "Other and Unknown"="7")
 
-#modes_int <- c("Water"="3","Air (Includes truck-air)"="4", "Border-Point-of-Entry" = "99")
+modes_int <- c("Water"="3","Air (Includes truck-air)"="4", "Border-Point-of-Entry" = "99")
 
-# commodities <- c("Aggregates",
-#                  "Agriculture and Fish",
-#                  "Base chemicals and Pharmaceuticals", 
-#                  "Coal",
-#                  "Food, Alcohol and Tobacco",
-#                  "Furniture",
-#                  "Log",
-#                  "Machinery, Electric, and Precision Instruments",
-#                  "Mixed Freight",
-#                  "Motorized vehicles",
-#                  "Non-coal Energy Products",
-#                  "Nonmetallic Mineral and Base Metal Products",
-#                  "Other Chemicals, Plastics, and Rubber",
-#                  "Raw and Finished Wood Products",
-#                  "Textiles and Leather",
-#                  "Transportation Equipment",
-#                  "Waste and Scrap"
-#                  )
+commodities <- c("Aggregates",
+                 "Agriculture and Fish",
+                 "Base chemicals and Pharmaceuticals",
+                 "Coal",
+                 "Food, Alcohol and Tobacco",
+                 "Furniture",
+                 "Log",
+                 "Machinery, Electric, and Precision Instruments",
+                 "Mixed Freight",
+                 "Motorized vehicles",
+                 "Non-coal Energy Products",
+                 "Nonmetallic Mineral and Base Metal Products",
+                 "Other Chemicals, Plastics, and Rubber",
+                 "Raw and Finished Wood Products",
+                 "Textiles and Leather",
+                 "Transportation Equipment",
+                 "Waste and Scrap"
+                 )
 
 od <- c("Both" = "Both","Inbound" = "dms_dest", "Outbound" = "dms_orig")
 #od_in <- c("Both" = "Both","Import" = "dms_dest", "Export" = "dms_orig")
@@ -106,15 +106,16 @@ domestic_tab <-
                        argonColumn(width = 12,
                                    #argonCard(width =12,
                                    tags$h2("County/State/Region to State Trade Map"),
-                                   tags$p("This tab displays FAF data flows between the ITTS members 
-                                      (as well as other southern states in the region) and all US states. 
+                                   tags$p("This tab displays commodity flows between the ITTS members 
+                                      (as well as other southern states in the region) and all US states using data from the FAF version 5.2. 
                                       The 'Focus Map on' filter allows you to switch between the ITTS counties OR states as the basis for summarizing the data. 
                                       A specific county or state can be selected by clicking on the map or choosing from the drop down box to the right. 
                                       By default the map displays the combined outbound and inbound freight movements by all modes for the selected county/state to all other states in the US. 
                                       The data can be refined further using the 'Inbound/Outbound', 'Mode Type', and 'Commodity' drop down boxes. 
-                                      These freight movements are summarized for two vintages 2022, and 2050 by tonnage or value, 
-                                      any of which can be selected from the 'Freight Measure' drop down box. The base year for domestic trade is 2022.
-                                      Additionally, the 'Top Partners' slide selector can be used to show only the top X trade partners."
+                                      These freight movements are summarized presented for two vintagesa 2022 base year, and a 2050 future year.
+                                      They are summarized by tonnage or value, any either of which can be selected from the 'Freight Measure' 
+                                      drop down box. The base year for domestic trade is 2022. Additionally, the 'Top Partners' slide selector 
+                                      can be used to show only the top X trade partners."
                                           #)
                                    )),
                        argonColumn(width = 10,
@@ -221,9 +222,12 @@ domestic_tab <-
                          
                          argonColumn(width = 12,
                                      tags$h2("County/State/Region to State Trade Table"),
-                                     tags$p("The table below displays the data for the specific county OR state and filters selected above. 
-                                 The table displays both tonnage and value by all two vintages 2022 and 2050.The base year for domestic trade is 2022.
-                                 The table can be downloaded in a CSV file format using the 'Download Data' button below."
+                                     tags$p("The table below displays the data for the specific 
+                                            county OR state and filters selected above. The table 
+                                            displays both tonnage and value by all two vintagesfor
+                                            the base year and future year -  2022 and 2050.The base
+                                            year for domestic trade is 2022. The table can be downloaded
+                                            in a CSV file format using the 'Download Data' button below."
                                             #)
                                      )),
                          argonRow(
@@ -287,12 +291,12 @@ domestic_tab <-
                             #argonCard(width =12,
                             tags$h2("County to County Trade Map"),
                             tags$p("This tab displays and summarizes FAF data disaggregated at the county level for the ITTS members states, 
-                      as well as other southern states in the region.
+                      as well as other Southeast states.
                       The map below displays the data for a specific county which can be selected by clicking the county or choosing from the 'County' drop down box to the right. 
                       By default the map displays the combined outbound and inbound freight movements by all modes for the selected county to all others in the region. 
                       The data can be refined further using the 'Inbound/Outbound', 'Mode Type', and 'Commodity' drop down boxes. 
-                      These freight movements are summarized for two vintages 2022 and 2050 by tonnage or value, 
-                      any of which can be selected from the 'Freight Measure' drop down box. 
+                      These freight movements are summarized for the 2022 base year and 2050 future year by tonnage or value, either 
+                      of which can be selected from the 'Freight Measure' drop down box.
                       Additionally, the 'Top Partners' slide selector can be used to show only the top X trade partners in the region, 
                       by default all counties trading with the selected county are shown."
                                    #)
@@ -396,8 +400,9 @@ domestic_tab <-
                                 #argonCard(width =12,
                                 tags$h2("County to County Trade Table"),
                                 tags$p("The table below displays the data for the specific county and filters selected above. 
-                                 The table displays trade between this county and all others by tonnage and value by all two vintages 2022 and 2050.
-                                 The table can be downloaded in a CSV file format using the 'Download Data' button below."
+                                       The table displays trade between this county and all others by tonnage and value for 
+                                       the 2022 base year and 2050 future year. The table can be downloaded in a CSV file format 
+                                       using the 'Download Data' button below."
                                        #)
                                 )),
                     argonColumn(width=10,h2(textOutput('table_title'))),

@@ -111,13 +111,13 @@ observeEvent(input$cors_opts, {
     updateSelectizeInput(session, 'county_opts_cs', label = "State", choices = state_ch, selected = c("Texas", value = "48"), server = FALSE)
     click_counties_cs$curr <- "48"
   } else if(input$cors_opts=="r2s"){
-    updateSelectizeInput(session, 'county_opts_cs', label = "Region", choices = c('ITTS', 'Southeast Region'), selected = "ITTS", server = FALSE)
+    updateSelectizeInput(session, 'county_opts_cs', label = "Region", choices = c('ITTS', 'Southeast Region'), selected = c("ITTS", value = "ITTS"), server = FALSE)
     click_counties_cs$curr <- "ITTS"
   }
   
   print(paste("CHECK input$county_ops_cs: ",input$county_ops_cs))
   
-})
+},ignoreInit = T)
 
 #this updates click_counties_cs
 observeEvent(input$county_opts_cs, {
@@ -225,8 +225,8 @@ data_ss_click_cs<- reactive({
   } else if(input$cors_opts == "s2s"){
     dat_temp_cs <- dat_ss
   } else if (input$cors_opts == 'r2s'){
-    
-    if (input$county_opts_cs == 'ITTS'){ # itts region 
+
+    if (input$county_opts_cs == 'ITTS'|click_counties_cs$curr == 'ITTS'){ # itts region 
       dat_temp_cs <- dat_ss %>%
         mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',origin),
                destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51"), 'ITTS',destination))
@@ -270,7 +270,6 @@ data_ss_click_cs<- reactive({
       
       dat_temp_cs = dat_temp_cs %>%
         filter(Grouped_sctg2==input$sctg2_opts_cs)
-      
       }
   
   
@@ -314,7 +313,14 @@ data_ss_click_cs<- reactive({
       if(input$Scenario_opt_cs == 'Baseline' | grepl('2022',input$Value_opts_cs)){
         
         dat_temp_cs = dat_temp_cs %>%
-          select(origin, destination, GEOID, contains('tons_'),contains('value_'))
+          select(origin, destination, GEOID, contains('tons_'),contains('value_')) %>%
+          group_by(GEOID)%>%
+          summarise(tons_2022 = sum(tons_2022),
+                     tons_2050 = sum(tons_2050),
+                     value_2022 = sum(value_2022),
+                     value_2050 = sum(value_2050)
+          ) %>%
+          ungroup()
         
         selected_col = input$Value_opts_cs
         
@@ -338,15 +344,15 @@ data_ss_click_cs<- reactive({
   
   
   if(nrow(dat_temp_cs)>0 & input$cors_opts %in% c('s2s','c2c')){
-    
+
     ln_select_cs <- state_base %>%
       select(GEOID, NAME) %>%
       inner_join(dat_temp_cs,by = "GEOID") %>%
       mutate(tranp=ifelse(rank <= input$n_top_cs, 1,.25))
     
   } else if (nrow(dat_temp_cs)>0 & input$cors_opts == 'r2s') {
-    
-    if (input$county_opts_cs == 'ITTS'){
+
+    if (input$county_opts_cs == 'ITTS'|click_counties_cs$curr == 'ITTS'){
       
       ln_select_cs <- ITTS_base %>%
         select(GEOID, NAME) %>%
@@ -365,7 +371,8 @@ data_ss_click_cs<- reactive({
     
     
     
-  } else {ln_select_cs=NULL}
+  } else {
+    ln_select_cs=NULL}
   
   
   return(ln_select_cs)
@@ -636,7 +643,7 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
           icon = makePulseIcon(heartbeat = 1,iconSize=10,
                                color=pulsecolor))
     }else if(input$cors_opts == "r2s"){
-      if (input$county_opts_cs == 'ITTS'){
+      if (input$county_opts_cs == 'ITTS'| click_counties_cs$curr == 'ITTS'){
         
         # all_states_centr_sel=all_states_centr %>% 
         #   filter(GEOID==click_counties_cs$curr)
@@ -807,7 +814,7 @@ output$scenario_text_output_cs <- renderText({
            grows its production of consumer goods at a 2.9% annual rate. For agriculture, the tonnage of 
            these goods originating in the Southeast will increase by about 1.3% annually.')
   } else if (input$Scenario_opt_cs == '_s2'){
-    return('Recognizing that economies are cyclic, production occurs throughout the world, and weather and 
+    return('Recognizing that economies are cyclic, production occurs throughout the world, weather and 
     other events can cause major shocks to the system, and that production (particularly resource-based) depends
     on weather and other high-variability factors, no region of the US can be self-sufficient. For reasons of 
     regional protection (from disruption and negative change) and also economic competitiveness and opportunity, 
@@ -823,9 +830,8 @@ output$scenario_text_output_cs <- renderText({
     technologies are rapidly evolving, impacting the movement of various commodities. Comparable technology 
     transformations in agriculture and other resource industries may occur, and distributed manufacturing (3-D 
     printing) may “flatten” or simplify the traditional three-tiered (resources, intermediate products, final 
-    products) supply chain. In Scenario 3, coal shipments in the Southeast are projected to decline by approximately
-    -4.5% annually until they vanish from the network. And high-tech durable manufacturing goods will grow by 
-    2.8% annually through 2050.')
+    products) supply chain. In Scenario 3, while coal shipments in the Southeast continue their historical decline,
+           high-tech durable manufacturing goods will grow at a faster rate that historically observed - 2.8% annually through 2050.')
   }
   
 })
@@ -841,7 +847,6 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
     ln_select_cs=data_ss_click_cs()
 
     #print(paste0("Printing Names: ", names(ln_select_cs)))
-    
     names(ln_select_cs)[names(ln_select_cs)=='factor_lab'] = input$Value_opts_cs
     
     #print('is the issue here 0?')

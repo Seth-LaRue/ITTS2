@@ -134,10 +134,13 @@ ui <- fluidPage(
     tags$script(HTML("
     $(document).ready(function() {
       var counter = 0;
+      var counter_analyzer = 0;
       var interval = setInterval(function() {
         counter++;
         $('#counter').text(counter + ' seconds');
-        if (counter >= 60) {
+        counter_analyzer++;
+          $('#counter_analyzer').text(counter_analyzer + ' seconds');
+        if (counter >= 60 || counter_analyzer >= 60) {
           clearInterval(interval);
         }
       }, 1000);
@@ -155,7 +158,13 @@ ui <- fluidPage(
                fluidRow(class = 'start_loader',
                         div(id = 'loading')),
                fluidRow(class = "start_loader mt-1",
-                        h1("Loading..."),
+                        h1("Loading...")
+               ),
+               fluidRow(class = "start_loader",
+                        h4("This processing may take a while")),
+               fluidRow(class = "start_loader",
+                        h4("Elapsed time:  "),
+                        h4(id = "counter_analyzer", "0 seconds")
                )
            )
   ),
@@ -171,6 +180,7 @@ ui <- fluidPage(
           ),
           fluidRow(class = "start_loader",
                    h4("Elapsed time:  "),
+                   br(),
                    h4(id = "counter", "0 seconds")
           )
       )),
