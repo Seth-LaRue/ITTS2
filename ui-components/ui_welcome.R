@@ -6,10 +6,10 @@ mod_welcome_ui <- function(id) {
   argonPage(
     fluidRow(
       column(12,
-             h1("Welcome to the SETTS Data Visualization Tool!"),
+             h1("Welcome to the Freight Flow Forecasting and Scenario Planning Tool!"),
              tags$p("This data visualization tool was developed by the Institute for Trade and Transportation Studies (ITTS) during development of the Southeast Trade and Transportation Study (SETTS)."),
              h2("How can you use this tool?"),
-             tags$p("The SETTS Data Visualization Tool provides an accessible way to explore and download commodity flow data for the 10-state ITTS region: Arkansas, 
+             tags$p("The Freight Flow Forecasting and Scenario Planning Tool provides an accessible way to explore and download commodity flow data for the 10-state ITTS region: Arkansas, 
                     Florida, Georgia, Kentucky, Louisiana, Mississippi, Missouri, South Carolina, Texas, and Virginia. This platform allows users to better understand
                     intraregional, domestic, and international freight flows to, from, and within the ITTS region, providing detail on volumes, values, commodities, 
                     modes, and trading partners."),

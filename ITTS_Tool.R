@@ -18,6 +18,8 @@ library(plotly)
 library(data.table)
 library(networkD3)
 library(waiter)
+library(shinyalert)
+
 #Initialize Data ----
 
 
@@ -134,6 +136,11 @@ ui <- fluidPage(
     tags$script(HTML("
    $(document).ready(function() {
   // Counter for overall time
+  
+  // initiate the counter_analyzer and analyzerInterval
+  let counter_analyzer = 0;
+  let analyzerInterval = 0;
+  
   var counter = 0;
   var counterInterval = setInterval(function() {
     counter++;
@@ -145,10 +152,10 @@ ui <- fluidPage(
 });
 
  $(document).on('click', '#stab2_mainbutt', function() {
- clearInterval(analyzerInterval);
-  var counter_analyzer = 0; 
-    var analyzerInterval = setInterval(function() {
-      counter_analyzer++;
+ //analyzerInterval = 0;
+    counter_analyzer = 0; 
+    analyzerInterval = setInterval(function() {
+      counter_analyzer = counter_analyzer + 1;
       $('#counter_analyzer').text(counter_analyzer + ' seconds');
       if (counter_analyzer >= 120) {
         clearInterval(analyzerInterval);
@@ -171,11 +178,11 @@ ui <- fluidPage(
                         h1("Loading...")
                ),
                fluidRow(class = "start_loader",
-                        h4("This processing may take a while")),
-               fluidRow(class = "start_loader",
-                        h4("Elapsed time:  "),
-                        h4(id = "counter_analyzer", "0 seconds")
-               )
+                        h3("This processing may take 10 - 180s"))#,
+               # fluidRow(class = "start_loader",
+               #          h4("Elapsed time:  "),
+               #          h4(id = "counter_analyzer", "0 seconds")
+               # )
            )
   ),
   div(id = "loading-content", class = "overlay-message",
@@ -197,7 +204,7 @@ ui <- fluidPage(
   
   
   argonDashPage(
-    title = "SETTS data visualization tool",
+    title = "Freight Flow Forecasting and Scenario Planning Tool",
     author = "Cambridge Systematics",
     
     sidebar = argonDashSidebar(
@@ -245,7 +252,7 @@ ui <- fluidPage(
         separator = T,
         separator_color = "secondary",
         height = 30,
-        h2('SETTS data visualization tool'),
+        h2('Freight Flow Forecasting and Scenario Planning Tool'),
       ),
     
     body = argonDashBody(

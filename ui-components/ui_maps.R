@@ -14,24 +14,24 @@ modes <- c("Truck"="1",
 
 modes_int <- c("Water"="3","Air (Includes truck-air)"="4", "Border-Point-of-Entry" = "99")
 
-commodities <- c("Aggregates",
-                 "Agriculture and Fish",
-                 "Base chemicals and Pharmaceuticals",
-                 "Coal",
-                 "Food, Alcohol and Tobacco",
-                 "Furniture",
-                 "Log",
-                 "Machinery, Electric, and Precision Instruments",
-                 "Mixed Freight",
-                 "Motorized vehicles",
-                 "Non-coal Energy Products",
-                 "Nonmetallic Mineral and Base Metal Products",
-                 "Other Chemicals, Plastics, and Rubber",
-                 "Raw and Finished Wood Products",
-                 "Textiles and Leather",
-                 "Transportation Equipment",
-                 "Waste and Scrap"
-                 )
+# commodities <- c("Aggregates",
+#                  "Agriculture and Fish",
+#                  "Base chemicals and Pharmaceuticals",
+#                  "Coal",
+#                  "Food, Alcohol and Tobacco",
+#                  "Furniture",
+#                  "Log",
+#                  "Machinery, Electric, and Precision Instruments",
+#                  "Mixed Freight",
+#                  "Motorized vehicles",
+#                  "Non-coal Energy Products",
+#                  "Nonmetallic Mineral and Base Metal Products",
+#                  "Other Chemicals, Plastics, and Rubber",
+#                  "Raw and Finished Wood Products",
+#                  "Textiles and Leather",
+#                  "Transportation Equipment",
+#                  "Waste and Scrap"
+#                  )
 
 od <- c("Both" = "Both","Inbound" = "dms_dest", "Outbound" = "dms_orig")
 #od_in <- c("Both" = "Both","Import" = "dms_dest", "Export" = "dms_orig")

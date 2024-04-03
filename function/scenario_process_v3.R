@@ -1,6 +1,6 @@
 #county to county and state to county/state
 
-ratio <- read.csv('ratio_2017.csv')
+#ratio <- read.csv('ratio_2017.csv')
 year_diff <- 2050 - 2022
 
 scen1_comm_list1 <- c('Other Chemicals, Plastics, and Rubber',
@@ -25,13 +25,13 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
     
     dat_temp_cs = dat_temp_cs %>%
       mutate(dms_imp_exp = ifelse(origin %in% curr, destination, origin),
-             GEOID = dms_imp_exp) %>% 
-      left_join(ratio, by = c('dms_mode','Grouped_sctg2'))
+             GEOID = dms_imp_exp,
+             ratio_2017 = value_2017/tons_2017) 
     
     } else {
     
     dat_temp_cs = dat_temp_cs %>% 
-      left_join(ratio, by = c('dms_mode','Grouped_sctg2'))
+      mutate(ratio_2017 = value_2017/tons_2017)
     
   }
     

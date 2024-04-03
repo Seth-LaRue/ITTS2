@@ -300,8 +300,13 @@ return <- return %>%
   #bindCache(input$stab2_states, input$stab2_OD, input$stab2_commodity, input$stab2_mode)
 
 observeEvent(input$stab2_mainbutt, {
+  
+  onFlushed(function() {
+    flush_waiter_message()
+  })
+  
   #browser()
-  show_waiter_message()
+  #show_waiter_message()
   
   #Warning list ------
   warning <- c()
@@ -854,11 +859,9 @@ output$stab2_line_value <- renderPlotly({
   })
   
 
-  waiter_hide() # hide the waiter  
+  #waiter_hide() # hide the waiter  
   } else {showNotification("Your filter selection does not include any freight flows.", type = "warning")}
   
-  onFlushed(function() {
-    flush_waiter_message()
-  })
+ 
   
   })
