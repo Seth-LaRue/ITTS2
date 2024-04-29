@@ -162,8 +162,7 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
       mutate(tons_2050_s3 = ifelse(
           Grouped_sctg2 %in% scen3_comm_list1,
           # Condition 1
-          tons_2022 * (1 + group1_new_rate)^year_diff,
-          
+          tons_2050,
           ifelse(
             Grouped_sctg2 %in% scen3_comm_list2,
             # Condition 2
@@ -173,7 +172,7 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
             
             Grouped_sctg2 %in% scen3_comm_list1,
             # Condition 3
-            tons_2022 * (1 + group1_new_rate)^year_diff *ratio_2017,
+            tons_2050,
             ifelse(
                 Grouped_sctg2 %in% scen3_comm_list2,
                 # Condition 4
