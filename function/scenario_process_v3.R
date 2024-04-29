@@ -47,26 +47,26 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
     dat_temp_cs <- dat_temp_cs %>%
       mutate(tons_2050_s1 = ifelse(
         #conditions
-        origin %in% curr & !(destination == origin) & # to avoid any internal flow in any case
+        origin %in% curr & !(destination %in% curr) & # to avoid any internal flow in any case
           Grouped_sctg2 %in% scen1_comm_list1,
         # Condition 1
         tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^ year_diff,
         ifelse(
-          origin %in% curr & !(destination == origin) &
+          origin %in% curr & !(destination %in% curr) &
             Grouped_sctg2 %in% scen1_comm_list2,
           # Condition 2
           # tons_2022 * (1+0.013)^year_diff,
           tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^ year_diff,
           tons_2050))) %>%
       mutate(value_2050_s1 = ifelse(
-            origin %in% curr & !(destination == origin) &
+            origin %in% curr & !(destination %in% curr) &
               Grouped_sctg2 %in% scen1_comm_list1,
             
             # Condition 3
             tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^ year_diff * ratio_2017,
           
             ifelse(
-              origin %in% curr & !(destination == origin) &
+              origin %in% curr & !(destination %in% curr) &
                 Grouped_sctg2 %in% scen1_comm_list2,
               # Condition 4
               tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^ year_diff*ratio_2017,
@@ -94,30 +94,56 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
     dat_temp_cs <- dat_temp_cs %>%
       mutate(
         #This seems wrong the third case would never occur? Therefore it assumes that a commodity is always in a group
+        # tons_2050_s2 = ifelse(
+        #   destination %in% curr & !(origin == destination) & !(Grouped_sctg2 %in% scen2_comm_list), # import non-energy
+        #   tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group1_new_rate/group1_base_rate) ^ year_diff,
+        #   ifelse(
+        #     origin %in% curr & !(destination == origin) & !(Grouped_sctg2 %in% scen2_comm_list), # export non-energy
+        #     tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group2_new_rate/group2_base_rate) ^ year_diff,
+        #     ifelse(
+        #       destination %in% curr & !(origin == destination) & (Grouped_sctg2 %in% scen2_comm_list), # import energy
+        #       tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group3_new_rate/group3_base_rate) ^ year_diff,
+        #       ifelse(
+        #         origin %in% curr & !(destination == origin) & (Grouped_sctg2 %in% scen2_comm_list), # export energy
+        #         tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group4_new_rate/group4_base_rate) ^ year_diff,
+        #         tons_2050)))),
         tons_2050_s2 = case_when(
-          destination %in% curr & !(origin == destination)  ~ # import
+          destination %in% curr & !(origin %in% curr)  ~ # import
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
-                   tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^year_diff,
-                   tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group3_new_rate/group3_base_rate) ^year_diff),
-          
-          origin %in% curr & !(destination == origin) ~ #export
+                   tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group1_new_rate/group1_base_rate) ^ year_diff,
+                   tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group3_new_rate/group3_base_rate) ^ year_diff),
+
+          origin %in% curr & !(destination %in% curr) ~ #export
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group4_new_rate/group4_base_rate) ^year_diff),
-          
-          TRUE ~ tons_2050),
-          
-        value_2050_s2 = case_when( 
-          destination %in% curr & !(origin == destination) ~ # import
-            ifelse(!(Grouped_sctg2 %in% scen2_comm_list), 
+
+         TRUE ~ tons_2050),
+        # value_2050_s2 = ifelse(
+        #   destination %in% curr & !(origin == destination) & !(Grouped_sctg2 %in% scen2_comm_list), # import non-energy
+        #   tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group1_new_rate/group1_base_rate) ^ year_diff *ratio_2017,
+        #   ifelse(
+        #     origin %in% curr & !(destination == origin) & !(Grouped_sctg2 %in% scen2_comm_list), # export non-energy
+        #     tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group2_new_rate/group2_base_rate) ^ year_diff *ratio_2017,
+        #     ifelse(
+        #       destination %in% curr & !(origin == destination) & (Grouped_sctg2 %in% scen2_comm_list), # import energy
+        #       tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group3_new_rate/group3_base_rate) ^ year_diff *ratio_2017,
+        #       ifelse(
+        #         origin %in% curr & !(destination == origin) & (Grouped_sctg2 %in% scen2_comm_list), # export energy
+        #         tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group4_new_rate/group4_base_rate) ^ year_diff * ratio_2017,
+        #         value_2050))))) %>%
+    
+        value_2050_s2 = case_when(
+          destination %in% curr & !(origin %in% curr) ~ # import
+            ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^year_diff *ratio_2017,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group3_new_rate/group3_base_rate) ^year_diff *ratio_2017),
-          
-          origin %in% curr & !(destination == origin) ~ #export
+
+          origin %in% curr & !(destination %in% curr) ~ #export
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff *ratio_2017,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group4_new_rate/group4_base_rate) ^year_diff *ratio_2017),
-          
+
           TRUE ~ value_2050)
       ) %>%
       mutate(tons_2050_s2 = ifelse(tons_2050_s2 < 0, 0, tons_2050_s2),
