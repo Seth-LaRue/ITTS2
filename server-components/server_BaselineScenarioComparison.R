@@ -1,40 +1,3 @@
-#load inputs#--------------------------------------
-# state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15",
-#                                    "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27",
-#                                    "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
-#                                    "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53",
-#                                    "54", "55", "56", "60", "66", "69","72", "78","99","99000"),
-#                          state_lab =c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
-#                                         "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana",
-#                                       "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
-#                                       "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
-#                                       "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma",
-#                                       "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas",
-#                                       "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming",
-#                                       "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "U.S. Virgin Islands","All States","All States"))
-# 
-# scen_colors <- data.frame(
-#   scenario = c("s0","s1","s2","s3"),
-#   scen_name = c("Baseline",
-#                 "Scenario 1: Respond to Heightened Supply Chain Risks",
-#                 "Scenario 2: Leverage Multi-State Strength",
-#                 "Scenario 3: Embrace Technology Transformations"),
-#   scen_color = c("#EE4B2B","#7752FE","#495E57","#99B080"),
-#   lntype = c("dash","solid","solid","solid"),
-#   dotmrk = c("square","circle","circle","circle"))
-# 
-# ini_modecolors <- data.frame(
-#   dms_mode = c("1","2","3","4","5","6","7","99"),
-#   mode_group = c("Truck", "Rail", "Water", "Air (Includes truck-air)", "Mutliple Modes and Mail", "Pipeline", "Other and Unknown","Unknown"),
-#   color = c("#d53e4f","#f46d43","#fdae61","#fee08b","#e6f598","#abdda4","#66c2a5","#E11111"))
-# 
-# ini_international <- data.frame(
-#   country_lab = c("Africa","Asia","Australia and Oceania",
-#               "North America",
-#               "South/Central America",
-#               "Antarctica","Europe"),
-#   country = c("1","2","3","4","6","7","8")
-# )
 
 #funcitons -----------------------
 line_plot <- function(df_in, meas = "Tonnage"){
@@ -170,9 +133,12 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
     source_2t3 <- rbind(source_2t3, source_temp)
   }
   
-  
+  #browser()
   
   link_1t2 <- df_in %>% 
+    pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
+    select(-name) %>% 
+    filter(state %in% input$stab2_states) %>%
     #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>%
     left_join(state_join) %>% rename(source1 = state_lab) %>%
     left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
@@ -245,20 +211,18 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
 stop_check_page <- reactiveVal(NA)
 
 stab2_data <- eventReactive(input$stab2_mainbutt,{
-  #req(stop_check_page())
- #browser()
-return<-dat_cs %>% 
+  print("RUNNING: stab2_data_creation")
+  #browser()
+return<-dat_ss %>% 
     #select(-c(tons_2017, value_2017)) %>%
     #state filter
-    mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>% 
-    filter(state %in% input$stab2_states) %>%
+    #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>% 
+    filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>%
     
     #inbound, outbound, within ITTS
-    mutate(direction = ifelse((nchar(origin) == 5 & (str_sub(destination,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))), "Within ITTS",
-                              ifelse((nchar(destination) == 5 & (str_sub(origin,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))), "Within ITTS",
-                                     ifelse(nchar(origin) == 5 & !(str_sub(destination,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound")))) %>%
+    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "Within ITTS",
+                                     ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound"))) %>%
     filter(direction %in% input$stab2_OD) %>%
-    
     #filter the simple ones
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
     filter(dms_mode %in% input$stab2_mode)
@@ -267,21 +231,22 @@ if("99" %in% input$stab2_states){
   add_row<-dat_cs %>% 
     #state filter
     #mutate(state = "All State") %>%
-    mutate(direction = ifelse((nchar(origin) == 5 & (str_sub(destination,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))), "Within ITTS",
-                              ifelse((nchar(destination) == 5 & (str_sub(origin,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))), "Within ITTS",
-                                     ifelse(nchar(origin) == 5 & !(str_sub(destination,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound")))) %>%
-    mutate(origin = ifelse(nchar(origin)==5, "99000", origin)) %>%
-    mutate(destination = ifelse(nchar(destination) == 5, "99000",destination)) %>%
+    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "Within ITTS",
+                              ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound"))) %>%
+    mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99", origin)) %>%
+    mutate(destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99",destination)) %>%
     filter(direction %in% input$stab2_OD) %>% 
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
     filter(dms_mode %in% input$stab2_mode) %>%
-    mutate(state = "99000")
+    #mutate(state = "99") %>%
+    group_by(origin, destination, direction, Grouped_sctg2, dms_mode) %>%
+    summarise_at(c("tons_2017","tons_2022","tons_2050","value_2017","value_2022","value_2050"),sum)
 
     return <- return %>% rbind(add_row)
 }
 
 #add scenarios
-curr = unique(c(return$origin[nchar(return$origin)==5], return$destination[nchar(return$destination)==5]))
+curr = c("05", "12","13","21","22","28","29","45","48","51","01","47","37")
 return <- process_scenario_v3(dat_temp_cs = return, #the filtered datatable
                     Scenario_opt_cs = input$stab2_comps, #scenario selection
                     curr = curr, #select which are the basis of imports and exports
@@ -294,7 +259,7 @@ return <- return %>%
          tons_2050_s0 = tons_2050,
          value_2017_s0 = value_2017,
          value_2022_s0 = value_2022,
-          value_2050_s0 = value_2050)
+         value_2050_s0 = value_2050)
   return(return)
   }) #%>% 
   #bindCache(input$stab2_states, input$stab2_OD, input$stab2_commodity, input$stab2_mode)
@@ -466,7 +431,7 @@ observeEvent(input$stab2_mainbutt, {
   
   req(stop_check_page())
   print("RUNNING SCEN_COMP: selection text")
- 
+ #outputs----
   # dynamic text summarize users selection
   output$scen_select_ty <- output$scen_select_pw <- output$scen_select <- renderText({
     if (length(input$stab2_comps) == 0) {
@@ -535,7 +500,7 @@ output$stab2_line_tons <- renderPlotly({
              value_2022_s1 = value_2022_s0,
              value_2022_s2 = value_2022_s0,
              value_2022_s3 = value_2022_s0) %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
                    names_to = c("measure","year", "scenario"),
@@ -559,7 +524,7 @@ output$stab2_line_value <- renderPlotly({
              value_2022_s1 = value_2022_s0,
              value_2022_s2 = value_2022_s0,
              value_2022_s3 = value_2022_s0) %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                  names_sep = "_",
                  names_to = c("measure","year", "scenario"),
@@ -586,7 +551,10 @@ output$stab2_line_value <- renderPlotly({
              value_2017_s1 = value_2017_s0,
              value_2017_s2 = value_2017_s0,
              value_2017_s3 = value_2017_s0)  %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
+      pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
+      select(-name) %>% 
+      filter(state %in% input$stab2_states) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(state) %>% 
@@ -616,7 +584,12 @@ output$stab2_line_value <- renderPlotly({
              value_2017_s1 = value_2017_s0,
              value_2017_s2 = value_2017_s0,
              value_2017_s3 = value_2017_s0)  %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
+      pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
+      select(-name) %>% 
+      filter(state %in% input$stab2_states) %>%
+      #filter(nchar(origin) == 5) %>%
+      #mutate(state = str_sub(origin,1,2)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(state) %>%
@@ -646,7 +619,7 @@ output$stab2_line_value <- renderPlotly({
              value_2017_s1 = value_2017_s0,
              value_2017_s2 = value_2017_s0,
              value_2017_s3 = value_2017_s0)  %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(dms_mode) %>%
@@ -677,7 +650,7 @@ output$stab2_line_value <- renderPlotly({
              value_2017_s1 = value_2017_s0,
              value_2017_s2 = value_2017_s0,
              value_2017_s3 = value_2017_s0)  %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(dms_mode) %>%
@@ -708,7 +681,7 @@ output$stab2_line_value <- renderPlotly({
              value_2017_s1 = value_2017_s0,
              value_2017_s2 = value_2017_s0,
              value_2017_s3 = value_2017_s0)  %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(Grouped_sctg2) %>%
@@ -739,7 +712,7 @@ output$stab2_line_value <- renderPlotly({
              value_2017_s1 = value_2017_s0,
              value_2017_s2 = value_2017_s0,
              value_2017_s3 = value_2017_s0)  %>%
-      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, state, direction)) %>%
+      select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
       group_by(Grouped_sctg2) %>%
