@@ -84,6 +84,33 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourc
   }
   return(bar_plot)
 }
+bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
+  #browser()
+  df_temp <- df_in %>% left_join(scen_colors)
+  
+  bar_plot <- plot_ly(df_temp,
+                      x = ~year,
+                      y = ~value,
+                      type = 'bar',
+                      name = ~scen_name,
+                      color = ~I(scen_color),
+                      hovertemplate = ~paste0("Year: ", year, "<br>",
+                                              meas,": ", formatC(value, format = "f",digits = 2,big.mark = ","))) %>%
+    layout(
+           yaxis = list(title = meas, 
+                        separatethousands= TRUE, 
+                        range = c(min(df_temp$value,na.rm=T)/2, max(df_temp$value,na.rm=T)*1.05)),
+           xaxis = list(title = ""),
+           legend = list(orientation = "h",   # show entries horizontally
+                         xanchor = "center",  # use center of legend as anchor
+                         x = 0.5,
+                         y = -0.2)) %>%
+    config(displayModeBar = FALSE)
+  if(meas == "Value USD"){
+    bar_plot<-bar_plot %>% layout(yaxis = list(title = "Value USD", tickformat = "$~s"))
+  }
+  return(bar_plot)
+}
 sankey_diagram <- function(df_in, meas = "Tonnage"){
   
   blabs <- c("Alabama", "Arkansas", "Florida", "Georgia", "Kentucky",
@@ -431,7 +458,7 @@ observeEvent(input$stab2_mainbutt, {
   
   req(stop_check_page())
   print("RUNNING SCEN_COMP: selection text")
- #outputs----
+  #outputs ----
   # dynamic text summarize users selection
   output$scen_select_ty <- output$scen_select_pw <- output$scen_select <- renderText({
     if (length(input$stab2_comps) == 0) {
@@ -482,24 +509,21 @@ observeEvent(input$stab2_mainbutt, {
       return(paste("Commodities selected: ", paste(input$stab2_commodity, collapse = ", ")))
     }
   })
-  
+  #dont close-------
   if(nrow(stab2_data())>0){
-
-#lineplots --------
-
-
-output$stab2_line_tons <- renderPlotly({
+    #lineplots ----
+    output$stab2_line_tons <- renderPlotly({
   req(stab2_data())
-  
-  print("RUNNING SCEN_COMP: tonnage lineplot")
+  #browser()
+  print("RUNNING SCEN_COMP: tonnage barplot")
   
     df_temp <- stab2_data() %>%
-      mutate(tons_2022_s1 = tons_2022_s0,
-             tons_2022_s2 = tons_2022_s0,
-             tons_2022_s3 = tons_2022_s0,
-             value_2022_s1 = value_2022_s0,
-             value_2022_s2 = value_2022_s0,
-             value_2022_s3 = value_2022_s0) %>%
+      # mutate(tons_2022_s1 = tons_2022_s0,
+      #        tons_2022_s2 = tons_2022_s0,
+      #        tons_2022_s3 = tons_2022_s0,
+      #        value_2022_s1 = value_2022_s0,
+      #        value_2022_s2 = value_2022_s0,
+      #        value_2022_s3 = value_2022_s0) %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                    names_sep = "_",
@@ -510,20 +534,14 @@ output$stab2_line_tons <- renderPlotly({
       group_by(scenario, year) %>%
       summarise(value = sum(value,na.rm = T)) %>% ungroup()
     
-    line_plot(df_temp, meas = "Tonnage")
+    bar_plot_yearaxis(df_temp, meas = "Tonnage")
   })
-  
-output$stab2_line_value <- renderPlotly({
+    
+    output$stab2_line_value <- renderPlotly({
   req(stab2_data())
   print("RUNNING SCEN_COMP: value lineplot")
   
     df_temp <- stab2_data() %>%
-      mutate(tons_2022_s1 = tons_2022_s0,
-             tons_2022_s2 = tons_2022_s0,
-             tons_2022_s3 = tons_2022_s0,
-             value_2022_s1 = value_2022_s0,
-             value_2022_s2 = value_2022_s0,
-             value_2022_s3 = value_2022_s0) %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
                  names_sep = "_",
@@ -534,7 +552,7 @@ output$stab2_line_value <- renderPlotly({
     group_by(scenario, year) %>%
     summarise(value = sum(value))  %>% ungroup()
     
-    line_plot(df_temp, meas = "Value USD")
+    bar_plot_yearaxis(df_temp, meas = "Value USD")
   })
 
 #dot plots----------
@@ -838,3 +856,54 @@ output$stab2_line_value <- renderPlotly({
  
   
   })
+
+
+#old lineplots
+# output$stab2_line_tons <- renderPlotly({
+#   req(stab2_data())
+#   
+#   print("RUNNING SCEN_COMP: tonnage lineplot")
+#   
+#   df_temp <- stab2_data() %>%
+#     mutate(tons_2022_s1 = tons_2022_s0,
+#            tons_2022_s2 = tons_2022_s0,
+#            tons_2022_s3 = tons_2022_s0,
+#            value_2022_s1 = value_2022_s0,
+#            value_2022_s2 = value_2022_s0,
+#            value_2022_s3 = value_2022_s0) %>%
+#     select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
+#     pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
+#                  names_sep = "_",
+#                  names_to = c("measure","year", "scenario"),
+#                  values_to = "value") %>% 
+#     filter(measure == "tons") %>%
+#     filter(year != 2017) %>%
+#     group_by(scenario, year) %>%
+#     summarise(value = sum(value,na.rm = T)) %>% ungroup()
+#   
+#   line_plot(df_temp, meas = "Tonnage")
+# })
+# 
+# output$stab2_line_value <- renderPlotly({
+#   req(stab2_data())
+#   print("RUNNING SCEN_COMP: value lineplot")
+#   
+#   df_temp <- stab2_data() %>%
+#     mutate(tons_2022_s1 = tons_2022_s0,
+#            tons_2022_s2 = tons_2022_s0,
+#            tons_2022_s3 = tons_2022_s0,
+#            value_2022_s1 = value_2022_s0,
+#            value_2022_s2 = value_2022_s0,
+#            value_2022_s3 = value_2022_s0) %>%
+#     select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
+#     pivot_longer(cols = ends_with(c("_s0","_s1","_s2","_s3")),
+#                  names_sep = "_",
+#                  names_to = c("measure","year", "scenario"),
+#                  values_to = "value") %>%
+#     filter(measure == "value") %>%
+#     filter(year != 2017) %>%
+#     group_by(scenario, year) %>%
+#     summarise(value = sum(value))  %>% ungroup()
+#   
+#   line_plot(df_temp, meas = "Value USD")
+# })
