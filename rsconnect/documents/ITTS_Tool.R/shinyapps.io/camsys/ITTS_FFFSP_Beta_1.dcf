@@ -1,0 +1,12 @@
+name: ITTS_FFFSP_Beta_1
+title: ITTS_FFFSP_Beta_1
+username: camsys
+account: camsys
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11910583
+bundleId: 8563933
+url: https://camsys.shinyapps.io/ITTS_FFFSP_Beta_1/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
