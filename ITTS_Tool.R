@@ -1,3 +1,6 @@
+#Initialize Data ----
+source("init.R")
+
 #Load Libraries ----
 library(shiny)
 library(argonR)
@@ -21,11 +24,6 @@ library(waiter)
 library(shinyalert)
 
 
-#Initialize Data ----
-
-
-
-#load(file = "ITTS_Initial_Data_03282024.Rdata")
 
 # ITTS_base <- state_base %>%
 #   mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',NAME),
@@ -170,8 +168,8 @@ ui <- fluidPage(
   
   ),
   useShinyjs(),
-  tags$div(id = "waiter-message", class = "overlay-message d-none",
-           div(class = 'inner-content d-none', 
+  tags$div(id = "waiter-message", class = "overlay-message",
+           div(class = 'inner-content', 
                id = 'waiter-inner-content',
                fluidRow(class = 'start_loader',
                         div(id = 'loading')),
@@ -186,22 +184,22 @@ ui <- fluidPage(
                # )
            )
   ),
-  div(id = "loading-content", class = "overlay-message",
-      div(class = 'inner-content',
-          fluidRow(class = 'start_loader',
-                   div(id = 'loading')),
-          fluidRow(class = "start_loader mt-1",
-                   h1("Loading the application")
-          ),
-          fluidRow(class = "start_loader",
-                   h3("This should take approximately 20-40 seconds.")
-          ),
-          fluidRow(class = "start_loader",
-                   h4("Elapsed time:  "),
-                   br(),
-                   h4(id = "counter", "0 seconds")
-          )
-      )),
+  # div(id = "loading-content", class = "overlay-message",
+  #     div(class = 'inner-content d-none',
+  #         fluidRow(class = 'start_loader',
+  #                  div(id = 'loading')),
+  #         fluidRow(class = "start_loader mt-1",
+  #                  h1("Loading the application")
+  #         ),
+  #         fluidRow(class = "start_loader",
+  #                  h3("This should take approximately 20-40 seconds.")
+  #         ),
+  #         fluidRow(class = "start_loader",
+  #                  h4("Elapsed time:  "),
+  #                  br(),
+  #                  h4(id = "counter", "0 seconds")
+  #         )
+  #     )),
   
   
   argonDashPage(
@@ -290,7 +288,15 @@ ui <- fluidPage(
 server <- function(input, output, session) {
 
   #main_tables <- reactiveValues(table = NULL)#What is this for?
-  
+  onFlushed(function() {
+    runjs('
+          //document.querySelector("#tabset_maps-ITTSInternationalTrade").classList.remove("active");
+          document.querySelector("#tabset_maps-ITTSCountyStatetoStateTrade").classList.remove("active");
+          $("#tab-welcome_tab").click();
+          $("body").css("overflow", "auto");
+          ')
+    hide(id = "loading-content", anim = TRUE, animType = "fade")
+  })
   
   onFlush(function(){
     runjs('
@@ -307,15 +313,7 @@ server <- function(input, output, session) {
     flush_waiter_message()
   })
   
-  onFlushed(function() {
-    runjs('
-          //document.querySelector("#tabset_maps-ITTSInternationalTrade").classList.remove("active");
-          document.querySelector("#tabset_maps-ITTSCountyStatetoStateTrade").classList.remove("active");
-          $("#tab-welcome_tab").click();
-          $("body").css("overflow", "auto");
-          ')
-    hide(id = "loading-content", anim = TRUE, animType = "fade")
-  })
+
 
   
   ##################################################################
