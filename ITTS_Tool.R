@@ -239,7 +239,7 @@ ui <- fluidPage(
         )
       ),
       argonSidebarDivider(),
-      argonSidebarHeader(title = "Version 1.0.000")
+      argonSidebarHeader(title = "Version 1.2.000")
     ),
     
     header = 
