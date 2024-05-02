@@ -79,14 +79,12 @@
                                          tags$div(
                                            #title = "Select States(s) for comparison",
                                            pickerInput(inputId = "stab2_states", 
-                                                       label = "State(s)", 
-                                                       choices = c("All States" = "99", state_ch),
-                                                       multiple = TRUE,
+                                                       label = "State", 
+                                                       choices = c(state_ch),
+                                                       multiple = FALSE,
                                                        options = list(
                                                          size = 7,
-                                                         title = "Please select the State(s) to include",
-                                                         'actions-box' = TRUE,
-                                                         'selected-text-format' = "count > 1"
+                                                         title = "Please select the State to include"
                                                        ))
                              )),
                              
