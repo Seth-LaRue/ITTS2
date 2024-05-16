@@ -121,29 +121,34 @@ top_importing_all <- function(df_in, tons_value_selection = "tons_2022",
     filter(rank <= 10) %>%
     left_join(all_selected, by=c("origin"="GEOID")) # Qi: changed from county_selected to al_selected, to apply for all geographic level.
   
-  
-  #rank_keep = df_temp$rank[df_temp$destination == county]
-  #ranks_keep = c(seq(rank_keep-5, rank_keep), seq(rank_keep+1,rank_keep+4))
-  #df_temp <- df_temp %>% filter(rank %in% ranks_keep)
-  
+  if(grepl("value",tons_value_selection)){
+    unit = ""
+    unit_pre = "$"
+  } else {
+    unit = " Thousand tons"
+    unit_pre = ""
+  }
   #then, make graph using filtered data. Graph differs for tons vs. value 
   import_plot <- df_temp %>% 
     plot_ly(source = sourceName, 
             type = "bar", color= I(ton_color), 
             x = ~reorder(NAME, desc(factor_lab)), y = ~factor_lab,    # change from county_lab to NAME column
-            hovertemplate = ~paste("%{label} <br>: ", formatC(factor_lab,digits=1,format="f",big.mark = ","), "<extra></extra>"), 
+            hovertemplate = ~paste0("%{label}:<br>", 
+                                   unit_pre, formatC(factor_lab,digits=1,format="f",big.mark = ","),unit, "<extra></extra>"), 
             text = ~reorder(NAME, desc(factor_lab)), 
             textposition = "none") %>%
     layout(
       xaxis = list(title = "",tickfont = list(size = 15)),
-      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))),tickfont = list(size = 15))) %>% 
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))," (Thousand Tons)"),tickfont = list(size = 15))) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
            #                            width = saveWidth,
            #                            height =  saveHeight)
     )
-  
+  if(grepl("value",tons_value_selection)){
+    import_plot<-import_plot %>% layout(yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))), tickformat = "$~s"))
+  }
   
   return(import_plot)
   
@@ -167,6 +172,13 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2022",
     filter(rank <= 10) %>%
     left_join(county_selected, by=c("destination"="GEOID")) 
   
+  if(grepl("value",tons_value_selection)){
+    unit = ""
+    unit_pre = "$"
+  } else {
+    unit = " Thousand tons"
+    unit_pre = ""
+  }
   
   #rank_keep = df_temp$rank[df_temp$destination == county]
   #ranks_keep = c(seq(rank_keep-5, rank_keep), seq(rank_keep+1,rank_keep+4))
@@ -177,18 +189,24 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2022",
     plot_ly(source = sourceName, 
             type = "bar", color= I(ton_color), 
             x = ~reorder(NAME, desc(factor_lab)), y = ~factor_lab, 
-            hovertemplate = ~paste("%{label} <br>:", round(factor_lab,digits=0), "<extra></extra>"), 
+            hovertemplate = ~paste("%{label}:<br>", 
+                                   unit_pre, round(factor_lab,digits=0),
+                                   unit, "<extra></extra>"), 
             text = ~reorder(NAME, desc(factor_lab)), 
             textposition = "none") %>%
     layout(
       xaxis = list(title = ""),
-      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")))), autosize = T) %>% 
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), " (Thousand tons)")), autosize = T) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
            #                            width = saveWidth,
            #                            height =  saveHeight)
     )
+  
+  if(grepl("value",tons_value_selection)){
+    export_plot<-export_plot %>% layout(yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))), tickformat = "$~s"))
+  }
   
   
   return(export_plot)
@@ -201,6 +219,13 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2022",
                                  location,
                                  sourceName = sourceName){
   
+  if(grepl("value",tons_value_selection)){
+    unit = ""
+    unit_pre = "$"
+  } else {
+    unit = " Thousand tons"
+    unit_pre = ""
+  }
   #first: filter, group, and summarize Transearch data based on user selections
   df_temp <- df_in %>%
     filter(origin != destination,
@@ -223,19 +248,24 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2022",
     plot_ly(source = sourceName, 
             type = "bar", color= I(ton_color), 
             x = ~reorder(NAME, desc(factor_lab)), y = ~factor_lab, 
-            hovertemplate = ~paste("%{label} <br>: ", formatC(factor_lab,digits=1,format="f",big.mark = ","), "<extra></extra>"), 
+            hovertemplate = ~paste0("%{label}:<br>", 
+                                   unit_pre, formatC(factor_lab,digits=1,format="f",big.mark = ","),
+                                   unit, "<extra></extra>"), 
             text = ~reorder(NAME, desc(factor_lab)), 
             textposition = "none") %>%
     layout(
       xaxis = list(title = "",tickfont = list(size = 15)),
-      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))),tickfont = list(size = 15))) %>% 
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), " (Thousand tons)"),tickfont = list(size = 15))) %>% 
     config(displaylogo = FALSE, 
-           modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
-           # toImageButtonOptions= list(filename = saveName,
-           #                            width = saveWidth,
-           #                            height =  saveHeight)
+           modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", 
+                                      "zoomOut2d", "resetScale2d", "toggleSpikelines", 
+                                      "hoverCompareCartesian", "hoverClosestGeo", 
+                                      "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", 
+                                      "hoverClosestPie", "toggleHover", "hoverClosestCartesian")
     )
-  
+  if(grepl("value",tons_value_selection)){
+    export_plot<-export_plot %>% layout(yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))), tickformat = "$~s"))
+  }
   
   return(export_plot)
   
@@ -315,6 +345,14 @@ mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
     formatted_label <- str_to_title(str_replace_all(tons_value_selection, "_", " "))
   }
   
+  if(grepl("Value",formatted_label)){
+    unit = ""
+    unit_pre = "$"
+  } else {
+    unit = " Thousand tons"
+    unit_pre = ""
+  }
+  
   mode_plot <- mode_df %>% plot_ly(source = sourceName) %>% 
     add_pie(values = ~factor_lab, 
             #textinfo='none', 
@@ -322,7 +360,9 @@ mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
             automargin = TRUE, 
             marker = list(colors = ~color, 
                           line = list(color = "#595959", width = 1)),
-            hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"),
+            hovertemplate = ~paste0("%{label}:<br>", 
+                                   unit_pre, formatC(factor_lab, digits = 1, big.mark = ",",format="f"), unit, 
+                                   "<br> %{percent} <extra></extra>"),
             text = ~mode_group, key=~mode_group, hole = 0.6, #textfont = list(family = "Arial"),
             textposition = "outside") %>%
     layout(#font = list(family = "Arial, "Source Sans Pro", \"Helvetica Neue\", Helvetica, sans-serif", color = "#333"),
@@ -383,7 +423,7 @@ commodity_pie_graph <- function(df_in, tons_value_selection = "tons_2022",
 direction_pie_graph_countyselected <- function(df_in, county, tons_value_selection = "tons_2022", 
                                 commcolors = init_commcolors, 
                                 sourceName = sourceName){
-  
+  #browser()
   dir_temp <- df_in %>% dplyr::filter(origin %in% county | destination %in% county) 
   dir_temp$direction[dir_temp$origin == county & dir_temp$origin == dir_temp$destination] <- "Within"
   dir_temp$direction[dir_temp$origin == county & dir_temp$origin != dir_temp$destination] <- "Outbound"
@@ -403,6 +443,13 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
     formatted_label <- str_to_title(str_replace_all(tons_value_selection, "_", " "))
   }
   
+  if(grepl("Value",formatted_label)){
+    unit = ""
+    unit_pre = "$"
+  } else {
+    unit = " Thousand tons"
+    unit_pre = ""
+  }
 
   dir_plot <- dir_temp %>% plot_ly(source = sourceName, 
                                    labels = ~direction, 
@@ -411,9 +458,14 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
             key = ~direction, 
             hole = 0.6, 
             sort = TRUE, 
-            direction = "clockwise",hovertemplate = ~paste("%{label} <br> : ", formatC(factor_lab, digits = 1, big.mark = ",",format="f"), "</br> %{percent} <extra></extra>"), 
-                                                                    marker = list(colors = ~color, line = list(color = "#595959", width = 1)), #textfont = list(family = "Arial", size = 10), 
-                                                                    textposition = "bottom center") %>%
+            direction = "clockwise",hovertemplate = ~paste0("%{label}:<br>", 
+                                                            unit_pre, formatC(factor_lab, digits = 1, big.mark = ",",format="f"), unit, 
+                                                            "<br> %{percent} <extra></extra>"), 
+            marker = list(colors = ~color, 
+                          line = list(color = "#595959", 
+                                      width = 1)), 
+            #textfont = list(family = "Arial", size = 10), 
+            textposition = "bottom center") %>%
     layout(
       #showlegend = TRUE, autosize = T, 
       annotations = list(text = HTML(paste0( formatted_label, "</i>")), "showarrow"=F),font=list(size = 20)) #%>% 
@@ -517,57 +569,6 @@ state_bubbles <- function(df_in, tons_value_selection, sourceName){
   return(temp_bub)
 }
 
-#function for displaying total tons or value
-# state_bar <- function(df_in, county, tons_value_selection){
-#     state_join <- data.frame(state = c("01", "02", "04", "05", "06", "08", "09", "10", "11", "12", "13", "15", 
-# "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27",
-# "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39",
-# "40", "41", "42", "44", "45", "46", "47", "48", "49", "50", "51", "53",
-# "54", "55", "56", "60", "66", "69","72", "78"),
-# state_lab =c("Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", 
-#              "Iowa", "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
-#              "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
-#              "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
-#              "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", 
-#              "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", 
-#              "American Samoa", "Guam", "Northern Mariana Islands", "Puerto Rico", "U.S. Virgin Islands"))
-
-#   df_temp <- df_in %>% 
-#     filter(origin == county|destination == county) %>%
-#     mutate(state = ifelse(origin == county, destination, origin)) %>%
-#     filter(state == str_sub(county, 1,2)) %>%
-#     rename(factor_lab = tons_value_selection) %>% 
-#     mutate(inbound_factor = ifelse(origin == state, factor_lab, 0)) %>%
-#     mutate(outbound_factor = ifelse(destination == state, factor_lab, 0)) %>%
-#     group_by(state) %>%
-#     summarise(inbound_factor = round(sum(inbound_factor),digits = 1),
-#               outbound_factor = round(sum(outbound_factor), digits = 1),
-#               factor_lab = round(sum(factor_lab), digits=1)) %>%
-#     ungroup() %>% 
-#     left_join(state_join)
-#     statenm <- df_temp$state_lab[1]
-#     fig <- plot_ly(df_temp, y = df_temp$state_lab, x = df_temp$inbound_factor, 
-#                    type = 'bar', width=1, 
-#                    orientation = 'h', name = 'Inbound Trade') %>%
-#       add_trace(x = df_temp$outbound_factor, y= df_temp$state_lab, name = "Outbound Trade") %>%
-#       layout(barmode = 'stack', 
-#              xaxis = list(title = "",
-#                                  showgrid = FALSE,
-#                                  showline = FALSE,
-#                                  showticklabels = FALSE,
-#                                  zeroline = FALSE),
-#              yaxis = list(
-#                                  showgrid = FALSE,
-#                                  showline = FALSE,
-#                                  showticklabels = FALSE,
-#                                  zeroline = FALSE))
-#     #fig <- fig %>% add_trace(y = ~outbound_factor, name = 'Outbound Trade')
-#     #fig <- fig %>% layout(yaxis = list(title = paste0('Trade with', statenm), barmode = 'stack'))
-#   
-# 
-#   return(fig)
-# }
-
 #function for tile graph 
 tile_graph <- function(df_in, tons_value_selection, sourceName){
 
@@ -578,6 +579,14 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
     ungroup() %>% mutate(parents = '') %>%
     mutate(percent = factor_lab/sum(factor_lab))
 
+  if(grepl("value",tons_value_selection)){
+    unit = ""
+    unit_pre = "$"
+  } else {
+    unit = " Thousand tons"
+    unit_pre = ""
+  }
+  
     tile_graph <- plot_ly(
     data = coms_temp,
     type = "treemap",
@@ -586,8 +595,8 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
     branchvalues = 'total',
     values = ~factor_lab,
     parents = ~parents,
-    text = ~paste(format(round(factor_lab),big.mark = ","), "<br>", round(percent*100, 1), "%"),
-    hovertemplate = ~paste("%{label} <br> :", formatC(factor_lab,digits=1,format="f",big.mark = ","), "<extra></extra>")
+    text = ~paste0(unit_pre, format(round(factor_lab),big.mark = ","), unit, "<br>", round(percent*100, 1), "%"),
+    hovertemplate = ~paste0("%{label}:<br>", unit_pre, formatC(factor_lab,digits=1,format="f",big.mark = ","), unit, "<extra></extra>")
   ) %>%
     layout(uniformtext=list(minsize= 20 #,mode='hide'
                             ))
@@ -595,101 +604,102 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
   return(tile_graph)
 }
 #observe events
-observe({
-  req(input$stab1_value_opts)
-  dir_temp <- dat_cs
-  dir_temp$direction[(nchar(dir_temp$origin) == 5 & str_sub(dir_temp$origin,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))|(nchar(dir_temp$destination) == 5 & str_sub(dir_temp$destination,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Within ITTS"
-  dir_temp$direction[nchar(dir_temp$origin) == 5 & !(dir_temp$destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Export"
-  dir_temp$direction[nchar(dir_temp$destination) == 5  & !(dir_temp$origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Import"
-  
-  output$cf_flowDirection <- renderPlotly({
-    #validate(need(try(nrow(dat %>% filter((origin %in% input$stab1_county_opts | destination %in% input$stab1_county_opts))) > 0), 
-    #              message = "Please define a geography on the user selection tab to generate a figure."))
-    #{
-      direction_pie_graph(dir_temp, #county = input$stab1_county_opts, 
-                          tons_value_selection = input$stab1_value_opts, 
-                          commcolors = init_commcolors, 
-                          sourceName = "direction_pie_graph")
-    #}
-  })
-})
-
-observe({
-  req(input$stab1_value_opts)
-  output$cf_mode <- renderPlotly({
-
-      mode_pie_graph(dat_cs,
-                     tons_value_selection = input$stab1_value_opts, 
-                     ini_modecolors = ini_modecolors, 
-                     sourceName = "mode_pie_graph")
-    
-  })
-})
-
-observe({
-  req(input$stab1_value_opts)
-  output$cf_commodity <- renderPlotly({
-      commodity_pie_graph(dat_cs %>% filter(nchar(destination)==5),
-                     tons_value_selection = input$stab1_value_opts, 
-                     commcolors = init_commcolors,
-                     sourceName = "commodity_pie_graph")
-    })
-})
-
-observe({
-  req(input$stab1_value_opts)
-  output$cf_topInbound <- renderPlotly({
-      top_importing_county(dat_cs %>% filter(nchar(origin) == 5),
-                          tons_value_selection = input$stab1_value_opts, 
-                          ton_color = "#66c2a5", 
-                          value_color = "#3288bd", 
-                          sourceName = "import_graph")
-  })
-})
-
-observe({
-  req(input$stab1_value_opts)
-  output$cf_topOutbound <- renderPlotly({
-      top_exporting_county(dat_cs %>% filter(nchar(destination) == 5), 
-                          tons_value_selection = input$stab1_value_opts, 
-                          ton_color = "#66c2a5", 
-                          value_color = "#3288bd", 
-                          sourceName = "top_export_partners")
-  })
-})
-
-observe({
-  req(input$stab1_value_opts)
-  output$totalcounty_text <- renderText({
-      total_tons_or_value(dat_cs, tons_value_selection = input$stab1_value_opts)
-  })
-})
-
-observe({
-  req(input$stab1_value_opts)
-  
-  bub_temp <- dat_cs %>%
-    mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2),str_sub(destination,1,2)))
-  bub_temp$direction[(nchar(bub_temp$origin) == 5 & str_sub(bub_temp$origin,1,2)== bub_temp$destination)|(nchar(bub_temp$destination) == 5 & str_sub(bub_temp$destination,1,2)== bub_temp$origin)] <- "Within"
-  bub_temp$direction[nchar(bub_temp$origin) == 5 & (bub_temp$destination != str_sub(bub_temp$origin,1,2))] <- "Export"
-  bub_temp$direction[nchar(bub_temp$destination) == 5 & (bub_temp$origin != str_sub(bub_temp$destination,1,2))] <- "Import"
-  View(bub_temp %>% filter(is.na(direction)))
-  
-  output$cf_state_trade_bubble_plot <- renderPlotly({
-
-      state_bubbles(bub_temp, tons_value_selection = input$stab1_value_opts)
-    
-    
-  })
-})
-
-observe({
-  req(input$stab1_value_opts)
-output$cf_tile_graph <- renderPlotly({
-  #validate(need(try(nrow(dat_cs %>% filter((origin %in% input$stab1_county_opts | destination %in% input$stab1_county_opts))) > 0), 
-  #              message = "Please define a geography on the user selection tab to generate a figure."))
-  #{
-    tile_graph(dat_cs, tons_value_selection = input$stab1_value_opts)
-  #}
-  })
-})
+#PLEASE CONFIRM THIS IS NECCESARY?
+# observe({
+#   req(input$stab1_value_opts)
+#   dir_temp <- dat_cs
+#   dir_temp$direction[(nchar(dir_temp$origin) == 5 & str_sub(dir_temp$origin,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))|(nchar(dir_temp$destination) == 5 & str_sub(dir_temp$destination,1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Within ITTS"
+#   dir_temp$direction[nchar(dir_temp$origin) == 5 & !(dir_temp$destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Export"
+#   dir_temp$direction[nchar(dir_temp$destination) == 5  & !(dir_temp$origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))] <- "Import"
+#   
+#   output$cf_flowDirection <- renderPlotly({
+#     #validate(need(try(nrow(dat %>% filter((origin %in% input$stab1_county_opts | destination %in% input$stab1_county_opts))) > 0), 
+#     #              message = "Please define a geography on the user selection tab to generate a figure."))
+#     #{
+#       direction_pie_graph(dir_temp, #county = input$stab1_county_opts, 
+#                           tons_value_selection = input$stab1_value_opts, 
+#                           commcolors = init_commcolors, 
+#                           sourceName = "direction_pie_graph")
+#     #}
+#   })
+# })
+# 
+# observe({
+#   req(input$stab1_value_opts)
+#   output$cf_mode <- renderPlotly({
+# 
+#       mode_pie_graph(dat_cs,
+#                      tons_value_selection = input$stab1_value_opts, 
+#                      ini_modecolors = ini_modecolors, 
+#                      sourceName = "mode_pie_graph")
+#     
+#   })
+# })
+# 
+# observe({
+#   req(input$stab1_value_opts)
+#   output$cf_commodity <- renderPlotly({
+#       commodity_pie_graph(dat_cs %>% filter(nchar(destination)==5),
+#                      tons_value_selection = input$stab1_value_opts, 
+#                      commcolors = init_commcolors,
+#                      sourceName = "commodity_pie_graph")
+#     })
+# })
+# 
+# observe({
+#   req(input$stab1_value_opts)
+#   output$cf_topInbound <- renderPlotly({
+#       top_importing_county(dat_cs %>% filter(nchar(origin) == 5),
+#                           tons_value_selection = input$stab1_value_opts, 
+#                           ton_color = "#66c2a5", 
+#                           value_color = "#3288bd", 
+#                           sourceName = "import_graph")
+#   })
+# })
+# 
+# observe({
+#   req(input$stab1_value_opts)
+#   output$cf_topOutbound <- renderPlotly({
+#       top_exporting_county(dat_cs %>% filter(nchar(destination) == 5), 
+#                           tons_value_selection = input$stab1_value_opts, 
+#                           ton_color = "#66c2a5", 
+#                           value_color = "#3288bd", 
+#                           sourceName = "top_export_partners")
+#   })
+# })
+# 
+# observe({
+#   req(input$stab1_value_opts)
+#   output$totalcounty_text <- renderText({
+#       total_tons_or_value(dat_cs, tons_value_selection = input$stab1_value_opts)
+#   })
+# })
+# 
+# observe({
+#   req(input$stab1_value_opts)
+#   
+#   bub_temp <- dat_cs %>%
+#     mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2),str_sub(destination,1,2)))
+#   bub_temp$direction[(nchar(bub_temp$origin) == 5 & str_sub(bub_temp$origin,1,2)== bub_temp$destination)|(nchar(bub_temp$destination) == 5 & str_sub(bub_temp$destination,1,2)== bub_temp$origin)] <- "Within"
+#   bub_temp$direction[nchar(bub_temp$origin) == 5 & (bub_temp$destination != str_sub(bub_temp$origin,1,2))] <- "Export"
+#   bub_temp$direction[nchar(bub_temp$destination) == 5 & (bub_temp$origin != str_sub(bub_temp$destination,1,2))] <- "Import"
+#   View(bub_temp %>% filter(is.na(direction)))
+#   
+#   output$cf_state_trade_bubble_plot <- renderPlotly({
+# 
+#       state_bubbles(bub_temp, tons_value_selection = input$stab1_value_opts)
+#     
+#     
+#   })
+# })
+# 
+# observe({
+#   req(input$stab1_value_opts)
+# output$cf_tile_graph <- renderPlotly({
+#   #validate(need(try(nrow(dat_cs %>% filter((origin %in% input$stab1_county_opts | destination %in% input$stab1_county_opts))) > 0), 
+#   #              message = "Please define a geography on the user selection tab to generate a figure."))
+#   #{
+#     tile_graph(dat_cs, tons_value_selection = input$stab1_value_opts)
+#   #}
+#   })
+# })

@@ -9,9 +9,10 @@ library(fuzzyjoin)
 library(leaflet)
 # Process ITTS Features Data ----
 ## Load data -----
- base_path = "C:/Users/qsi/OneDrive - Cambridge Systematics/Commodity Flow/"
-#base_path = "C:/Users/qsi/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Commodity Flow/"
-
+# base_path = "C:/Users/qsi/OneDrive - Cambridge Systematics/Commodity Flow/"
+# base_path = "C:/Users/qsi/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Commodity Flow/"
+# base_path = "C:/Users/slarue/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Documents/003 ITTS SETTS/Task 5 Scenario Tool/Removed ITTS Files/"
+# base_path = "C:/Users/slarue/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Documents/3. Regional Profile/3.4 Commodity Flow and Performance/Commodity Flow/"
 ### load the aggregated commodity groups 
 commodity_group <- read_excel("SETTS_sandbox/GroupedCommodities.xlsx")
 
@@ -31,9 +32,13 @@ state_code <- read_excel("SETTS_sandbox/ZoneLookup.xlsx")
 #   mutate(mode_name = paste(mode_code,mode_name,sep = " - "))
 
 ## load and process mother faf data ----
-moth <- fread(paste0(base_path, 'disaggregatedITTS-20172050-withHeaders'),
+
+
+
+moth <- fread(paste0(base_path, 'disaggregatedITTS-20172050-withHeaders',sep =""),
                        colClasses = c(dms_orig = "character",dms_dest ="character",
-                                      fr_dest = "character", fr_orig = "character")) %>%
+                                      fr_dest = "character", fr_orig = "character")
+              ) %>%
   left_join(.,commodity_group, by = c("sctg2" = "STCGCode")) %>%
   rename(Grouped_sctg2 = Grouped) %>%
   mutate(Foreign = ifelse(!is.na(fr_orig)|!is.na(fr_dest),1,0)) %>%
@@ -42,6 +47,12 @@ moth <- fread(paste0(base_path, 'disaggregatedITTS-20172050-withHeaders'),
             "STCGDescription")) 
 gc()
 rm(commodity_group)
+
+#check moth ----
+moth$dms_orig %>% stringr::str_sub(1,2) %>% unique() %>% length()
+moth$dms_dest %>% stringr::str_sub(1,2) %>% unique() %>% length()
+moth$dms_dest[str_sub(moth$dms_dest,1,2) == "23"] %>% nchar() %>% unique()
+moth$dms_orig[str_sub(moth$dms_orig,1,2) == "23"] %>% nchar() %>% unique()
 
 ## Process Port Data ----
 airport_zonename_lookup <- state_code %>%
@@ -187,11 +198,12 @@ gc()
 
 #### destination state
 cnty2State_ToState <- moth %>%
-  left_join(.,state_code, by = c("dms_dest" = "ZoneNum")) %>%
-  rename(dms_dest_state = StateCode)%>% #does this capture NASSSS??
+  filter(str_sub(dms_orig,1,2) == "23"|str_sub(dms_dest,1,2)=="23") %>% 
+  left_join(.,state_code, by = c("dms_dest" = "ZoneNum")) %>% #should we even be using this?
+  rename(dms_dest_state = StateCode) %>% 
   select(-c("ZoneName","StateAbbrev","fr_orig","fr_dest",
             "fr_inmode","fr_outmode")) %>%
-  filter(nchar(dms_dest_state)==2) %>%  # what does this filter here mean? all the states are two digits.
+  #filter(nchar(dms_dest_state)==2) %>%  # what does this filter here mean? all the states are two digits.
   filter(nchar(dms_orig)==5) %>%
   filter(str_sub(dms_orig, 1,2) %in% c("05","12","13","21","22","28","29","45","48","51")) %>%#these are an essential step to filter only itts counties and states 
   group_by(dms_dest_state,dms_orig,Grouped_sctg2,dms_mode,trade_type) %>%
@@ -211,7 +223,7 @@ cnty2State_FromState <- moth %>%
   rename(dms_orig_state = StateCode) %>%
   select(-c("ZoneName","StateAbbrev","fr_orig","fr_dest",
             "fr_inmode","fr_outmode")) %>%
-  filter(nchar(dms_orig_state)==2) %>%  # what does this filter here mean? all the states are two digits. 
+  #filter(nchar(dms_orig_state)==2) %>%  # what does this filter here mean? all the states are two digits. 
   filter(nchar(dms_dest)==5) %>%
   filter(str_sub(dms_dest, 1,2) %in% c("05","12","13","21","22","28","29","45","48","51")) %>%
   group_by(dms_orig_state,dms_dest,Grouped_sctg2,dms_mode,trade_type) %>%
@@ -226,8 +238,8 @@ cnty2State_FromState <- moth %>%
          destination = dms_dest)
 
 gc()
-cnty2state_feature <- rbind(cnty2State_ToState,cnty2State_FromState) %>%
-  mutate(lineid = paste0(pmin(origin, destination), pmax(origin, destination)))
+  # cnty2state_feature <- rbind(cnty2State_ToState,cnty2State_FromState) %>%
+  #   mutate(lineid = paste0(pmin(origin, destination), pmax(origin, destination)))
   #left_join(.,Mode, by = c("dms_mode"= "mode_code")) %>%
   #left_join(.,trade_type, by = c("trade_type" = "trade_code"))
 

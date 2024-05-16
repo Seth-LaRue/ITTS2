@@ -2,6 +2,12 @@
 #funcitons -----------------------
 line_plot <- function(df_in, meas = "Tonnage"){
   
+  if(meas == "Value USD"){
+    unit = " $Million"
+  } else {
+    unit = " Thousand tons"
+  }
+  
   df_temp <- df_in %>% mutate(year = as.numeric(year)) %>%
     left_join(scen_colors)
   
@@ -10,25 +16,23 @@ line_plot <- function(df_in, meas = "Tonnage"){
                    linetype = ~I(lntype),
                    name = ~scen_name,
                    hovertemplate = paste0('Year: %{x}<br>', 
-                                          meas, 
-                                          ':%{y:.2s} <br>')) %>%
+                                          ':%{y:.2s}', unit,'<br>')) %>%
     layout(xaxis = list(title = 'Year'),
-           yaxis = list(title = meas, separatethousands= TRUE),
+           yaxis = list(title = paste0(meas," (",unit,")"), separatethousands= TRUE),
            legend = list(orientation = "h",   # show entries horizontally
                          xanchor = "center",  # use center of legend as anchor
                          x = 0.5,
                          y = -0.2)) %>%
     config(displayModeBar = FALSE)
   if(meas == "Value USD"){
-    lplot<-lplot %>% layout(yaxis = list(title = meas, tickformat = "$~s"))
+    lplot<-lplot %>% layout(yaxis = list(title = paste0(meas," (",unit,")"), tickformat = "$~s"))
   }
   
   return(lplot)
   
 }
 dot_plot <- function(df_in, meas = "Tonnage"){
-  #names <- unique(df_in$state_lab)
-  #browser()
+  
   trace <- df_in %>% select(-scenario)
   df_temp <- df_in %>% left_join(scen_colors)
   
@@ -59,6 +63,13 @@ dot_plot <- function(df_in, meas = "Tonnage"){
 bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourceName){
   meas = ifelse(stringr::str_split(measure, '_')[[1]][[1]] == 'tons','Tonnage','Value USD')
   yr = stringr::str_split(measure, '_')[[1]][[2]]
+  if(meas == "Value USD"){
+    unit = ""
+    unit_pre = "$"
+  } else {
+    unit = "Thousand tons"
+    unit_pre = ""
+  }
   #print(unique(df_in$scenario))
   #browser()
   df_temp <- df_in %>% left_join(scen_colors)
@@ -71,21 +82,31 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourc
                       color = ~I(scen_color),
                       hovertemplate = ~paste0(group, "<br>",
                                               "Year: ", yr, "<br>",
-                                              meas,": ", formatC(value, format = "f",digits = 2,big.mark = ","))) %>%
-    layout(yaxis = list(title = meas, separatethousands= TRUE),
+                                              unit_pre, formatC(value, format = "f",digits = 2,big.mark = ","), " ",
+                                              unit)) %>%
+    layout(yaxis = list(title = paste0(meas," (", unit,")"), separatethousands= TRUE),
            xaxis = list(title = ""),
            legend = list(orientation = "h",   # show entries horizontally
                          xanchor = "center",  # use center of legend as anchor
                          x = 0.5,
                          y = -0.2)) %>%
     config(displayModeBar = FALSE)
+  
   if(meas == "Value USD"){
     bar_plot<-bar_plot %>% layout(yaxis = list(title = "Value USD", tickformat = "$~s"))
   }
+  
   return(bar_plot)
 }
 bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
   #browser()
+  if(meas == "Value USD"){
+    unit_pre = "$"
+    unit = ""
+  } else {
+    unit_pre = ""
+    unit = "Thousand tons"
+  }
   df_temp <- df_in %>% left_join(scen_colors)
   
   bar_plot <- plot_ly(df_temp,
@@ -95,9 +116,10 @@ bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
                       name = ~scen_name,
                       color = ~I(scen_color),
                       hovertemplate = ~paste0("Year: ", year, "<br>",
-                                              meas,": ", formatC(value, format = "f",digits = 2,big.mark = ","))) %>%
+                                              unit_pre, formatC(value, format = "f",digits = 2,big.mark = ","),
+                                              unit)) %>%
     layout(
-           yaxis = list(title = meas, 
+           yaxis = list(title = paste0(meas, " (", unit, ")"),
                         separatethousands= TRUE, 
                         range = c(min(df_temp$value,na.rm=T)/2, max(df_temp$value,na.rm=T)*1.05)),
            xaxis = list(title = ""),
@@ -112,6 +134,8 @@ bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
   return(bar_plot)
 }
 sankey_diagram <- function(df_in, meas = "Tonnage"){
+  
+  #browser()
   
   blabs <- c("Alabama", "Arkansas", "Florida", "Georgia", "Kentucky",
              "Louisiana", "Mississippi", "Missouri", "North Carolina", "South Carolina",
@@ -163,6 +187,7 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   #browser()
   
   link_1t2 <- df_in %>% 
+    mutate(destination = ifelse(destination == origin, "remoov", destination)) %>%
     pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
     select(-name) %>% 
     filter(state %in% input$stab2_states) %>%
@@ -174,6 +199,10 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   
   
   link_2t3 <- df_in %>%
+    mutate(destination = ifelse(destination == origin, "remoov",destination)) %>% #this ensure internal flows don't end up being counted twice
+    pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
+    select(-name) %>% 
+    filter(state %in% input$stab2_states) %>%
     left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
     rename(source2 = mode_group) %>%
     rename(source3 = Grouped_sctg2) %>%
@@ -211,8 +240,13 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
                    link = list(
                      source = c(source_1t2_full$index1-1, source_2t3_full$index2-1),
                      target = c(source_1t2_full$index2-1, source_2t3_full$index3-1),
-                     value = c(source_1t2_full$value-1, source_2t3_full$value-1),
-                     label = paste("Tonnage: ", source_1t2_full$value, "\n")
+                     value = c(source_1t2_full$value, source_2t3_full$value),
+                     customdata = c(paste0('from: ', source_1t2_full$source1, '<br>to: ', source_1t2_full$source2),
+                                    paste0('from: ', source_2t3_full$source2, '<br>to: ', source_2t3_full$source3)),
+                    
+                     #label = paste("Tonnage: ", source_1t2_full$value, "\n")
+                     hovertemplate = paste0('Tonnage: %{value:.1f}<br>',
+                                            '%{customdata}<br><extra></extra>')
                    )
   ) %>% config(displayModeBar = FALSE)
   

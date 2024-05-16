@@ -152,7 +152,8 @@ domestic_tab <-
                                                            choices = c('ITTS', 
                                                                        'Southeast Region'),#cbind(county_choices$county_lab, value = county_choices$GEOID),
                                                            multiple = F,
-                                                           selected = 'ITTS'
+                                                           selected = 'ITTS', 
+                                                           options = list(maxOptions = 9999)
                                                            #selected = NULL,
                                             )
                                    ),#end div
@@ -322,6 +323,7 @@ domestic_tab <-
                                                     multiple = F,
                                                     selected = '48453',
                                                     options = list(
+                                                      maxOptions = 9999,
                                                       placeholder = 'Select County',
                                                       searchField = c('NAME','county_lab','statename', 'GEOID')
                                                     )
