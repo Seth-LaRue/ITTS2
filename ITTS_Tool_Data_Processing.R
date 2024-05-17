@@ -238,10 +238,14 @@ cnty2State_FromState <- moth %>%
          destination = dms_dest)
 
 gc()
-  # cnty2state_feature <- rbind(cnty2State_ToState,cnty2State_FromState) %>%
-  #   mutate(lineid = paste0(pmin(origin, destination), pmax(origin, destination)))
-  #left_join(.,Mode, by = c("dms_mode"= "mode_code")) %>%
-  #left_join(.,trade_type, by = c("trade_type" = "trade_code"))
+
+
+  cnty2state_feature <- rbind(cnty2State_ToState,cnty2State_FromState) %>%
+    filter(origin == "23"|destination == "23") %>%
+    write.csv("data/cnty2state_maine_only.csv", row.names = F)
+    #mutate(lineid = paste0(pmin(origin, destination), pmax(origin, destination))
+    #left_join(.,Mode, by = c("dms_mode"= "mode_code")) %>%
+    #left_join(.,trade_type, by = c("trade_type" = "trade_code"))
 
 ##Process State to State datasetf
 state2state_feature <- moth %>%
@@ -266,6 +270,7 @@ state2state_feature <- moth %>%
          destination = dms_dest_state)
 write.csv(state2state_feature, "state2state_feature.csv", row.names = F)
 
+state2state_feature %>% filter(origin == "23"|destination == "23") %>% write.csv("data/state2state_feature_maine_only.csv", row.names = F)
 ## Process ITTS Features International trading ----
 ### Option 1 ----
 ### feature for international flow, ignore the domestic segment of the flow.  

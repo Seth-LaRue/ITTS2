@@ -2,6 +2,7 @@ click_counties_in <- reactiveValues(curr=NULL,prev=NULL)
 
 #initialization---- 
 #make a version for ports and internationals
+print('international map initialization')
 all_states_centr_sel_ini_in=all_states_centr %>% 
   filter(GEOID=='48')
 
@@ -108,7 +109,8 @@ output$odmap_in <- renderLeaflet({
 
 #port to state selection----
 observeEvent(input$cors_opts_in, {
-  
+  print('cors_opts_in change')
+  #browser()
   req(input$cors_opts_in)
   
   if(input$cors_opts_in=="p2n"){
@@ -260,6 +262,7 @@ observeEvent(input$dms_mode_opts_in, {
 
 observeEvent(input$odmap_in_shape_click, {
   req(input$odmap_in_shape_click)
+  print('here949494')
   if(!is.null(input$odmap_in_shape_click$id)){
     if(input$odmap_in_shape_click$id %in% all_selected$GEOID){
       sel = all_selected$NAME[all_selected$GEOID == input$odmap_in_shape_click$id]
@@ -283,6 +286,7 @@ observeEvent(input$odmap_in_shape_click, {
 }) 
 
 observeEvent(input$odmap_in_marker_click, {
+  print('here11231')
   req(input$odmap_in_marker_click)
   if(!is.null(input$odmap_in_marker_click$id)){
     if(input$odmap_in_marker_click$id %in% all_selected$GEOID){
@@ -307,6 +311,8 @@ observeEvent(input$odmap_in_marker_click, {
 }) 
 
 observeEvent(input$Value_opts_in,{
+  print('here222')
+  #browser()
   if(grepl('2019',input$Value_opts_in)){
     updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
   } else if (grepl(c('2021'),input$Value_opts_in)) {

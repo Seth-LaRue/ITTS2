@@ -1,5 +1,24 @@
 #Initialize Data ----
 source("init.R")
+# dat_pin <- read.csv("data/ports2international_feature_update5172024.csv",
+#                     colClasses = c("character","character","character","character","character",
+#                                    "numeric","numeric","numeric","numeric","numeric","numeric")) %>%
+#   rename(tons_2019 = Tons_2019,
+#          tons_2021 = Tons_2021,
+#          tons_2022 = Tons_2022,
+#          value_2019 = Value_2019,
+#          value_2021 = Value_2021,
+#          value_2022 = Value_2022)
+# dat_sin <- read.csv("data/states2international_feature_update5172024.csv",
+#                     colClasses = c("character","character","character","character","character",
+#                                    "numeric","numeric","numeric","numeric","numeric","numeric")) %>%
+#   rename(tons_2019 = Tons_2019,
+#          tons_2021 = Tons_2021,
+#          tons_2022 = Tons_2022,
+#          value_2019 = Value_2019,
+#          value_2021 = Value_2021,
+#          value_2022 = Value_2022)
+# save.image(file = "ITTS_Initial_Data_05172024.RData")
 
 #Load Libraries ----
 library(shiny)
@@ -22,61 +41,6 @@ library(data.table)
 library(networkD3)
 library(waiter)
 library(shinyalert)
-
-
-
-# ITTS_base <- state_base %>%
-#   mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',NAME),
-#          GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',GEOID)) %>%
-#   group_by(NAME, GEOID) %>%
-#   summarise(NAME = unique(NAME),
-#             GEOID = unique(GEOID))%>%
-#   ungroup()
-# 
-# ITTS_boundary <- ITTS_base %>% filter(GEOID == 'ITTS') %>%
-#   select('GEOID','NAME') %>%
-#   mutate(type = '',
-#          mode_nm = '') %>% st_transform(crs = st_crs(4326))
-# 
-# all_selected = rbind(all_selected,ITTS_boundary)
-# 
-# SE_base <- state_base %>%
-#   mutate(NAME = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',NAME),
-#          GEOID = ifelse(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"),'Southeast Region',GEOID)) %>%
-#   group_by(NAME, GEOID) %>%
-#   summarise(NAME = unique(NAME),
-#             GEOID = unique(GEOID))%>%
-#   ungroup()
-# 
-# SE_boundary <- SE_base %>% filter(GEOID == 'Southeast Region') %>%
-#   select('GEOID','NAME') %>%
-#   mutate(type = '',
-#          mode_nm = '')
-# 
-# #all_selected = rbind(all_selected,SE_boundary)
-# 
-# other_states = state_base %>%
-#   filter(!(GEOID %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"))) %>%
-#   select(-'state_lab',-'STATEFP') %>%
-#   mutate(type = "",
-#          mode_nm = "")
-# 
-# all_selected <- rbind(all_selected,other_states)  ## add all geographical boundaries to this layer, used in graphs.
-# 
-# international_base <- international_base %>%
-#   mutate(type = "",
-#          mode_nm = "") %>% st_transform(crs = st_crs(4326))
-# 
-# all_selected <- rbind(all_selected,international_base)
-# all_selected <- st_transform(all_selected, crs = st_crs(4326))
-# county_selected <- st_transform(county_selected, crs = st_crs(4326))
-
-# this is for hatch pattern on ITTS and SE_hatch
-# ITTS_hatch <- HatchedPolygons::hatched.SpatialPolygons(ITTS_boundary, density = 1, angle = c(45, 135))
-# SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, angle = c(45, 135))
-#remove(ITTS_boundary)
-#remove(SE_boundary)
-#remove(other_states)
 
 #Source scripts ----
 source("gral_parameters.R")
@@ -229,7 +193,7 @@ ui <- fluidPage(
           tabName = "maps_tabs",
           style = "text-align:left",
           icon = icon("map"),
-          "Scenario Explorer"
+          "Trade Explorer"
         ),
         argonSidebarItem(
           tabName = "summary_tab",
@@ -300,14 +264,14 @@ server <- function(input, output, session) {
   
   onFlush(function(){
     runjs('
-          $("#tab-maps_tabs").click();
+          //$("#tab-maps_tabs").click();
           //$("#tabset_maps-ITTSInternationalTrade-tab").click();
           //$("#tabset_maps-ITTSCountytoCountyTrade-tab").click();
-          $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click();
+          //$("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click();
           
           $("#tabset_maps-ITTSCountytoCountyTrade-tab").click(function(){$("#odmap").trigger("shown");});
           $("#tabset_maps-ITTSCountyStatetoStateTrade-tab").click(function(){$("#odmap_cs").trigger("shown");});
-          //$("#tabset_maps-ITTSInternationalTrade-tab").click(function(){$("#odmap_in").trigger("shown");}); #add this back for international trade remove this comment!
+          $("#tabset_maps-ITTSInternationalTrade-tab").click(function(){$("#odmap_in").trigger("shown");}); 
 
           ')
     flush_waiter_message()
@@ -320,7 +284,7 @@ server <- function(input, output, session) {
   # Server portion for Analysis tab
   source('server-components/server_cty2cty_map.R', local = TRUE)
   source('server-components/server_cty2state_map.R', local = TRUE)
-  #source('server-components/server_intn_map.R', local = TRUE)
+  source('server-components/server_intn_map.R', local = TRUE)
   source('server-components/server_BaselineSummary.R', local = TRUE)
   source('server-components/server_BaselineScenarioComparison.R', local = TRUE)
   
