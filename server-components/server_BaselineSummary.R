@@ -122,8 +122,8 @@ top_importing_all <- function(df_in, tons_value_selection = "tons_2022",
     left_join(all_selected, by=c("origin"="GEOID")) # Qi: changed from county_selected to al_selected, to apply for all geographic level.
   
   if(grepl("value",tons_value_selection)){
-    unit = ""
-    unit_pre = "$"
+    unit = " $Million"
+    unit_pre = ""
   } else {
     unit = " Thousand tons"
     unit_pre = ""
@@ -173,8 +173,8 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2022",
     left_join(county_selected, by=c("destination"="GEOID")) 
   
   if(grepl("value",tons_value_selection)){
-    unit = ""
-    unit_pre = "$"
+    unit = " $Million"
+    unit_pre = ""
   } else {
     unit = " Thousand tons"
     unit_pre = ""
@@ -220,8 +220,8 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2022",
                                  sourceName = sourceName){
   
   if(grepl("value",tons_value_selection)){
-    unit = ""
-    unit_pre = "$"
+    unit = " $Million"
+    unit_pre = ""
   } else {
     unit = " Thousand tons"
     unit_pre = ""
@@ -274,11 +274,6 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2022",
 mode_pie_graph <- function(df_in, tons_value_selection = "tons_2022",
                            ini_modecolors = ini_modecolors,
                            sourceName = sourceName){
-  #browser()
-  #arguments: cf_db = Transearch database, yrSelection = Year, flowUnit = Tons or Value,
-  #counties = counties selected by the user;
-  #modecolors = data frame with two columns ("Mode_Group" and "color") that crosswalks between modes and their color on the graph
-  #saveName, saveWidth, saveHeight = arguments passed to the Plotly configu function to customize file saving
 
   mode_df <- df_in %>% 
     #dplyr::filter(origin %in% county | destination %in% county) %>%
@@ -336,7 +331,7 @@ mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
     #rbind(data.frame(dms_mode = c("1","2","3","4","5","6","7"), factor_lab = rep(0,7))) %>% #this fills any zero modes
     dplyr::group_by(dms_mode) %>% 
     dplyr::summarise(factor_lab = sum(factor_lab, na.rm = TRUE)) %>% ungroup() %>%
-    left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode)))
+    left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode)))
   
 
   if (length(strsplit(tons_value_selection, "_")[[1]]) == 1) {
@@ -346,8 +341,8 @@ mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
   }
   
   if(grepl("Value",formatted_label)){
-    unit = ""
-    unit_pre = "$"
+    unit = " $Million"
+    unit_pre = ""
   } else {
     unit = " Thousand tons"
     unit_pre = ""
@@ -444,8 +439,8 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
   }
   
   if(grepl("Value",formatted_label)){
-    unit = ""
-    unit_pre = "$"
+    unit = " $Million"
+    unit_pre = ""
   } else {
     unit = " Thousand tons"
     unit_pre = ""
@@ -580,8 +575,8 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
     mutate(percent = factor_lab/sum(factor_lab))
 
   if(grepl("value",tons_value_selection)){
-    unit = ""
-    unit_pre = "$"
+    unit = " $Million"
+    unit_pre = ""
   } else {
     unit = " Thousand tons"
     unit_pre = ""

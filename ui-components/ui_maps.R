@@ -153,7 +153,7 @@ domestic_tab <-
                                                                        'Southeast Region'),#cbind(county_choices$county_lab, value = county_choices$GEOID),
                                                            multiple = F,
                                                            selected = 'ITTS', 
-                                                           options = list(maxOptions = 9999)
+                                                           options = list(maxOptions = 1375)
                                                            #selected = NULL,
                                             )
                                    ),#end div

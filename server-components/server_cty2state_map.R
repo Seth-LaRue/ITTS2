@@ -105,13 +105,13 @@ observeEvent(input$cors_opts, {
   
   print("UPDATING: input$county_ops_cs")
   if(input$cors_opts=="c2c"){
-    updateSelectizeInput(session, 'county_opts_cs', label = "County", choices = cty_ch, selected = c("Travis County, TX", value = "48453"), server = FALSE)
+    updateSelectizeInput(session, 'county_opts_cs', label = "County", choices = cty_ch, selected = c("Travis County, TX", value = "48453"), server = FALSE, options = list(maxOptions = 1375))
     click_counties_cs$curr <- "48453"
   } else if(input$cors_opts=="s2s"){
-    updateSelectizeInput(session, 'county_opts_cs', label = "State", choices = state_ch, selected = c("Texas", value = "48"), server = FALSE)
+    updateSelectizeInput(session, 'county_opts_cs', label = "State", choices = state_ch, selected = c("Texas", value = "48"), server = FALSE, options = list(maxOptions = 1375))
     click_counties_cs$curr <- "48"
   } else if(input$cors_opts=="r2s"){
-    updateSelectizeInput(session, 'county_opts_cs', label = "Region", choices = c('ITTS', 'Southeast Region'), selected = c("ITTS", value = "ITTS"), server = FALSE)
+    updateSelectizeInput(session, 'county_opts_cs', label = "Region", choices = c('ITTS', 'Southeast Region'), selected = c("ITTS", value = "ITTS"), server = FALSE, options = list(maxOptions = 1375))
     click_counties_cs$curr <- "ITTS"
   }
   

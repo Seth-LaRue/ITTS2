@@ -193,7 +193,7 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
     filter(state %in% input$stab2_states) %>%
     #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>%
     left_join(state_join) %>% rename(source1 = state_lab) %>%
-    left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
+    left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
     rename(source2 = mode_group) %>%
     group_by(source1, source2) %>% summarise(value = sum(value))
   
@@ -203,7 +203,7 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
     pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
     select(-name) %>% 
     filter(state %in% input$stab2_states) %>%
-    left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
+    left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
     rename(source2 = mode_group) %>%
     rename(source3 = Grouped_sctg2) %>%
     group_by(source2, source3) %>% summarise(value = sum(value))
@@ -281,30 +281,30 @@ return<-dat_ss %>%
     filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>%
     
     #inbound, outbound, within ITTS
-    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "Within ITTS",
-                                     ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound"))) %>%
+    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99"), "Within ITTS",
+                                     ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99")),"Outbound","Inbound"))) %>%
     filter(direction %in% input$stab2_OD) %>%
     #filter the simple ones
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
     filter(dms_mode %in% input$stab2_mode)
     
-if("99" %in% input$stab2_states){
-  add_row<-dat_cs %>% 
-    #state filter
-    #mutate(state = "All State") %>%
-    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "Within ITTS",
-                              ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound"))) %>%
-    mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99", origin)) %>%
-    mutate(destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99",destination)) %>%
-    filter(direction %in% input$stab2_OD) %>% 
-    filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
-    filter(dms_mode %in% input$stab2_mode) %>%
-    #mutate(state = "99") %>%
-    group_by(origin, destination, direction, Grouped_sctg2, dms_mode) %>%
-    summarise_at(c("tons_2017","tons_2022","tons_2050","value_2017","value_2022","value_2050"),sum)
-
-    return <- return %>% rbind(add_row)
-}
+# if("99" %in% input$stab2_states){
+  # add_row<-dat_ss %>%
+  #   #state filter
+  #   # mutate(state = "All State") %>%
+  #   # mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "Within ITTS",
+  #   #                           ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound"))) %>%
+  #   mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99", origin)) %>%
+  #   mutate(destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99",destination)) %>%
+  #   #filter(direction %in% input$stab2_OD) %>%
+  #   #filter(Grouped_sctg2 %in% input$stab2_commodity) %>%
+  #   #filter(dms_mode %in% input$stab2_mode) %>%
+  #   #mutate(state = "99") %>%
+  #   group_by(origin, destination, Grouped_sctg2, dms_mode) %>%
+  #   summarise_at(c("tons_2017","tons_2022","tons_2050","value_2017","value_2022","value_2050"),sum)
+# 
+#     return <- return %>% rbind(add_row)
+# }
 
 #add scenarios
 curr = c("05", "12","13","21","22","28","29","45","48","51","01","47","37")
@@ -684,7 +684,7 @@ observeEvent(input$stab2_mainbutt, {
       group_by(dms_mode, measure, scenario) %>%
       summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
       filter(measure == "tons") %>%
-      left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
+      left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
       rename(label = mode_group)
     
     dot_plot(df_temp) 
@@ -715,7 +715,7 @@ observeEvent(input$stab2_mainbutt, {
       group_by(dms_mode, measure, scenario) %>%
       summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
       filter(measure == "value") %>%
-      left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
+      left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
       rename(label = mode_group)
     
     dot_plot(df_temp, meas = "Value USD") 
@@ -797,7 +797,7 @@ observeEvent(input$stab2_mainbutt, {
                    names_sep = "_",
                    names_to = c("measure","year", "scenario"),
                    values_to = "value") %>% 
-      left_join(ini_modecolors %>% mutate(dms_mode = as.numeric(dms_mode))) %>%
+      left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
       filter(measure == stringr::str_split(input$stab2_value_opts, "_")[[1]][1]) %>%
       filter(year == stringr::str_split(input$stab2_value_opts, "_")[[1]][2]) %>%
       group_by(mode_group, scenario) %>%

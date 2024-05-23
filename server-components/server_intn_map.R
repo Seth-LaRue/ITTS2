@@ -20,9 +20,9 @@ dat_ini_in <- dat_sin %>%
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
   summarise(tons_2019 = sum(tons_2019), 
-            tons_2021 = sum(tons_2021),
+            tons_2022 = sum(tons_2022),
             value_2019 = sum(value_2019),
-            value_2021 = sum(value_2021)) %>%
+            value_2022 = sum(value_2022)) %>%
   ungroup() %>%
   mutate(rank = rank(desc(value_2019)))
 
@@ -32,9 +32,9 @@ dat_pini_in <- dat_pin %>%
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
   summarise(tons_2019 = sum(tons_2019), 
-            tons_2021 = sum(tons_2021),
+            tons_2022 = sum(tons_2022),
             value_2019 = sum(value_2019),
-            value_2021 = sum(value_2021)) %>%
+            value_2022 = sum(value_2022)) %>%
   ungroup() %>%
   mutate(rank = rank(desc(value_2019)))
 
@@ -315,7 +315,7 @@ observeEvent(input$Value_opts_in,{
   #browser()
   if(grepl('2019',input$Value_opts_in)){
     updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else if (grepl(c('2021'),input$Value_opts_in)) {
+  } else if (grepl(c('2022'),input$Value_opts_in)) {
     updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline',
                                                                                              'Scenario 1' = '_s1',
                                                                                              'Scenario 2' = '_s2',
@@ -374,9 +374,9 @@ data_ss_click_in<- reactive({
       dat_temp_in = dat_temp_in %>%
         group_by(origin, destination, GEOID)%>%
         summarise(tons_2019 = sum(tons_2019), 
-                  tons_2021 = sum(tons_2021),
+                  tons_2022 = sum(tons_2022),
                   value_2019 = sum(value_2019),
-                  value_2021 = sum(value_2021)) %>%
+                  value_2022 = sum(value_2022)) %>%
         ungroup()
       selected_col = input$Value_opts_in
       }else{
@@ -426,9 +426,9 @@ data_ss_click_in<- reactive({
              GEOID = dms_imp_exp) %>% 
       group_by(dms_imp_exp, GEOID)%>%
       summarise(tons_2019 = sum(tons_2019), 
-                tons_2021 = sum(tons_2021),
+                tons_2022 = sum(tons_2022),
                 value_2019 = sum(value_2019),
-                value_2021 = sum(value_2021)) %>%
+                value_2022 = sum(value_2022)) %>%
       ungroup()
     selected_col = input$Value_opts_in
     
@@ -771,9 +771,9 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
   SETTS_ss_in<-SETTS_ss_in %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
     rename('Tons 2019</br>(Thousand Tons)'='tons_2019',
-           'Tons 2021</br>(Thousand Tons)'='tons_2021',
+           'Tons 2022</br>(Thousand Tons)'='tons_2022',
            'Value 2019</br>($Million)'='value_2019',
-           'Value 2021</br>($Million)'='value_2021')
+           'Value 2022</br>($Million)'='value_2022')
   names(SETTS_ss_in)[grepl('_',names(SETTS_ss_in))] <- str_to_title(gsub("_"," ",names(SETTS_ss_in)[grepl('_',names(SETTS_ss_in))]))
   
   #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
@@ -875,9 +875,9 @@ observe({
     SETTS_ss_in<-SETTS_ss_in %>%
       mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>%
       rename('Tons 2019</br>(Thousand Tons)'='tons_2019',
-             'Tons 2021</br>(Thousand Tons)'='tons_2021',
+             'Tons 2022</br>(Thousand Tons)'='tons_2022',
              'Value 2019</br>($Million)'='value_2019',
-             'Value 2021</br>($Million)'='value_2021')
+             'Value 2022</br>($Million)'='value_2022')
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
     SETTS_ss_in_r$SETTS_ss_in=SETTS_ss_in
     
@@ -886,9 +886,9 @@ observe({
   } else {
     SETTS_ss_in <- data.frame('EmptyData'=c(),
                               'Tons 2019</br>(Thousand Tons)'=c(),
-                              'Tons 2021</br>(Thousand Tons)'=c(),
+                              'Tons 2022</br>(Thousand Tons)'=c(),
                               'Value 2019</br>($Million)'=c(),
-                              'Value 2021</br>($Million)'=c())
+                              'Value 2022</br>($Million)'=c())
     SETTS_ss_in_r$SETTS_ss_in=SETTS_ss_in
     replaceData(proxy_cty2state_tbl, SETTS_ss_in, rownames = FALSE)
     
@@ -956,7 +956,7 @@ observe({
   })
   
   output$in_mode <- renderPlotly({
-    mode_pie_graph(dat_in,
+    mode_pie_graph_v2(dat_in,
                    #county = input$county_opts,
                    tons_value_selection = selected_value_in,
                    ini_modecolors = ini_modecolors,

@@ -1,24 +1,5 @@
 #Initialize Data ----
 source("init.R")
-# dat_pin <- read.csv("data/ports2international_feature_update5172024.csv",
-#                     colClasses = c("character","character","character","character","character",
-#                                    "numeric","numeric","numeric","numeric","numeric","numeric")) %>%
-#   rename(tons_2019 = Tons_2019,
-#          tons_2021 = Tons_2021,
-#          tons_2022 = Tons_2022,
-#          value_2019 = Value_2019,
-#          value_2021 = Value_2021,
-#          value_2022 = Value_2022)
-# dat_sin <- read.csv("data/states2international_feature_update5172024.csv",
-#                     colClasses = c("character","character","character","character","character",
-#                                    "numeric","numeric","numeric","numeric","numeric","numeric")) %>%
-#   rename(tons_2019 = Tons_2019,
-#          tons_2021 = Tons_2021,
-#          tons_2022 = Tons_2022,
-#          value_2019 = Value_2019,
-#          value_2021 = Value_2021,
-#          value_2022 = Value_2022)
-# save.image(file = "ITTS_Initial_Data_05172024.RData")
 
 #Load Libraries ----
 library(shiny)

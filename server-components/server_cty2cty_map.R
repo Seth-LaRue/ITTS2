@@ -48,7 +48,7 @@ observeEvent(input$odmap_shape_click, {
   
   
   
-  updateSelectizeInput(session, 'county_opts', choices = cty_ch, selected = c(cnty, value = val), server = TRUE)#cbind(county_choices, value = county_choices$GEOID), selected = c(cnty, value = val), server = TRUE)
+  updateSelectizeInput(session, 'county_opts', choices = cty_ch, selected = c(cnty, value = val), server = TRUE, options = list(maxOptions = 1375))#cbind(county_choices, value = county_choices$GEOID), selected = c(cnty, value = val), server = TRUE)
   
   
 })

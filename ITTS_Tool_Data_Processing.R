@@ -636,3 +636,42 @@ SE_hatch <- HatchedPolygons::hatched.SpatialPolygons(SE_boundary, density  = 1, 
 ITTS_base <- sf::st_transform(ITTS_base,CRS("+init=epsg:4269"))
 SE_base <- sf::st_transform(SE_base,CRS("+init=epsg:4269"))
 all_selected <- sf::st_transform(all_selected,CRS("+init=epsg:4269"))
+
+#adding new data to the rdata
+main_cs <- read.csv('data/cnty2state_maine_only.csv',
+                    colClasses = c("character","character","character","character","character",
+                                   "numeric","numeric","numeric","numeric","numeric","numeric")) |>
+  mutate(tons_2022 = (tons_2050 - tons_2017) / (2050 - 2017) * (2022 - 2017) + tons_2017) |>
+  mutate(value_2022 = (value_2050 - value_2017) / (2050 - 2017) * (2022 - 2017) + value_2017) |> 
+  select(-tons_2020, -value_2020, -trade_type)
+dat_cs <- rbind(dat_cs, main_cs)
+rm(main_cs)
+main_ss <- read.csv('data/state2state_feature_maine_only.csv',
+                    colClasses = c("character","character","character","character","character",
+                                   "numeric","numeric","numeric","numeric","numeric","numeric")) |>
+  mutate(tons_2022 = (tons_2050 - tons_2017) / (2050 - 2017) * (2022 - 2017) + tons_2017) |>
+  mutate(value_2022 = (value_2050 - value_2017) / (2050 - 2017) * (2022 - 2017) + value_2017) |> 
+  select(-tons_2020, -value_2020, -trade_type)
+dat_ss <- rbind(dat_ss, main_ss)
+rm(main_ss)
+dat_pin <- read.csv("data/ports2international_feature_update5172024.csv",
+                    colClasses = c("character","character","character","character","character",
+                                   "numeric","numeric","numeric","numeric","numeric","numeric")) %>%
+  rename(tons_2019 = Tons_2019,
+         tons_2021 = Tons_2021,
+         tons_2022 = Tons_2022,
+         value_2019 = Value_2019,
+         value_2021 = Value_2021,
+         value_2022 = Value_2022)
+dat_sin <- read.csv("data/states2international_feature_update5172024.csv",
+                    colClasses = c("character","character","character","character","character",
+                                   "numeric","numeric","numeric","numeric","numeric","numeric")) %>%
+  rename(tons_2019 = Tons_2019,
+         tons_2021 = Tons_2021,
+         tons_2022 = Tons_2022,
+         value_2019 = Value_2019,
+         value_2021 = Value_2021,
+         value_2022 = Value_2022)
+source("init.R")
+
+save.image(file = "ITTS_Initial_Data_05232024.RData")
