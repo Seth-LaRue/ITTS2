@@ -319,10 +319,7 @@ observeEvent(input$Value_opts_in,{
     updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline',
                                                                                              'Scenario 1' = '_s1',
                                                                                              'Scenario 2' = '_s2',
-                                                                                             'Scenario 3' = '_s3',
-                                                                                             'Scenario 4' = '_s4',
-                                                                                             'Scenario 5' = '_s5',
-                                                                                             'Scenario 6' = '_s6'),
+                                                                                             'Scenario 3' = '_s3'),
                          selected = 'Baseline',server = TRUE)
   }
 })
@@ -730,7 +727,7 @@ output$scenario_title_in <- renderText({
 })
 
 output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
-  
+  #browser()
   
   if(input$Scenario_opt_in == 'Baseline' &
      grepl('2019',input$Value_opts_in) &
