@@ -594,6 +594,7 @@ domestic_tab <-
                                  width = 12,
                                  argonColumn(width=10,h2(textOutput('table_title_in'))),
                                  argonColumn(width = 10, h2(textOutput('scenario_title_in'))),
+                                 argonColumn(width = 10, p(textOutput("scenario_text_output_in"))),
                                  argonColumn(width=2,downloadButton('download_in','Selected Data')),#, class = "butt_down_cs")),
                                  br(),br(),br()
                                ),

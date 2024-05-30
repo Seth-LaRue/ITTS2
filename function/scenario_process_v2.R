@@ -9,7 +9,7 @@ scen1_comm_list2 <- c('Agriculture and Fish') # agriculture increase by 1.3% ann
 
 scen2_comm_list <- c('Non-coal Energy Products')
 
-#scen3_comm_list1 <- c('Coal')
+scen3_comm_list1 <- c('Coal')
 scen3_comm_list2 <- c('Machinery, Electric, and Precision Instruments','Transportation Equipment')
 
 
@@ -213,7 +213,7 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
           # Condition 4
           tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff*ratio_2017,
           # Default case
-          dat_temp_cs[[Value_opts_cs]]
+          dat_temp_cs[[Value_opts_cs]] # if not matching any, equals the default
         )
       )
       )%>%

@@ -172,7 +172,7 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
             
             Grouped_sctg2 %in% scen3_comm_list1,
             # Condition 3
-            tons_2050,
+            value_2050,
             ifelse(
                 Grouped_sctg2 %in% scen3_comm_list2,
                 # Condition 4
