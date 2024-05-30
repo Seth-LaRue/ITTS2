@@ -1,8 +1,3 @@
-#ports <- c("Port 1","Port 2","Port 3", "1_3_5_7_9_11_13_15_17_19_21_23_25")
-#states <- c("Arkansas","ect.")
-#partners <- c("partner1","partner2")
-
-#int_ports_mode_no_selelect <- data.frame(mode = c("3","4","99"), use = c("3006","4111","99144"))
 
 modes <- c("Truck"="1",
            "Rail" ="2",
@@ -14,56 +9,8 @@ modes <- c("Truck"="1",
 
 modes_int <- c("Water"="3","Air (Includes truck-air)"="4", "Border-Point-of-Entry" = "99")
 
-# commodities <- c("Aggregates",
-#                  "Agriculture and Fish",
-#                  "Base chemicals and Pharmaceuticals",
-#                  "Coal",
-#                  "Food, Alcohol and Tobacco",
-#                  "Furniture",
-#                  "Log",
-#                  "Machinery, Electric, and Precision Instruments",
-#                  "Mixed Freight",
-#                  "Motorized vehicles",
-#                  "Non-coal Energy Products",
-#                  "Nonmetallic Mineral and Base Metal Products",
-#                  "Other Chemicals, Plastics, and Rubber",
-#                  "Raw and Finished Wood Products",
-#                  "Textiles and Leather",
-#                  "Transportation Equipment",
-#                  "Waste and Scrap"
-#                  )
 
 od <- c("Both" = "Both","Inbound" = "dms_dest", "Outbound" = "dms_orig")
-#od_in <- c("Both" = "Both","Import" = "dms_dest", "Export" = "dms_orig")
-# 
-# ITTS_states <- data.frame(state = c("Arkansas","Florida","Georgia","Kentucky","Louisiana","Mississippi","Missouri","South Carolina","Texas","Virginia", "Alabama","Tennessee","North Carolina"),
-#                           FIPS = c("05","12","13","21","22","28","29","45","48","51","01","47","37"))
-
-#county_base <- readOGR("Date/cb_2018_us_county_500k/cb_2018_us_county_500k.shp")
-
-# county_selected <- county_base[county_base$STATEFP %in% c("05", "12","13","21","22","28","29","45","48","51"), ]
-# ITTS_states_choices <- data.frame(statename=c("Arkansas","Florida","Georgia","Kentucky",
-#                                               "Louisiana","Mississippi","Missouri","South Carolina",
-#                                               "Texas","Virginia", "Alabama","Tennessee","North Carolina"),
-#                                   STATEFP = c("05","12","13",
-#                                               "21","22","28",
-#                                               "29","45","48",
-#                                               "51",
-#                                               "01","47","37"))
-
-# county_choices <- county_selected %>% #@data %>%
-#   select(STATEFP, NAME, GEOID) %>%
-#   left_join(ITTS_states_choices) %>%
-#   select(-c(STATEFP)) %>%
-#   arrange(statename)
-
-# cty_ch = county_choices$GEOID
-# state_ch = state_choices$GEOID
-# port_ch = ports_base$GEOID
-# names(port_ch) = ports_base$NAME
-# names(cty_ch)=  county_choices$county_lab
-# names(state_ch)= state_choices$NAME
-
 
 domestic_tab <- 
   

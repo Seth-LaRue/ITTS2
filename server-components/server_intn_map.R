@@ -321,6 +321,7 @@ observeEvent(input$Value_opts_in,{
                                                                                           'Scenario 2: Leverage Multi-State Strength' = '_s2',
                                                                                           'Scenario 3: Embrace Technology Transformations' = '_s3'),
                          selected = 'Baseline', server = FALSE)
+
   }
 })
 
@@ -752,7 +753,7 @@ output$scenario_text_output_in <- renderText({
 })
 
 output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
-  
+  #browser()
   
   if(input$Scenario_opt_in == 'Baseline' &
      grepl('2019',input$Value_opts_in) &

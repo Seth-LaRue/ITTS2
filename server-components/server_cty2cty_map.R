@@ -1,9 +1,9 @@
 #this intializes the county options
-#updateSelectizeInput(session, 'county_opts', choices = cty_ch, selected = '48453', server = TRUE)
 
+#we could remove the prev value
 click_counties <- reactiveValues(curr=NULL,prev=NULL)
 
-
+#removing this section seems like it should be done
 all_counties_centr_sel_ini=all_counties_centr %>% 
   filter(GEOID=='48453')
 
@@ -24,8 +24,6 @@ ln_select_ini <- county_selected %>%
   select(GEOID,county_lab) %>%
   inner_join(dat_ini,by = "GEOID")
 
-
-
 #observeEvent(input$county_opts,{browser()})
 
 observeEvent(input$county_opts, {
@@ -33,9 +31,9 @@ observeEvent(input$county_opts, {
   cnty = county_selected$GEOID[county_selected$GEOID == input$county_opts]
   
   click_counties$curr <- cnty
-  
 })
 
+#I think this is fine except why do we need the click counties exactly
 observeEvent(input$odmap_shape_click, {
   req(input$odmap_shape_click)
   #print(input$odmap_shape_click$id)
@@ -46,11 +44,7 @@ observeEvent(input$odmap_shape_click, {
   cnty = county_selected$county_lab[county_selected$GEOID == click_counties$curr]
   val = click_counties$curr
   
-  
-  
-  updateSelectizeInput(session, 'county_opts', choices = cty_ch, selected = c(cnty, value = val), server = TRUE, options = list(maxOptions = 1375))#cbind(county_choices, value = county_choices$GEOID), selected = c(cnty, value = val), server = TRUE)
-  
-  
+  updateSelectizeInput(session, 'county_opts', choices = cty_ch, selected = c(cnty, value = val), server = TRUE, options = list(maxOptions = 1377))
 })
 
 observeEvent(input$Value_opts, {
@@ -61,7 +55,7 @@ observeEvent(input$Value_opts, {
     } else {
       # Check if the current selection is not "Baseline"
       if (input$Scenario_opt != "Baseline") {
-        return(NULL)
+
       } else {
         # Update to the selected scenario
         updateSelectizeInput(session, 'Scenario_opt', label = 'Scenario Options', choices = c('Baseline' = 'Baseline',
@@ -77,6 +71,7 @@ observeEvent(input$Value_opts, {
 
 output$odmap <- renderLeaflet({
   
+  #calculating the colors before hand? Is that possible
   pal_factor_ini <- colorQuantile(palette = "Blues",domain = ln_select_ini$value_2022,probs = seq(0, 1, .2))
   pulsecolor_ini='red'
   
@@ -144,9 +139,9 @@ data_ss_click<- reactive({
   
   #additional filtering can go here
   
+  #filter direction
   if(input$OD_opts != "Both"){
-    # dat_temp <- dat %>%
-    #   filter(!!input$OD_opts == click_counties$curr) this method didn't work unfortunately
+    
     if(input$OD_opts == "dms_orig"){
       dat_temp <- dat %>%
         filter(origin == click_counties$curr) %>%
@@ -156,6 +151,7 @@ data_ss_click<- reactive({
         filter(destination == click_counties$curr) %>%
         mutate(GEOID = origin)
     }
+    
     #filtering for mode
     if(input$dms_mode_opts != "All" & nrow(dat_temp) >=1) {
       dat_temp = dat_temp %>%
@@ -165,45 +161,6 @@ data_ss_click<- reactive({
       dat_temp = dat_temp %>%
         filter(Grouped_sctg2==input$sctg2_opts)}
     
-    # output$c2c_flowDirection <- renderPlotly({
-    #   direction_pie_graph_countyselected(dat_temp,
-    #                                      county = input$county_opts,
-    #                                      tons_value_selection = input$Value_opts,
-    #                                      commcolors = init_commcolors,
-    #                                      sourceName = "c2c_flowDirection")
-    # })
-    # 
-    # output$c2c_mode <- renderPlotly({
-    #   mode_pie_graph(dat_temp,
-    #                  #county = input$county_opts,
-    #                  tons_value_selection = input$Value_opts,
-    #                  ini_modecolors = ini_modecolors,
-    #                  sourceName = "c2c_mode")
-    # })
-    # 
-    # output$c2c_cf_commodity <- renderPlotly({
-    #   tile_graph(dat_temp,
-    #              tons_value_selection = input$Value_opts,
-    #              sourceName = "c2c_cf_commodity")
-    # })
-    # 
-    # output$c2c_cf_topInbound <- renderPlotly({
-    #   top_importing_county(dat_temp,
-    #                        tons_value_selection = input$Value_opts,
-    #                        ton_color = "#66c2a5",
-    #                        value_color = "#3288bd",
-    #                        sourceName = "c2c_cf_topInbound")
-    #   
-    # })
-    # 
-    # output$c2c_cf_topOutbound <- renderPlotly({
-    #   top_exporting_county(dat_temp,
-    #                        tons_value_selection = input$Value_opts,
-    #                        ton_color = "#66c2a5",
-    #                        value_color = "#3288bd",
-    #                        sourceName = "c2c_cf_topOutbound")
-    # })
-    # 
     if(input$sctg2_opts == "All" | input$dms_mode_opts == "All"){
       
       if(input$Scenario_opt == 'Baseline' |grepl('2022',input$Value_opts)){
@@ -379,6 +336,7 @@ observeEvent(eventExpr = map_update(), {
   
   con_name = county_selected$county_lab[county_selected$GEOID == click_counties$curr]
   
+  #this should be removed
   if(input$OD_opts == "Both"){
     dir = "Inbound & Outbound to "
   }else if(input$OD_opts == "dms_orig"){

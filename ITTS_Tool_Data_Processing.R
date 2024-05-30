@@ -663,6 +663,7 @@ dat_pin <- read.csv("data/ports2international_feature_update5172024.csv",
          value_2019 = Value_2019,
          value_2021 = Value_2021,
          value_2022 = Value_2022)
+dat_pin[is.na(dat_pin)]<-0
 dat_sin <- read.csv("data/states2international_feature_update5172024.csv",
                     colClasses = c("character","character","character","character","character",
                                    "numeric","numeric","numeric","numeric","numeric","numeric")) %>%
@@ -672,6 +673,8 @@ dat_sin <- read.csv("data/states2international_feature_update5172024.csv",
          value_2019 = Value_2019,
          value_2021 = Value_2021,
          value_2022 = Value_2022)
+dat_sin[is.na(dat_sin)]<-0
+
 source("init.R")
 
 save.image(file = "ITTS_Initial_Data_05232024.RData")
