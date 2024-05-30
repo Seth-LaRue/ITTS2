@@ -244,7 +244,7 @@ observeEvent(input$county_opts_in, {
 })
 
 observeEvent(input$dms_mode_opts_in, {
-
+  
   if(input$cors_opts_in == "p2n"&input$dms_mode_opts_in != "All"){
     pb_temp<- ports_base[ports_base$mode_nm == input$dms_mode_opts_in,]
     port_ch_tmp = pb_temp$GEOID
@@ -257,7 +257,7 @@ observeEvent(input$dms_mode_opts_in, {
       updateSelectizeInput(session, 'county_opts_in', choices = port_ch_tmp, server = TRUE)
     }
   }
-
+  
 })
 
 observeEvent(input$odmap_in_shape_click, {
@@ -293,10 +293,10 @@ observeEvent(input$odmap_in_marker_click, {
       sel = all_selected$NAME[all_selected$GEOID == input$odmap_in_marker_click$id]
       if(input$cors_opts_in == "p2n"){
         if(input$dms_mode_opts_in != "All"){
-        pb_temp<- ports_base[ports_base$mode_nm == input$dms_mode_opts_in,]
-        port_ch_tmp = pb_temp$GEOID
-        names(port_ch_tmp) = pb_temp$NAME
-        updateSelectizeInput(session, 'county_opts_in', choices = port_ch_tmp, selected = c(sel, value = input$odmap_in_marker_click$id), server = TRUE)}
+          pb_temp<- ports_base[ports_base$mode_nm == input$dms_mode_opts_in,]
+          port_ch_tmp = pb_temp$GEOID
+          names(port_ch_tmp) = pb_temp$NAME
+          updateSelectizeInput(session, 'county_opts_in', choices = port_ch_tmp, selected = c(sel, value = input$odmap_in_marker_click$id), server = TRUE)}
         else {
           updateSelectizeInput(session, 'county_opts_in', choices = port_ch, selected = c(sel, value = input$odmap_in_marker_click$id), server = TRUE)}
         click_counties_in$prev=click_counties_in$curr
@@ -306,39 +306,39 @@ observeEvent(input$odmap_in_marker_click, {
         click_counties_in$prev=click_counties_in$curr
         click_counties_in$curr=input$odmap_in_shape_click$id
       }
-
+      
     }}
 }) 
 
-observeEvent(input$Value_opts_in,{
-  print('here222')
-  #browser()
-  if(grepl('2019',input$Value_opts_in)){
-    updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
-  } else if (grepl(c('2022'),input$Value_opts_in)) {
-    updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline' = 'Baseline',
-                                                                                          'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
-                                                                                          'Scenario 2: Leverage Multi-State Strength' = '_s2',
-                                                                                          'Scenario 3: Embrace Technology Transformations' = '_s3'),
-                         selected = 'Baseline', server = FALSE)
-
-  }
-})
+# observeEvent(input$Value_opts_in,{
+#   print('here222')
+#   #browser()
+#   if(grepl('2019',input$Value_opts_in)){
+#     updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline'), selected = 'Baseline',server = TRUE)
+#   } else if (grepl(c('2022'),input$Value_opts_in)) {
+#     updateSelectizeInput(session, 'Scenario_opt_in', label = 'Scenario Options', choices = c('Baseline' = 'Baseline',
+#                                                                                           'Scenario 1: Respond to Heightened Supply Chain Risks' = '_s1',
+#                                                                                           'Scenario 2: Leverage Multi-State Strength' = '_s2',
+#                                                                                           'Scenario 3: Embrace Technology Transformations' = '_s3'),
+#                          selected = 'Baseline', server = FALSE)
+# 
+#   }
+# })
 
 SETTS_ss_in_r <- reactiveValues(SETTS_ss_in=ln_select_in_ini %>% st_drop_geometry())
 
+
 data_ss_click_in<- reactive({
-  #req(n_lines_disp$curr)
   req(click_counties_in$curr)
   req(input$dms_mode_opts_in)
   req(input$sctg2_opts_in)
   req(input$Value_opts_in)
-  req(input$Scenario_opt_in)
   req(input$OD_opts_in)
   req(input$county_opts_in)
   req(input$n_top_in)
   req(input$cors_opts_in)
-  #additional filtering can go here
+  
+  
   if(input$cors_opts_in == "p2n"){
     dat_temp_in <- dat_pin
   } else if(input$cors_opts_in == "s2n"){
@@ -355,20 +355,16 @@ data_ss_click_in<- reactive({
         filter(destination == click_counties_in$curr) %>%
         mutate(GEOID = origin)
     }
-    #filtering for mode
     if(input$dms_mode_opts_in != "All" & nrow(dat_temp_in) >=1) {
-     dat_temp_in = dat_temp_in %>%
-       filter(dms_mode == input$dms_mode_opts_in)
-     
-     }
-    #filter for commodity
+      dat_temp_in = dat_temp_in %>%
+        filter(dms_mode == input$dms_mode_opts_in)
+      
+    }
     if(input$sctg2_opts_in != "All" & nrow(dat_temp_in) >=1) {
       dat_temp_in = dat_temp_in %>%
         filter(Grouped_sctg2==input$sctg2_opts_in)}
     
     if(input$sctg2_opts_in == "All"| input$dms_mode_opts_in == "All"){
-      if(input$Scenario_opt_in == 'Baseline' |grepl('2019',input$Value_opts_in)){
-        
       dat_temp_in = dat_temp_in %>%
         group_by(origin, destination, GEOID)%>%
         summarise(tons_2019 = sum(tons_2019), 
@@ -376,49 +372,21 @@ data_ss_click_in<- reactive({
                   value_2019 = sum(value_2019),
                   value_2022 = sum(value_2022)) %>%
         ungroup()
-      selected_col = input$Value_opts_in
-      }else{
-        dat_temp_in = process_scenario_in(dat_temp_in,
-                                       input$Value_opts_in,
-                                       input$Scenario_opt_in,
-                                       click_counties_in$curr,
-                                       c('origin', 'destination', 'GEOID'),
-                                       1)
-        selected_col <- paste0(input$Value_opts_in, input$Scenario_opt_in)}
-    } 
-    
-    else {
-      if(input$Scenario_opt_in == 'Baseline' |grepl('2019',input$Value_opts_in)){
-        dat_temp_in = dat_temp_in %>%
-          select(origin, destination, GEOID, contains('tons_'),contains('value_'))
-        selected_col = input$Value_opts_in
-        
-      }
-      else{
-        dat_temp_in = process_scenario_in(dat_temp_in,
-                                       input$Value_opts_in,
-                                       input$Scenario_opt_in,
-                                       click_counties_in$curr,
-                                       c('origin', 'destination', 'GEOID','Grouped_sctg2','dms_mode'),
-                                       1)
-        selected_col <- paste0(input$Value_opts_in, input$Scenario_opt_in)
-      }
       
+    } else {
+      dat_temp_in = dat_temp_in %>%
+        select(origin, destination, GEOID, contains('Tons_'),contains('Value_'))
     }
-    #this is in case someone select origin and destination for import/export
   } else {
     dat_temp_in <- dat_temp_in %>%
       filter(origin == click_counties_in$curr|destination == click_counties_in$curr)
-    #filtering for mode
     if(input$dms_mode_opts_in != "All" & nrow(dat_temp_in) >=1) {
       dat_temp_in = dat_temp_in %>%
         filter(dms_mode == input$dms_mode_opts_in)}
-    #filter for commodity
     if(input$sctg2_opts_in != "All" & nrow(dat_temp_in) >=1) {
       dat_temp_in = dat_temp_in %>%
         filter(Grouped_sctg2==input$sctg2_opts_in)}
     
-    if(input$Scenario_opt_in == 'Baseline' |grepl('2019',input$Value_opts_in)){
     dat_temp_in = dat_temp_in %>%
       mutate(dms_imp_exp = ifelse(origin == click_counties_in$curr, destination, origin),
              GEOID = dms_imp_exp) %>% 
@@ -428,23 +396,10 @@ data_ss_click_in<- reactive({
                 value_2019 = sum(value_2019),
                 value_2022 = sum(value_2022)) %>%
       ungroup()
-    selected_col = input$Value_opts_in
-    
-    } else{
-      dat_temp_in_input = dat_temp_in
-      dat_temp_in = process_scenario_in(dat_temp_in_input,
-                                     input$Value_opts_in,
-                                     input$Scenario_opt_in,
-                                     click_counties_in$curr,
-                                     col_list = c('dms_imp_exp', 'GEOID'),
-                                     0)
-      
-      selected_col <- paste0(input$Value_opts_in, input$Scenario_opt_in)
-    }
   }
   
   dat_temp_in = dat_temp_in %>%
-    rename(factor_lab = selected_col) %>%
+    rename(factor_lab = input$Value_opts_in) %>%
     mutate(rank = rank(desc(factor_lab))) #%>%
   if(nrow(dat_temp_in)>0){
     ln_select_in <- international_base %>%
@@ -462,22 +417,22 @@ map_update_in <- reactive({
   req(input$dms_mode_opts_in)
   req(input$sctg2_opts_in)
   req(input$Value_opts_in)
-  input$Scenario_opt_in
+  #input$Scenario_opt_in
   req(input$OD_opts_in)
   req(input$n_top_in)
   req(input$cors_opts_in)
   paste(click_counties_in$curr,input$dms_mode_opts_in,
         input$sctg2_opts_in,
-        input$Value_opts_in,input$Scenario_opt_in, input$OD_opts_in, input$n_top_in, input$cors_opts_in) 
+        input$Value_opts_in,input$OD_opts_in, input$n_top_in, input$cors_opts_in) 
 })
 
 #cs map update
 observeEvent(eventExpr = map_update_in(), {
   req(click_counties_in$curr,input$dms_mode_opts_in,
-      input$sctg2_opts_in, input$Value_opts_in,input$Scenario_opt_in, input$n_top_in)
+      input$sctg2_opts_in, input$Value_opts_in, input$n_top_in)
   pb_temp <- ports_base 
   if(input$dms_mode_opts_in != "All"){
-  pb_temp <- pb_temp%>% filter(mode_nm == input$dms_mode_opts_in)
+    pb_temp <- pb_temp%>% filter(mode_nm == input$dms_mode_opts_in)
   }
   #do we have to use the entire line file to remove?
   ln_select_in=data_ss_click_in()
@@ -612,22 +567,22 @@ observeEvent(eventExpr = map_update_in(), {
                    #   color = "red",
                    #   fillOpacity = 0,
                    #   bringToFront = TRUE)
-                   ) %>%
+        ) %>%
         addLegend(position = "bottomright",
                   layerId = 'leg',
                   colors = pal_factor_colors,
                   labels = pal_factor_labs, 
                   title = titl) %>%
         addPulseMarkers(
-         layerId = 'pulsemarker',
-         lng = port_pulse$long, lat = port_pulse$lat,
-         label = pulse_name,
-         labelOptions = labelOptions(
-           style = list("front-weight" = "normal", padding = "3px 8px"),
-           textsize = "15px",
-           direction = "auto"),
-         icon = makePulseIcon(heartbeat = 1,iconSize=10,
-                              color=pulsecolor))
+          layerId = 'pulsemarker',
+          lng = port_pulse$long, lat = port_pulse$lat,
+          label = pulse_name,
+          labelOptions = labelOptions(
+            style = list("front-weight" = "normal", padding = "3px 8px"),
+            textsize = "15px",
+            direction = "auto"),
+          icon = makePulseIcon(heartbeat = 1,iconSize=10,
+                               color=pulsecolor))
     } else if(input$cors_opts_in == "s2n"){
       all_states_centr_sel=all_states_centr %>% 
         filter(GEOID==click_counties_in$curr)
@@ -708,82 +663,62 @@ observe({
 })
 output$table_title_in <- renderText({ table_titl() })
 
-output$scenario_title_in <- renderText({
-  
-  if (input$Scenario_opt_in == '_s1'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 1- Respond to Heightened Supply Chain Risks')
-  }else if (input$Scenario_opt_in == '_s2'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 2- Leverage Multi-State Strength')
-  }else if (input$Scenario_opt_in == '_s3'){
-    sencario = paste0("Selected Scenario: ", 'Scenario 3- Embrace Technology Transformations')
-  }else{
-    sencario = paste0("Selected Scenario: ", input$Scenario_opt_in)}
-  return(sencario)
-})
+# output$scenario_title_in <- renderText({
+#   
+#   if (input$Scenario_opt_in == '_s1'){
+#     sencario = paste0("Selected Scenario: ", 'Scenario 1- Respond to Heightened Supply Chain Risks')
+#   }else if (input$Scenario_opt_in == '_s2'){
+#     sencario = paste0("Selected Scenario: ", 'Scenario 2- Leverage Multi-State Strength')
+#   }else if (input$Scenario_opt_in == '_s3'){
+#     sencario = paste0("Selected Scenario: ", 'Scenario 3- Embrace Technology Transformations')
+#   }else{
+#     sencario = paste0("Selected Scenario: ", input$Scenario_opt_in)}
+#   return(sencario)
+# })
 
-output$scenario_text_output_in <- renderText({
-  req(input$Scenario_opt)
-  
-  if(input$Scenario_opt_in == '_s1'){
-    return('In Scenario 1, due to the resilience and readiness of the region’s supply chains, the Southeast
-           region increases its production of consumer goods and agricultural goods over time. The Southeast
-           grows its production of consumer goods at a 2.9% annual rate. For agriculture, the tonnage of 
-           these goods originating in the Southeast will increase by about 1.3% annually.')
-  } else if (input$Scenario_opt_in == '_s2'){
-    return('Recognizing that economies are cyclic, production occurs throughout the world, weather and 
-    other events can cause major shocks to the system, and that production (particularly resource-based) depends
-    on weather and other high-variability factors, no region of the US can be self-sufficient. For reasons of 
-    regional protection (from disruption and negative change) and also economic competitiveness and opportunity, 
-    the ITTS region aims to: (1) produce a majority share of goods consumed in the Southeast region within the 
-    Southeast region; (2) become a net exporter of goods to the rest of the US and the world; (3) serve as the 
-    leading global gateway for international imports and exports for the entire US; (4) operate from a platform 
-    of heightened energy self-sufficiency. In Scenario 2, Southeast trade overall increases, and the region is 
-    assumed to grow more energy-independent. As a result, non-energy Southeast imports and exports grow at 2.9% 
-    and 2.3% annually, respectively. For energy products, Southeast imports of energy products decline at an annual
-    rate of -1.4%, and exports increase 2.95% annually.')
-  }else if (input$Scenario_opt_in == '_s3'){
-    return('As the U.S. reduces its use of coal and gasoline and embraces alternative energy, energy production 
-    technologies are rapidly evolving, impacting the movement of various commodities. Comparable technology 
-    transformations in agriculture and other resource industries may occur, and distributed manufacturing (3-D 
-    printing) may “flatten” or simplify the traditional three-tiered (resources, intermediate products, final 
-    products) supply chain. In Scenario 3, while coal shipments in the Southeast continue their historical decline,
-    high-tech durable manufacturing goods will grow at a faster rate that historically observed - 2.8% annually through 2050.')
-  }
-  
-})
+# output$scenario_text_output_in <- renderText({
+#   req(input$Scenario_opt)
+#   
+#   if(input$Scenario_opt_in == '_s1'){
+#     return('In Scenario 1, due to the resilience and readiness of the region’s supply chains, the Southeast
+#            region increases its production of consumer goods and agricultural goods over time. The Southeast
+#            grows its production of consumer goods at a 2.9% annual rate. For agriculture, the tonnage of 
+#            these goods originating in the Southeast will increase by about 1.3% annually.')
+#   } else if (input$Scenario_opt_in == '_s2'){
+#     return('Recognizing that economies are cyclic, production occurs throughout the world, weather and 
+#     other events can cause major shocks to the system, and that production (particularly resource-based) depends
+#     on weather and other high-variability factors, no region of the US can be self-sufficient. For reasons of 
+#     regional protection (from disruption and negative change) and also economic competitiveness and opportunity, 
+#     the ITTS region aims to: (1) produce a majority share of goods consumed in the Southeast region within the 
+#     Southeast region; (2) become a net exporter of goods to the rest of the US and the world; (3) serve as the 
+#     leading global gateway for international imports and exports for the entire US; (4) operate from a platform 
+#     of heightened energy self-sufficiency. In Scenario 2, Southeast trade overall increases, and the region is 
+#     assumed to grow more energy-independent. As a result, non-energy Southeast imports and exports grow at 2.9% 
+#     and 2.3% annually, respectively. For energy products, Southeast imports of energy products decline at an annual
+#     rate of -1.4%, and exports increase 2.95% annually.')
+#   }else if (input$Scenario_opt_in == '_s3'){
+#     return('As the U.S. reduces its use of coal and gasoline and embraces alternative energy, energy production 
+#     technologies are rapidly evolving, impacting the movement of various commodities. Comparable technology 
+#     transformations in agriculture and other resource industries may occur, and distributed manufacturing (3-D 
+#     printing) may “flatten” or simplify the traditional three-tiered (resources, intermediate products, final 
+#     products) supply chain. In Scenario 3, while coal shipments in the Southeast continue their historical decline,
+#     high-tech durable manufacturing goods will grow at a faster rate that historically observed - 2.8% annually through 2050.')
+#   }
+#   
+# })
 
-output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
-  #browser()
+output$subsetSETTS_in<-renderDataTable({
   
-  if(input$Scenario_opt_in == 'Baseline' &
-     grepl('2019',input$Value_opts_in) &
-     input$dms_mode_opts_in == 'All' &
-     input$sctg2_opts_in == 'All' &
-     input$OD_opts_in == 'Both'){
-    ln_select_in=ln_select_in_ini
-    names(ln_select_in)[names(ln_select_in)=='factor_lab']=input$Value_opts_in}
-  else if(input$Scenario_opt_in == 'Baseline' ){
-    ln_select_in=data_ss_click_in()
-    names(ln_select_in)[names(ln_select_in)=='factor_lab']=input$Value_opts_in
-  }else{
-    ln_select_in=data_ss_click_in()
-    names(ln_select_in)[names(ln_select_in)=='factor_lab']=paste0(input$Value_opts_in, input$Scenario_opt_in)
-  }
   
+  ln_select_in=ln_select_in_ini
+  
+  names(ln_select_in)[names(ln_select_in)=='factor_lab']=input$Value_opts_in
   
   SETTS_ss_in<-ln_select_in %>% 
     st_drop_geometry() 
   
-  if(input$OD_opts_in == "Both"){
   SETTS_ss_in<-SETTS_ss_in %>% 
     left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-  } else if(input$OD_opts_in == "dms_orig"){
-    SETTS_ss_in<-SETTS_ss_in %>%
-      left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))
-  } else if(input$OD_opts_in == "dms_dest"){
-    SETTS_ss_in<-SETTS_ss_in %>%
-      left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("origin" = "GEOID"))
-  }
   
   SETTS_ss_in<-SETTS_ss_in %>%
     arrange(rank) %>% 
@@ -797,21 +732,16 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
            'Tons 2022</br>(Thousand Tons)'='tons_2022',
            'Value 2019</br>($Million)'='value_2019',
            'Value 2022</br>($Million)'='value_2022')
+  
   names(SETTS_ss_in)[grepl('_',names(SETTS_ss_in))] <- str_to_title(gsub("_"," ",names(SETTS_ss_in)[grepl('_',names(SETTS_ss_in))]))
   
-  #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
-  
-  #Qi: not sure why this crash the tool, 
   # if(input$cors_opts_in=="p2n"){
   #   SETTS_ss_in<-SETTS_ss_in %>%
-  #     rename('International Region'='NAME')#%>%
-  #   #filter(rank <= input$n_top_in)
+  #     rename('Port'='NAME')
   # } else if(input$cors_opts_in=="s2n"){
   #   SETTS_ss_in<-SETTS_ss_in %>%
-  #     rename('International Region'='NAME') #%>%
-  #   #filter(rank <= input$n_top_in)
+  #     rename('International Region'='NAME') 
   # }
-  
   
   
   
@@ -821,18 +751,7 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
                          options = list(lengthMenu=c(5,10,100),
                                         pageLength=10, 
                                         scrollX = TRUE,
-                                        dom = 'lftp'#, 
-                                        # buttons = list(list(extend = "copy", 
-                                        #                     text = "Copy Table", 
-                                        #                     exportOptions = list(
-                                        #                       modifier = list(page = "all")
-                                        #                     )),
-                                        #                list(extend = "excel", 
-                                        #                     text = "Export to Excel", 
-                                        #                     filename = "SETTS_Tool_Data",
-                                        #                     exportOptions = list(
-                                        #                       modifier = list(page = "all")
-                                        #                     )))
+                                        dom = 'lftp' 
                          ), 
                          rownames=FALSE,
                          escape = FALSE
@@ -840,46 +759,31 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
     DT::formatRound(grepl("20", colnames(SETTS_ss_in)),digits = 1,mark = ",")
   
   return(SETTS_tbl_in)
-  
+  browser()
 })
 
 proxy_cty2state_tbl = dataTableProxy('subsetSETTS_in')
+
 
 observe({
   
   req(click_counties_in$curr,input$dms_mode_opts_in,
       input$county_opts_in,input$n_top_in,
-      input$OD_opts_in, input$sctg2_opts_in, input$Value_opts_in,input$Scenario_opt_in)
+      input$OD_opts_in, input$sctg2_opts_in, input$Value_opts_in)
   
   ln_select_in=data_ss_click_in()
   
-  # validate(need(nrow(ln_select_in)>0,
-  #               'There is no data for the selected subset.'))
   
   if(!is.null(ln_select_in)){
     
-    #names(ln_select_in)[names(ln_select_in)=='factor_lab']=input$Value_opts_in
+    names(ln_select_in)[names(ln_select_in)=='factor_lab']=input$Value_opts_in
     
-    if(input$Scenario_opt_in == 'Baseline' &
-       grepl('2019',input$Value_opts_in) &
-       input$dms_mode_opts_in == 'All' &
-       input$sctg2_opts_in == 'All' &
-       input$OD_opts_in == 'Both'){
-      names(ln_select_in)[names(ln_select_in)=='factor_lab']=input$Value_opts_in}
-    else if(input$Scenario_opt_in == 'Baseline' ){
-      names(ln_select_in)[names(ln_select_in)=='factor_lab']=input$Value_opts_in
-    }else{
-      names(ln_select_in)[names(ln_select_in)=='factor_lab']=paste0(input$Value_opts_in, input$Scenario_opt_in)
-    }
-
     SETTS_ss_in<-ln_select_in %>%
       st_drop_geometry()
     
     if(input$OD_opts_in == "Both"){
-
       SETTS_ss_in<-SETTS_ss_in %>%
         left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-
     } else if(input$OD_opts_in == "dms_orig"){
       SETTS_ss_in<-SETTS_ss_in %>%
         left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))
@@ -901,8 +805,6 @@ observe({
              'Tons 2022</br>(Thousand Tons)'='tons_2022',
              'Value 2019</br>($Million)'='value_2019',
              'Value 2022</br>($Million)'='value_2022')
-    #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
-    SETTS_ss_in_r$SETTS_ss_in=SETTS_ss_in
     
     replaceData(proxy_cty2state_tbl, SETTS_ss_in, rownames = FALSE)
     
@@ -931,7 +833,7 @@ output$download_in <- downloadHandler(
 
 observe({
   req(click_counties_in$curr,input$dms_mode_opts_in,input$county_opts_in,input$n_top_in,
-      input$OD_opts_in, input$sctg2_opts_in, input$Value_opts_in, input$Scenario_opt_in)
+      input$OD_opts_in, input$sctg2_opts_in, input$Value_opts_in)
   
   if(input$cors_opts_in == "p2n"){
     dat_in <- dat_pin
@@ -957,17 +859,17 @@ observe({
   
   selected_value_in = input$Value_opts_in
   
-  # if scenario applied
-  if (input$Scenario_opt_in != 'Baseline'){
-    dat_in = process_scenario_in(dat_in,
-                              input$Value_opts_in,
-                              input$Scenario_opt_in,
-                              click_counties_in$curr,
-                              c('origin', 'destination','Grouped_sctg2','dms_mode'),
-                              1)
-    selected_value_in = paste0(input$Value_opts_in,input$Scenario_opt_in)
-  }
-  #str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
+  # # if scenario applied
+  # if (input$Scenario_opt_in != 'Baseline'){
+  #   dat_in = process_scenario_in(dat_in,
+  #                             input$Value_opts_in,
+  #                             input$Scenario_opt_in,
+  #                             click_counties_in$curr,
+  #                             c('origin', 'destination','Grouped_sctg2','dms_mode'),
+  #                             1)
+  #   selected_value_in = paste0(input$Value_opts_in,input$Scenario_opt_in)
+  # }
+  # #str_to_title(gsub("_"," ",paste0(input$Value_opts, input$Scenario_opt)))
   
   
   output$in_flowDirection <- renderPlotly({
@@ -980,10 +882,10 @@ observe({
   
   output$in_mode <- renderPlotly({
     mode_pie_graph_v2(dat_in,
-                   #county = input$county_opts,
-                   tons_value_selection = selected_value_in,
-                   ini_modecolors = ini_modecolors,
-                   sourceName = "in_mode")
+                      #county = input$county_opts,
+                      tons_value_selection = selected_value_in,
+                      ini_modecolors = ini_modecolors,
+                      sourceName = "in_mode")
   })
   
   output$in_cf_commodity <- renderPlotly({

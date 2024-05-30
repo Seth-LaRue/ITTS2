@@ -80,7 +80,8 @@
                                            #title = "Select States(s) for comparison",
                                            pickerInput(inputId = "stab2_states", 
                                                        label = "State", 
-                                                       choices = c(state_ch, "ITTS Region" = "99"),
+                                                       choices = c("ITTS Region" = "99",
+                                                                   state_ch),
                                                        multiple = FALSE,
                                                        options = list(
                                                          size = 7,
