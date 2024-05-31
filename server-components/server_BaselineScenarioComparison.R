@@ -293,27 +293,9 @@ return<-dat_ss %>%
     #filter the simple ones
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
     filter(dms_mode %in% input$stab2_mode)
-    
-# if("99" %in% input$stab2_states){
-  # add_row<-dat_ss %>%
-  #   #state filter
-  #   # mutate(state = "All State") %>%
-  #   # mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "Within ITTS",
-  #   #                           ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")),"Outbound","Inbound"))) %>%
-  #   mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99", origin)) %>%
-  #   mutate(destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37"), "99",destination)) %>%
-  #   #filter(direction %in% input$stab2_OD) %>%
-  #   #filter(Grouped_sctg2 %in% input$stab2_commodity) %>%
-  #   #filter(dms_mode %in% input$stab2_mode) %>%
-  #   #mutate(state = "99") %>%
-  #   group_by(origin, destination, Grouped_sctg2, dms_mode) %>%
-  #   summarise_at(c("tons_2017","tons_2022","tons_2050","value_2017","value_2022","value_2050"),sum)
-# 
-#     return <- return %>% rbind(add_row)
-# }
-
+    #browser()
 #add scenarios
-curr = c("05", "12","13","21","22","28","29","45","48","51","01","47","37")
+curr = c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99")
 return <- process_scenario_v3(dat_temp_cs = return, #the filtered datatable
                     Scenario_opt_cs = input$stab2_comps, #scenario selection
                     curr = curr, #select which are the basis of imports and exports

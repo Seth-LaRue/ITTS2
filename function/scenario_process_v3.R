@@ -20,7 +20,7 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
                                 curr, #select which are the basis of imports and exports
                                 all_flag #not sure which one
                                 ){
-  
+  #browser()
   if(all_flag == 0){
     
     dat_temp_cs = dat_temp_cs %>%
