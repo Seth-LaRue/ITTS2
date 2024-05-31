@@ -497,7 +497,7 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
     }
     
     if(grepl('tons',input$Value_opts_cs)){
-      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts_cs,),'_',' '), " (Thousand tons)")
+      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts_cs,),'_',' '), " (K Tons)")
       pulsecolor='blue'
       
       pal_factor <- colorQuantile(
@@ -779,6 +779,18 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
 
 outputOptions(output, 'odmap_cs', suspendWhenHidden = FALSE)
 
+output$subtitle_1_cs <- output$subtitle_2_cs <- output$subtitle_3_cs <- output$subtitle_4_cs <-output$subtitle_5_cs <- renderText({
+  
+  if (input$Scenario_opt_cs == '_s1'){
+    sencario = paste0('Scenario 1')
+  }else if (input$Scenario_opt_cs == '_s2'){
+    sencario = paste0("Scenario 2")
+  }else if (input$Scenario_opt_cs == '_s3'){
+    sencario = paste0("'Scenario 3")
+  }else{
+    sencario = paste0("Baseline Scenario")}
+  return(sencario)
+})
 
 output$table_title_cs <- renderText({
   print('RENDERING: Table Title')
@@ -893,8 +905,8 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
   SETTS_ss_cs<-SETTS_ss_cs %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
-    rename('Tons 2022</br>(Thousand Tons)'='tons_2022',
-           'Tons 2050</br>(Thousand Tons)'='tons_2050',
+    rename('Tons 2022</br>(K Tons)'='tons_2022',
+           'Tons 2050</br>(K Tons)'='tons_2050',
            'Value 2022</br>($Million)'='value_2022',
            'Value 2050</br>($Million)'='value_2050')
   names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))] <- str_to_title(gsub("_"," ",names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))]))
@@ -983,8 +995,8 @@ observeEvent(eventExpr = data_ss_click_cs(), {
     
     SETTS_ss_cs<-SETTS_ss_cs %>%
       mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>%
-      rename('Tons 2022</br>(Thousand Tons)'='tons_2022',
-             'Tons 2050</br>(Thousand Tons)'='tons_2050',
+      rename('Tons 2022</br>(K Tons)'='tons_2022',
+             'Tons 2050</br>(K Tons)'='tons_2050',
              'Value 2022</br>($Million)'='value_2022',
              'Value 2050</br>($Million)'='value_2050')
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
@@ -993,8 +1005,8 @@ observeEvent(eventExpr = data_ss_click_cs(), {
     
   } else {
     SETTS_ss_cs <- data.frame('EmptyData'=c(),
-                              'Tons 2022</br>(Thousand Tons)'=c(),
-                              'Tons 2050</br>(Thousand Tons)'=c(),
+                              'Tons 2022</br>(K Tons)'=c(),
+                              'Tons 2050</br>(K Tons)'=c(),
                               'Value 2022</br>($Million)'=c(),
                               'Value 2050</br>($Million)'=c())
     SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs

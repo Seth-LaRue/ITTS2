@@ -1,8 +1,8 @@
 #Initialize Data ----
 source("init.R")
-rm(tostate1)
-rm(objects_new)
-rm(objects_old)
+#rm(tostate1)
+#rm(objects_new)
+#rm(objects_old)
 
 #Load Libraries ----
 library(shiny)

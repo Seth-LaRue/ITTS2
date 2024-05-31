@@ -56,7 +56,7 @@ output$odmap_in <- renderLeaflet({
   pal_factor_labs_ini_in <- paste(scales::comma(lag(pal_factor_labs_ini_in)), scales::comma(pal_factor_labs_ini_in), sep = " - ")[-1]
 
   con_name_ini_in=all_selected$NAME[all_selected$GEOID == '48']
-  titl_ini_in = paste0("Inbound & Outbound to </br>", con_name_ini_in, "</br>", str_replace(str_to_title('Value_2019'),'_',' '), " (Thousand tons)")
+  titl_ini_in = paste0("Inbound & Outbound to </br>", con_name_ini_in, "</br>", str_replace(str_to_title('Value_2019'),'_',' '), " (K tons)")
   #print('why arent i browsing?')
   #browser()
   m_in %>%
@@ -329,8 +329,9 @@ map_update_in <- reactive({
 
 #cs map update
 observeEvent(eventExpr = map_update_in(), {
+  
   req(click_counties_in$curr,input$dms_mode_opts_in,
-      input$sctg2_opts_in, input$Value_opts_in,input$Scenario_opt_in, input$n_top_in)
+      input$sctg2_opts_in, input$Value_opts_in, input$n_top_in)
   
   #browser()
   pb_temp <- ports_base 
@@ -399,7 +400,7 @@ observeEvent(eventExpr = map_update_in(), {
     
     
     if(grepl('tons',input$Value_opts_in)){
-      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts_in,),'_',' '), " (Thousand tons)")
+      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts_in,),'_',' '), " (K tons)")
       pulsecolor='blue'
       
       pal_factor <- colorQuantile(
@@ -436,6 +437,7 @@ observeEvent(eventExpr = map_update_in(), {
     pal_factor_labs <- paste(scales::comma(lag(pal_factor_labs)), scales::comma(pal_factor_labs), sep = " - ")[-1]
     
     if(input$cors_opts_in=="p2n"){
+      print("RENDERING: Leaflet Port Map")
       pulse_name = ports_base$NAME[ports_base$GEOID == click_counties_in$curr]
       
       port_pulse=ports_base %>% 
@@ -569,26 +571,8 @@ observe({
   }
   table_titl(title)
 })
-output$table_title_in <- renderText({ table_titl() })
 
-# output$scenario_title_in <- renderText({
-#   
-#   if (input$Scenario_opt_in == '_s1'){
-#     sencario = paste0("Selected Scenario: ", 'Scenario 1')
-#   }else if (input$Scenario_opt_in == '_s2'){
-#     sencario = paste0("Selected Scenario: ", 'Scenario 2')
-#   }else if (input$Scenario_opt_in == '_s3'){
-#     sencario = paste0("Selected Scenario: ", 'Scenario 3')
-#   }else if (input$Scenario_opt_in == '_s4'){
-#     sencario = paste0("Selected Scenario: ", 'Scenario 4')
-#   }else if (input$Scenario_opt_in == '_s5'){
-#     sencario = paste0("Selected Scenario: ", 'Scenario 5')
-#   }else if (input$Scenario_opt_in == '_s6'){
-#     sencario = paste0("Selected Scenario: ", 'Scenario 6')
-#   }else{
-#     sencario = paste0("Selected Scenario: ", input$Scenario_opt_in)}
-#   return(sencario)
-# })
+output$table_title_in <- renderText({ table_titl() })
 
 output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
   #browser()
@@ -610,8 +594,8 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
   
   SETTS_ss_in<-SETTS_ss_in %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
-    rename('Tons 2019</br>(Thousand Tons)'='tons_2019',
-           'Tons 2022</br>(Thousand Tons)'='tons_2022',
+    rename('Tons 2019</br>(K tons)'='tons_2019',
+           'Tons 2022</br>(K tons)'='tons_2022',
            'Value 2019</br>($Million)'='value_2019',
            'Value 2022</br>($Million)'='value_2022')
   
@@ -622,8 +606,8 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
     #if it's null
     SETTS_ss_in<-ln_select_in_ini[0,]|>st_drop_geometry() |>
       select('NAME',starts_with('tons_'), starts_with('value_'))|>
-      rename('Tons 2019</br>(Thousand Tons)'='tons_2019',
-             'Tons 2022</br>(Thousand Tons)'='tons_2022',
+      rename('Tons 2019</br>(K tons)'='tons_2019',
+             'Tons 2022</br>(K tons)'='tons_2022',
              'Value 2019</br>($Million)'='value_2019',
              'Value 2022</br>($Million)'='value_2022')
     
@@ -643,7 +627,7 @@ output$subsetSETTS_in<-renderDataTable({#server = FALSE,{
     DT::formatRound(grepl("20", colnames(SETTS_ss_in)),digits = 1,mark = ",")
   
   return(SETTS_tbl_in)
-  browser()
+  #browser()
 })
 
 proxy_cty2state_tbl = dataTableProxy('subsetSETTS_in')
@@ -664,16 +648,14 @@ observe({
     
     SETTS_ss_in<-ln_select_in %>%
       st_drop_geometry()
-    
-    if(input$OD_opts_in == "Both"){
-      SETTS_ss_in<-SETTS_ss_in %>%
-        left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-    } else if(input$OD_opts_in == "dms_orig"){
-      SETTS_ss_in<-SETTS_ss_in %>%
-        left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("destination" = "GEOID"))
-    } else if(input$OD_opts_in == "dms_dest"){
-      SETTS_ss_in<-SETTS_ss_in %>%
-        left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("origin" = "GEOID"))
+    #browser()
+  
+    if(input$OD_opts == "Both"){
+      SETTS_ss_in<-SETTS_ss_in %>% 
+        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
+    } else {
+      SETTS_ss_in<-SETTS_ss_in %>% 
+        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("GEOID" = "GEOID"))
     }
     
     SETTS_ss_in<-SETTS_ss_in %>%
@@ -685,8 +667,8 @@ observe({
     
     SETTS_ss_in<-SETTS_ss_in %>%
       mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>%
-      rename('Tons 2019</br>(Thousand Tons)'='tons_2019',
-             'Tons 2022</br>(Thousand Tons)'='tons_2022',
+      rename('Tons 2019</br>(K tons)'='tons_2019',
+             'Tons 2022</br>(K tons)'='tons_2022',
              'Value 2019</br>($Million)'='value_2019',
              'Value 2022</br>($Million)'='value_2022')
     
@@ -694,8 +676,8 @@ observe({
     
   } else {
     SETTS_ss_in <- data.frame('EmptyData'=c(),
-                              'Tons 2019</br>(Thousand Tons)'=c(),
-                              'Tons 2022</br>(Thousand Tons)'=c(),
+                              'Tons 2019</br>(K tons)'=c(),
+                              'Tons 2022</br>(K tons)'=c(),
                               'Value 2019</br>($Million)'=c(),
                               'Value 2022</br>($Million)'=c())
     SETTS_ss_in_r$SETTS_ss_in=SETTS_ss_in

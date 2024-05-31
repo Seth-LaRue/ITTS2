@@ -316,7 +316,7 @@ observeEvent(eventExpr = map_update(), {
       arrange(-rank)
     
     if(grepl('tons',input$Value_opts)){
-      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts,),'_',' '), " (Thousand tons)")
+      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts,),'_',' '), " (K tons)")
       pal_factor <- colorQuantile(
         palette = "YlOrRd",
         domain = ln_select$factor_lab[!duplicated(ln_select$factor_lab)],
@@ -407,7 +407,7 @@ observeEvent(eventExpr = map_update(), {
     
   } else {
     if(grepl('tons',input$Value_opts)){
-      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts,),'_',' '), " (Thousand tons)")
+      titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts,),'_',' '), " (K tons)")
       pulsecolor='blue'
     } else {
       titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts,),'_',' '), " ($Million)")
@@ -514,6 +514,18 @@ output$scenario_text_output <- renderText({
   
 })
 
+output$subtitle_1_cc <- output$subtitle_2_cc <- output$subtitle_3_cc <- output$subtitle_4_cc <-output$subtitle_5_cc <- renderText({
+  
+  if (input$Scenario_opt == '_s1'){
+    sencario = paste0('Scenario 1')
+  }else if (input$Scenario_opt == '_s2'){
+    sencario = paste0("Scenario 2")
+  }else if (input$Scenario_opt == '_s3'){
+    sencario = paste0("'Scenario 3")
+  }else{
+    sencario = paste0("Baseline Scenario")}
+  return(sencario)
+})
 
 
 output$subsetSETTS<-renderDataTable({#server = FALSE,{
@@ -565,8 +577,8 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     }
   SETTS_ss<-SETTS_ss %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
-    rename( 'Tons 2022</br>(Thousand Tons)'='tons_2022',
-            'Tons 2050</br>(Thousand Tons)'='tons_2050',
+    rename( 'Tons 2022</br>(K Tons)'='tons_2022',
+            'Tons 2050</br>(K Tons)'='tons_2050',
             'Value 2022</br>($Million)'='value_2022',
             'Value 2050</br>($Million)'='value_2050')
 
@@ -654,8 +666,8 @@ observe({
     
     SETTS_ss<-SETTS_ss %>%
       mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
-      rename('Tons 2022</br>(Thousand Tons)'='tons_2022',
-             'Tons 2050</br>(Thousand Tons)'='tons_2050',
+      rename('Tons 2022</br>(K Tons)'='tons_2022',
+             'Tons 2050</br>(K Tons)'='tons_2050',
              'Value 2022</br>($Million)'='value_2022',
              'Value 2050</br>($Million)'='value_2050')
     
@@ -666,8 +678,8 @@ observe({
     
     replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)} else {
       SETTS_ss <- data.frame('County'=c(),
-                             'Tons 2022</br>(Thousand Tons)'=c(),
-                             'Tons 2050</br>(Thousand Tons)'=c(),
+                             'Tons 2022</br>(K Tons)'=c(),
+                             'Tons 2050</br>(K Tons)'=c(),
                              'Value 2022</br>($Million)'=c(),
                              'Value 2050</br>($Million)'=c())
       

@@ -5,7 +5,7 @@ line_plot <- function(df_in, meas = "Tonnage"){
   if(meas == "Value USD"){
     unit = " $Million"
   } else {
-    unit = " Thousand tons"
+    unit = " K tons"
   }
   
   df_temp <- df_in %>% mutate(year = as.numeric(year)) %>%
@@ -50,8 +50,12 @@ dot_plot <- function(df_in, meas = "Tonnage"){
               hovertemplate = ~paste0(label,"<br>",
                                       meas,": ",formatC(100*value, format = "f",digits = 2),"%")) %>%
     layout(xaxis = list(title = 'Percent Growth',
-                        tickformat = '0%'),
+                        tickformat = '0%'#,
+                        #tickvals = 0:(length(df_temp$label |> unique())-1)+0.99
+                        ),
            yaxis = list(title = ''),
+           margin = list(l = 100),
+           height = 175+35*(length(df_temp$label |> unique())),
            legend = list(orientation = "h",   # show entries horizontally
                          xanchor = "center",  # use center of legend as anchor
                          x = 0.5,
@@ -67,7 +71,7 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourc
     unit = ""
     unit_pre = "$"
   } else {
-    unit = "Thousand tons"
+    unit = "K tons"
     unit_pre = ""
   }
   #print(unique(df_in$scenario))
@@ -75,7 +79,7 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourc
   df_temp <- df_in %>% left_join(scen_colors)
   
   bar_plot <- plot_ly(df_temp,
-                      x = ~str_wrap(group,16),
+                      x = ~str_wrap(group,25),
                       y = ~value,
                       type = 'bar',
                       name = ~scen_name,
@@ -86,6 +90,7 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourc
                                               unit)) %>%
     layout(yaxis = list(title = paste0(meas," (", unit,")"), separatethousands= TRUE),
            xaxis = list(title = ""),
+           margin = list(b=50),
            legend = list(orientation = "h",   # show entries horizontally
                          xanchor = "center",  # use center of legend as anchor
                          x = 0.5,
@@ -98,6 +103,7 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourc
   
   return(bar_plot)
 }
+
 bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
   #browser()
   if(meas == "Value USD"){
@@ -105,7 +111,7 @@ bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
     unit = ""
   } else {
     unit_pre = ""
-    unit = "Thousand tons"
+    unit = "K tons"
   }
   df_temp <- df_in %>% left_join(scen_colors)
   
@@ -135,29 +141,29 @@ bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
 }
 sankey_diagram <- function(df_in, meas = "Tonnage"){
   
-  #browser()
   
   blabs <- c("Alabama", "Arkansas", "Florida", "Georgia", "Kentucky",
              "Louisiana", "Mississippi", "Missouri", "North Carolina", "South Carolina",
              "Tennessee", "Texas", "Virginia", "All States",
              
-             "Truck", "Rail", "Water", "Air", 
+             "Truck", "Rail", "Water", "Air (Includes truck-air)", 
              "Mutliple Modes and Mail", "Pipeline", "Other and Unknown",
              
-             "Aggregates", "Agriculture and Fish", "Energy Products", 
-             "Machinery, Electric, and Precision Instruments", "Mixed Freight", "Nonmetallic Mineral and Base Metal Products", 
-             "Raw and Finished Wood Products", "Waste and Scrap", "Chemicals, Pharmaceuticals, Plastics, and Rubber", 
-             "Food, Alcohol and Tobacco", "Textiles and Leather", "Vehicles and Transportation Equipment")
+             "Aggregates", "Agriculture and Fish", "Base chemicals and Pharmaceuticals", "Coal", 
+             "Food, Alcohol and Tobacco", "Furniture", "Log", "Machinery, Electric, and Precision Instruments", 
+             "Mixed Freight", "Motorized vehicles", "Non-coal Energy Products", 
+             "Nonmetallic Mineral and Base Metal Products", "Other Chemicals, Plastics, and Rubber", 
+             "Raw and Finished Wood Products", "Textiles and Leather", "Transportation Equipment", "Waste and Scrap")
   
   
   shell_orig <- data.frame(source = blabs,
-                           index = c(seq(0:32))
+                           index = c(seq(0:37))
   )
   shell1 <- shell_orig[1:14,] %>% rename(source1 = source,
                                          index1 = index)
   shell2 <- shell_orig[15:21,] %>% rename(source2 = source, 
                                           index2 = index)
-  shell3 <- shell_orig[22:33,] %>% rename(source3 = source,
+  shell3 <- shell_orig[22:38,] %>% rename(source3 = source,
                                           index3 = index)
   
   source_1t2 <- source1_temp <- shell1
@@ -165,7 +171,7 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   source_1t2$index2 <- shell2$index2[1]
   
   for(n in 2:nrow(shell2)){
-    print(n)
+    #print(n)
     source_temp <- source1_temp
     source_temp$source2 <- shell2$source2[n]
     source_temp$index2 <- shell2$index2[n]
@@ -177,7 +183,7 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   source_2t3$index3 <- shell3$index3[1]
   
   for(n in 2:nrow(shell3)){
-    print(n)
+    #print(n)
     source_temp <- source2_temp
     source_temp$source3 <- shell3$source3[n]
     source_temp$index3 <- shell3$index3[n]
@@ -194,7 +200,7 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
     #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>%
     left_join(state_join) %>% rename(source1 = state_lab) %>%
     left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
-    rename(source2 = mode_group) %>%
+    rename(source2 = mode_group) %>% 
     group_by(source1, source2) %>% summarise(value = sum(value))
   
   
@@ -208,8 +214,8 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
     rename(source3 = Grouped_sctg2) %>%
     group_by(source2, source3) %>% summarise(value = sum(value))
   
-  source_1t2_full <- left_join(source_1t2, link_1t2) %>% filter(!is.na(value))
-  source_2t3_full <- left_join(source_2t3, link_2t3) %>% filter(!is.na(value))
+  source_1t2_full <- left_join(source_1t2, link_1t2) %>% filter(!is.na(value)) |> filter(!duplicated(paste0(source1,source2)))
+  source_2t3_full <- left_join(source_2t3, link_2t3) %>% filter(!is.na(value)) |> filter(!duplicated(paste0(source2,source3)))
   
   #source_1t2_full$value[is.na(source_1t2_full$value)] <- 0
   #source_2t3_full$value[is.na(source_2t3_full$value)] <- 0
@@ -278,7 +284,7 @@ return<-dat_ss %>%
     #select(-c(tons_2017, value_2017)) %>%
     #state filter
     #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>% 
-    filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>%
+    filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>% 
     
     #inbound, outbound, within ITTS
     mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99"), "Within ITTS",
@@ -406,7 +412,7 @@ observeEvent(input$stab2_mainbutt, {
                 ),
                 argonRow(width = 12,h2("Percent Growth by State")),
                 argonRow(width = 12,
-                         argonColumn(width = 6,plotlyOutput("stab2_tons_state_growth_dotplot", width = "auto", height = "auto")),
+                         argonColumn(width = 6,plotlyOutput("stab2_tons_state_growth_dotplot", width = "auto", height = "100%")),
                          argonColumn(width = 6,plotlyOutput("stab2_value_state_growth_dotplot", width = "auto", height = "auto"))
                 ),
                 argonRow(width = 12,h2("Percent Growth by Mode", align = 'center')),
@@ -725,8 +731,8 @@ observeEvent(input$stab2_mainbutt, {
   output$stab2_tons_com_growth_dotplot <- renderPlotly({
     req(stab2_data())
     print("RUNNING SCEN_COMP: tonnage com dot")
-    
-    df_temp <- stab2_data() %>%
+    #browser()
+    df_temp <- stab2_data() %>% 
       mutate(tons_2017_s1 = tons_2017_s0,
              tons_2017_s2 = tons_2017_s0,
              tons_2017_s3 = tons_2017_s0,

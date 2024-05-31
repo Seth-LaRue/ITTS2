@@ -68,7 +68,7 @@ top_importing_all <- function(df_in, tons_value_selection = "tons_2022",
     unit = " $Million"
     unit_pre = ""
   } else {
-    unit = " Thousand tons"
+    unit = " K tons"
     unit_pre = ""
   }
   #then, make graph using filtered data. Graph differs for tons vs. value 
@@ -82,7 +82,7 @@ top_importing_all <- function(df_in, tons_value_selection = "tons_2022",
             textposition = "none") %>%
     layout(
       xaxis = list(title = "",tickfont = list(size = 15)),
-      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))," (Thousand Tons)"),tickfont = list(size = 15))) %>% 
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " "))," (K tons)"),tickfont = list(size = 15))) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
@@ -119,7 +119,7 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2022",
     unit = " $Million"
     unit_pre = ""
   } else {
-    unit = " Thousand tons"
+    unit = " K tons"
     unit_pre = ""
   }
   
@@ -139,7 +139,7 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2022",
             textposition = "none") %>%
     layout(
       xaxis = list(title = ""),
-      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), " (Thousand tons)")), autosize = T) %>% 
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), " (K tons)")), autosize = T) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
@@ -166,7 +166,7 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2022",
     unit = " $Million"
     unit_pre = ""
   } else {
-    unit = " Thousand tons"
+    unit = " K tons"
     unit_pre = ""
   }
   #first: filter, group, and summarize Transearch data based on user selections
@@ -198,7 +198,7 @@ top_exporting_all <- function(df_in, tons_value_selection = "tons_2022",
             textposition = "none") %>%
     layout(
       xaxis = list(title = "",tickfont = list(size = 15)),
-      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), " (Thousand tons)"),tickfont = list(size = 15))) %>% 
+      yaxis = list(title = paste0(str_to_title(str_replace(tons_value_selection,"_", " ")), " (K tons)"),tickfont = list(size = 15))) %>% 
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", 
                                       "zoomOut2d", "resetScale2d", "toggleSpikelines", 
@@ -287,7 +287,7 @@ mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
     unit = " $Million"
     unit_pre = ""
   } else {
-    unit = " Thousand tons"
+    unit = " K tons"
     unit_pre = ""
   }
   
@@ -306,7 +306,7 @@ mode_pie_graph_v2 <- function(df_in, tons_value_selection = "Value_2022)",
     layout(#font = list(family = "Arial, "Source Sans Pro", \"Helvetica Neue\", Helvetica, sans-serif", color = "#333"),
       #showlegend = T, autosize = T, 
       annotations = list(text = HTML(paste0(formatted_label, "</i>")), "showarrow"=F,font=list(size = 20))) %>% 
-    layout(legend = list(font = list(size = 20))) %>%
+    layout(legend = list(font = list(size = 10))) %>%
     config(displaylogo = FALSE, 
            modeBarButtonsToRemove = c("zoom2d", "pan2d", "select2d", "lasso2d", "zoomIn2d", "zoomOut2d", "resetScale2d", "toggleSpikelines", "hoverCompareCartesian", "hoverClosestGeo", "hoverClosest3d", "hoverClosestGeo", "hoverClosestGl2d", "hoverClosestPie", "toggleHover", "hoverClosestCartesian")#,
            # toImageButtonOptions= list(filename = saveName,
@@ -385,7 +385,7 @@ direction_pie_graph_countyselected <- function(df_in, county, tons_value_selecti
     unit = " $Million"
     unit_pre = ""
   } else {
-    unit = " Thousand tons"
+    unit = " K tons"
     unit_pre = ""
   }
 
@@ -521,7 +521,7 @@ tile_graph <- function(df_in, tons_value_selection, sourceName){
     unit = " $Million"
     unit_pre = ""
   } else {
-    unit = " Thousand tons"
+    unit = " K tons"
     unit_pre = ""
   }
   

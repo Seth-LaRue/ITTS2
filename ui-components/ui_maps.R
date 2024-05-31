@@ -198,12 +198,12 @@ domestic_tab <-
                            width = 12,
                            argonColumn( width = 5.5, 
                                         #Flow Direction Graph
-                                        h2("Flow Direction", align = "left"), 
+                                        h2("Flow Direction", align = "left", .noWS = "after"), h4(textOutput('subtitle_1_cs'), .noWS = 'before'),
                                         plotlyOutput("c2s_flowDirection", width = "auto", height = "auto")),
                            
                            argonColumn( width = 6.5, 
                                         #Mode Graph
-                                        h2("Domestic Mode", align = "left"), 
+                                        h2("Domestic Mode", align = "left", .noWS = "after"), h4(textOutput('subtitle_2_cs'), .noWS = 'before'),
                                         plotlyOutput("c2s_mode", width = "auto", height = "auto"))
                          ),
                          argonRow(
@@ -211,17 +211,17 @@ domestic_tab <-
                            argonColumn(
                              width = 12,
                              # commodity graph
-                             h2("Commodity Type", align = 'center'),
+                             h2("Commodity Type", align = 'center', .noWS = "after"), h4(textOutput('subtitle_3_cs'),align = 'center', .noWS = 'before'),
                              plotlyOutput("c2s_cf_commodity", width = "auto", height = 'auto'))),
                          argonRow(
                            width = 12,
                            argonColumn(width = 6,
                                        #Top Import
-                                       h2("Top 10 Inbound Trading Partners",align = "center"),
+                                       h2("Top 10 Inbound Trading Partners",align = "center", .noWS = "after"), h4(textOutput('subtitle_4_cs'),align = 'center', .noWS = 'before'),
                                        plotlyOutput("c2s_cf_topInbound",width = "auto", height = "auto")),
                            argonColumn(width = 6,
                                        #Top Export
-                                       h2("Top 10 Outbound Trading Partners", align = "center"),
+                                       h2("Top 10 Outbound Trading Partners", align = "center", .noWS = "after"), h4(textOutput('subtitle_5_cs'),align = 'center', .noWS = 'before'),
                                        plotlyOutput("c2s_cf_topOutbound",width = "auto", height = "auto"))
                          )))
                    )), #end county to state tab
@@ -374,12 +374,12 @@ domestic_tab <-
                     width = 12,
                     argonColumn( width = 6, 
                                  #Flow Direction Graph
-                                 h2("Flow Direction", align = "center"), 
+                                 h2("Flow Direction", align = "center", .noWS = "after"), h4(textOutput('subtitle_1_cc'),align = 'center',  .noWS = 'before'),
                                  plotlyOutput("c2c_flowDirection", width = "auto", height = "auto")),
                     
                     argonColumn( width = 6, 
                                  #Mode Graph
-                                 h2("Domestic Mode", align = "center"), 
+                                 h2("Domestic Mode", align = "center", .noWS = "after"), h4(textOutput('subtitle_2_cc'),align = 'center',  .noWS = 'before'), 
                                  plotlyOutput("c2c_mode", width = "auto", height = "auto"))
                   ),
                   argonRow(
@@ -387,17 +387,17 @@ domestic_tab <-
                     argonColumn(
                       width = 12,
                       # commodity graph
-                      h2("Commodity Type", align = 'center'),
+                      h2("Commodity Type", align = 'center', .noWS = "after"), h4(textOutput('subtitle_3_cc'),align = 'center', .noWS = 'before'),
                       plotlyOutput("c2c_cf_commodity", width = "auto", height = 'auto'))),
                   argonRow(
                     width = 12,
                     argonColumn(width = 6,
                                 #Top Import
-                                h2("Top 10 Inbound Trading Partners",align = "center"),
+                                h2("Top 10 Inbound Trading Partners",align = "center", .noWS = "after"), h4(textOutput('subtitle_4_cc'),align = 'center', .noWS = 'before'),
                                 plotlyOutput("c2c_cf_topInbound",width = "auto", height = "auto")),
                     argonColumn(width = 6,
                                 #Top Export
-                                h2("Top 10 Outbound Trading Partners", align = "center"),
+                                h2("Top 10 Outbound Trading Partners", align = "center", .noWS = "after"), h4(textOutput('subtitle_5_cc'),align = 'center', .noWS = 'before'),
                                 plotlyOutput("c2c_cf_topOutbound",width = "auto", height = "auto"))
                   ))
               ))), #<- you need to uncomment this for international
