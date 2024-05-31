@@ -31,7 +31,7 @@ output$odmap_cs <- renderLeaflet({
   pal_factor_labs_ini_cs <- paste(scales::comma(lag(pal_factor_labs_ini_cs)), scales::comma(pal_factor_labs_ini_cs), sep = " - ")[-1]
   
   con_name_ini_cs=ITTS_base$NAME[ITTS_base$GEOID == 'ITTS']
-  titl_ini_cs = paste0("Inbound & Outbound to </br>", con_name_ini_cs, str_replace(str_to_title('value_2022'),'_',' '), " (Thousand tons)")
+  titl_ini_cs = paste0("Inbound & Outbound to </br>", con_name_ini_cs, "</br>", str_replace(str_to_title('value_2022'),'_',' '), " ($Million)")
   
   
   m_cs %>%

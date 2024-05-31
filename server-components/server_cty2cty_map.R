@@ -542,13 +542,17 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   if(input$OD_opts == "Both"){
     SETTS_ss<-SETTS_ss %>% 
       left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-  } else if(input$OD_opts == "dms_orig"){
+  } else {
     SETTS_ss<-SETTS_ss %>%
-      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
-  } else if(input$OD_opts == "dms_dest"){
-    SETTS_ss<-SETTS_ss %>%
-      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
+      left_join(st_drop_geometry(select(county_selected, GEOID)), by = "GEOID")
   }
+  # else if(input$OD_opts == "dms_orig"){
+  #   SETTS_ss<-SETTS_ss %>%
+  #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
+  # } else if(input$OD_opts == "dms_dest"){
+  #   SETTS_ss<-SETTS_ss %>%
+  #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
+  # }
   
   SETTS_ss<-SETTS_ss %>%
     arrange(rank) %>% 
@@ -625,17 +629,22 @@ observe({
     
     SETTS_ss<-ln_select %>% 
       st_drop_geometry() 
-    
+    # browser()
     if(input$OD_opts == "Both"){
       SETTS_ss<-SETTS_ss %>% 
         left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
-    } else if(input$OD_opts == "dms_orig"){
-      SETTS_ss<-SETTS_ss %>%
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
-    } else if(input$OD_opts == "dms_dest"){
-      SETTS_ss<-SETTS_ss %>%
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
+    } else {
+      SETTS_ss<-SETTS_ss %>% 
+      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("GEOID" = "GEOID"))
     }
+    
+    # else if(input$OD_opts == "dms_orig"){
+    #   SETTS_ss<-SETTS_ss %>%
+    #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
+    # } else if(input$OD_opts == "dms_dest"){
+    #   SETTS_ss<-SETTS_ss %>%
+    #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
+    # }
     
     SETTS_ss<-SETTS_ss %>%
       arrange(rank) %>% 
