@@ -68,7 +68,6 @@ observeEvent(input$Value_opts, {
   })
 })
 
-
 output$odmap <- renderLeaflet({
   
   #calculating the colors before hand? Is that possible
@@ -120,11 +119,7 @@ output$odmap <- renderLeaflet({
                            color=pulsecolor_ini))#,color = 'EE4B2B'))#'#AA4A44'))
 })
 
-
-
 SETTS_ss_r <- reactiveValues(SETTS_ss=ln_select_ini %>% st_drop_geometry())
-
-
 
 data_ss_click<- reactive({
   #req(n_lines_disp$curr)
@@ -222,45 +217,6 @@ data_ss_click<- reactive({
       dat_temp = dat_temp %>%
         filter(Grouped_sctg2==input$sctg2_opts)}
     
-    #   output$c2c_flowDirection <- renderPlotly({
-    #     direction_pie_graph_countyselected(dat_temp,
-    #                    county = input$county_opts,
-    #                    tons_value_selection = factor_lab,
-    #                    commcolors = init_commcolors,
-    #                    sourceName = "c2c_flowDirection")
-    #   })
-    # 
-    #   output$c2c_mode <- renderPlotly({
-    #     mode_pie_graph(dat_temp,
-    #                    #county = input$county_opts,
-    #                    tons_value_selection = factor_lab,
-    #                    ini_modecolors = ini_modecolors,
-    #                    sourceName = "c2c_mode")
-    #   })
-    # 
-    #   output$c2c_cf_commodity <- renderPlotly({
-    #     tile_graph(dat_temp,
-    #                tons_value_selection = input$Value_opts,
-    #                sourceName = "c2c_cf_commodity")
-    #   })
-    # 
-    #   output$c2c_cf_topInbound <- renderPlotly({
-    #     top_importing_county(dat_temp,
-    #                          tons_value_selection = input$Value_opts,
-    #                          ton_color = "#66c2a5",
-    #                          value_color = "#3288bd",
-    #                          sourceName = "c2c_cf_topInbound")
-    # 
-    # })
-    # 
-    #   output$c2c_cf_topOutbound <- renderPlotly({
-    #     top_exporting_county(dat_temp,
-    #                          tons_value_selection = input$Value_opts,
-    #                          ton_color = "#66c2a5",
-    #                          value_color = "#3288bd",
-    #                          sourceName = "c2c_cf_topOutbound")
-    #   })
-    
     if(input$Scenario_opt == 'Baseline' |grepl('2022',input$Value_opts)){
       
       dat_temp = dat_temp %>%
@@ -300,7 +256,14 @@ data_ss_click<- reactive({
       select(GEOID,county_lab) %>%
       inner_join(dat_temp,by = "GEOID") %>%
       mutate(tranp=ifelse(rank <= input$n_top, 1,.25))
-  } else {ln_select=NULL}
+  } else {
+    ln_select=NULL
+    
+    warning = HTML("Your selections did not include any freight flows. <br/> 
+                    Please change your selection to continue.")
+    
+    showNotification(HTML(warning), type = "warning")
+    }
   
   return(ln_select)
 })
@@ -556,6 +519,8 @@ output$scenario_text_output <- renderText({
 output$subsetSETTS<-renderDataTable({#server = FALSE,{
   req(data_ss_click)
   
+  ln_select = data_ss_click()
+  if(!is.null(ln_select)){
   if(input$Scenario_opt == 'Baseline' &
      grepl('2022',input$Value_opts) &
      input$dms_mode_opts == 'All' &
@@ -591,7 +556,9 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
     rename('County' = 'county_lab')
   
   SETTS_ss_r$SETTS_ss=SETTS_ss
-  
+  } else { 
+    SETTS_ss <- ln_select_ini[0,]
+    }
   SETTS_ss<-SETTS_ss %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
     rename( 'Tons 2022</br>(Thousand Tons)'='tons_2022',

@@ -372,7 +372,14 @@ data_ss_click_cs<- reactive({
     
     
   } else {
-    ln_select_cs=NULL}
+    ln_select_cs=NULL
+    
+    warning = HTML("Your selections did not include any freight flows. <br/> 
+                    Please change your selection to continue.")
+    
+    showNotification(HTML(warning), type = "warning")
+    
+    }
   
   
   return(ln_select_cs)
@@ -446,20 +453,16 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
     
   }
   
-  
-  
-  
-  
-  
   if(!is.null(ln_select_cs)) {
+    
     if(input$cors_opts %in% c('s2s','c2c')){
       leafletProxy(mapId = "odmap_cs",session = session) %>%
         removeShape(layerId = paste("data", ITTS_base$GEOID)) %>%
         removeShape(layerId = paste(all_selected$GEOID)) %>%
         #removeShape(layerId = 'leg') %>%
         clearControls() %>%
-        removeShape(layerId = 'pulsemarker')}
-    else if(input$cors_opts == 'r2s'){
+        removeShape(layerId = 'pulsemarker')
+      } else if(input$cors_opts == 'r2s'){
       if (input$county_opts_cs == 'ITTS'){
         
         leafletProxy(mapId = "odmap_cs",session = session) %>%
@@ -487,13 +490,11 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
     
     if(input$OD_opts_cs == "Both"){
       dir = "Inbound & Outbound to "
-    }else if(input$OD_opts_cs == "dms_orig"){
-      dir = "Outbound from "
-    } else {
+      } else if(input$OD_opts_cs == "dms_orig"){
+        dir = "Outbound from "
+      } else {
       dir = "Inbound to "
     }
-    
-    
     
     if(grepl('tons',input$Value_opts_cs)){
       titl = paste0(dir, con_name, "</br>", str_replace(str_to_title(input$Value_opts_cs,),'_',' '), " (Thousand tons)")
@@ -764,31 +765,34 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
                                  color=pulsecolor))
       }
     }
-    onFlushed(function() {
-      flush_waiter_message()
-    })
+    
+
     
   }
+  
+  onFlushed(function() {
+    flush_waiter_message()
+  })
+  
   print("END: Observe")
 },ignoreInit = TRUE)
 
 outputOptions(output, 'odmap_cs', suspendWhenHidden = FALSE)
 
-table_titl <- reactiveVal("")
-# output$table_title_cs <- renderText({
-#   req(click_counties_cs$curr)
-observe({
+
+output$table_title_cs <- renderText({
+  print('RENDERING: Table Title')
   if(input$OD_opts_cs != "Both"){
     if(input$OD_opts_cs == "dms_orig"){
-      output$table_title_cs = renderText(paste0("Origin: ", all_selected$NAME[all_selected$GEOID == click_counties_cs$curr]))
+      text <- paste0("Origin: ", all_selected$NAME[all_selected$GEOID == click_counties_cs$curr])
       
     } else {
-      output$table_title_cs = renderText(paste0("Destination: ", all_selected$NAME[all_selected$GEOID == click_counties_cs$curr]))
+      text <- paste0("Destination: ", all_selected$NAME[all_selected$GEOID == click_counties_cs$curr])
     }
   } else {
-    output$table_title_cs = renderText(paste0("Selected: ", all_selected$NAME[all_selected$GEOID == click_counties_cs$curr]))
+    text <- paste0("Selected: ", all_selected$NAME[all_selected$GEOID == click_counties_cs$curr])
   }
-  
+  return(text)
 })
 #output$table_title_cs <- renderText({ table_titl() })
 
@@ -838,49 +842,54 @@ output$scenario_text_output_cs <- renderText({
 
 
 output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
+  
   print("RENDERING: subsetSETTS_cs")
-
+  
+  if(!is.null(data_ss_click_cs())){
     if(input$Scenario_opt_cs == 'Baseline'){
-    print("CALLING: data_ss_click_cs point 1")
-
-        #ln_select_cs=ln_select_cs_ini()
-    ln_select_cs=data_ss_click_cs()
-
-    #print(paste0("Printing Names: ", names(ln_select_cs)))
-    names(ln_select_cs)[names(ln_select_cs)=='factor_lab'] = input$Value_opts_cs
-    
-    #print('is the issue here 0?')
-  }else{
-    
-    print("CALLING: data_ss_click_cs point 2")
-    ln_select_cs=data_ss_click_cs()
-    names(ln_select_cs)[names(ln_select_cs)=='factor_lab']=paste0(input$Value_opts_cs, input$Scenario_opt_cs)
-    
-  }
+      print("CALLING: data_ss_click_cs point 1")
+      
+      ln_select_cs=data_ss_click_cs()
+      
+      names(ln_select_cs)[names(ln_select_cs)=='factor_lab'] = input$Value_opts_cs
+      
+      }else{
+        
+        print("CALLING: data_ss_click_cs point 2")
+        ln_select_cs=data_ss_click_cs()
+        names(ln_select_cs)[names(ln_select_cs)=='factor_lab']=paste0(input$Value_opts_cs, input$Scenario_opt_cs)
+        
+        }
   
-  SETTS_ss_cs<-ln_select_cs %>% 
-    st_drop_geometry() 
-  
-  if(input$OD_opts_cs == "Both"){
-    SETTS_ss_cs<-SETTS_ss_cs %>% 
+    SETTS_ss_cs<-ln_select_cs %>% st_drop_geometry() 
+    
+    if(input$OD_opts_cs == "Both"){
+      
+      SETTS_ss_cs<-SETTS_ss_cs %>% 
       left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("GEOID"))
-  } else if(input$OD_opts_cs == "dms_orig"){
+      
+      } else if(input$OD_opts_cs == "dms_orig"){
+
+        SETTS_ss_cs<-SETTS_ss_cs %>%
+          left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("GEOID"))
+        
+        } else if(input$OD_opts_cs == "dms_dest"){
+          
+          SETTS_ss_cs<-SETTS_ss_cs %>%
+            left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("GEOID"))
+          
+          }
     
     SETTS_ss_cs<-SETTS_ss_cs %>%
-      left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("GEOID"))
+      arrange(rank) %>% 
+      select('NAME',starts_with('tons_'), starts_with('value_'))
     
-  } else if(input$OD_opts_cs == "dms_dest"){
-    
-    SETTS_ss_cs<-SETTS_ss_cs %>%
-      left_join(st_drop_geometry(select(all_selected, GEOID)), by = c("GEOID"))
-    
+    SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs
+  
+    } else {
+      print("you made it to null what's going on?")
+    SETTS_ss_cs <- ln_select_cs_ini[0,] |> st_drop_geometry()
   }
-  
-  SETTS_ss_cs<-SETTS_ss_cs %>%
-    arrange(rank) %>% 
-    select('NAME',starts_with('tons_'), starts_with('value_'))
-  
-  SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs
   
   SETTS_ss_cs<-SETTS_ss_cs %>%
     mutate_at(vars(contains('tons_'),contains('value_')),~round(.,1)) %>% 
@@ -890,17 +899,6 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
            'Value 2050</br>($Million)'='value_2050')
   names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))] <- str_to_title(gsub("_"," ",names(SETTS_ss_cs)[grepl('_',names(SETTS_ss_cs))]))
   
-  #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
-  
-  # if(input$cors_opts=="c2c"){
-  #   SETTS_ss_cs<-SETTS_ss_cs %>%
-  #     rename('State'='NAME')#%>%
-  #   #filter(rank <= input$n_top_cs)
-  # } else if(input$cors_opts=="s2s"){
-  #   SETTS_ss_cs<-SETTS_ss_cs %>%
-  #     rename('State'='NAME') #%>%
-  #   #filter(rank <= input$n_top_cs)
-  # }
   SETTS_ss_cs<-SETTS_ss_cs %>%
          rename('State'='NAME')
   
@@ -928,8 +926,9 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   ) %>% 
     DT::formatRound(grepl("20", colnames(SETTS_ss_cs)),digits = 1,mark = ",")
   
-  return(SETTS_tbl_cs)
+  print("Done rendering SETTS_tbl_cs")
   
+  return(SETTS_tbl_cs)
 })
 
 proxy_cty2state_tbl = dataTableProxy('subsetSETTS_cs')
@@ -943,9 +942,8 @@ observeEvent(eventExpr = data_ss_click_cs(), {
       input$OD_opts_cs,
       input$sctg2_opts_cs, 
       input$Value_opts_cs,
-      input$Scenario_opt_cs) #
+      input$Scenario_opt_cs) 
   
-  print("RUNNING: eventless observe")
   print("CALLING: data_ss_click_cs()")
   ln_select_cs=data_ss_click_cs()
   
@@ -1024,12 +1022,14 @@ output$download_cs <- downloadHandler(
 observe({
   req(click_counties_cs$curr,input$dms_mode_opts_cs,input$county_opts_cs,input$n_top_cs,
       input$OD_opts_cs, input$sctg2_opts_cs, input$Value_opts_cs, input$Scenario_opt_cs)
-  
+  print("RUNNING: Eventlessobserveline1027")
+  #browser()
   if(input$cors_opts == "c2c"){
     dat_in <- dat_cs
   } else if(input$cors_opts == "s2s"){
     dat_in <- dat_ss
   } else if (input$cors_opts == 'r2s'){
+    
     if (input$county_opts_cs == 'ITTS'){
       dat_in <- dat_ss %>%
         mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51"),'ITTS',origin),
