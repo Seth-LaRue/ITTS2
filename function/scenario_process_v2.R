@@ -36,7 +36,6 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
   parameter_sel <- gsub("[0-9_]", "", Value_opts_cs)
   
   if(Scenario_opt_cs == '_s1'){
-    
     # for consumer goods:
     group1_new_rate = 0.029
     group1_base_rate = 0.023
@@ -45,10 +44,9 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
     group2_base_rate = 0.011
     
     dat_temp_cs <- dat_temp_cs %>%
-      
       mutate(temp = ifelse(
         origin %in% curr & 
-          !(destination %in% curr ) & # to avoid any internal flow in any case
+          destination != curr  & # to avoid any internal flow in any case
           Grouped_sctg2 %in% scen1_comm_list1 & 
           year_selected == 2050 & 
           parameter_sel == 'tons',
@@ -58,7 +56,7 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
         
         ifelse(
           origin %in% curr & 
-            !(destination %in% curr ) &
+            destination != curr  &
             Grouped_sctg2 %in% scen1_comm_list2 & 
             year_selected == 2050 & 
             parameter_sel == 'tons',
@@ -69,7 +67,7 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
           
           ifelse(
             origin %in% curr & 
-              !(destination %in% curr) &
+              destination != curr &
               Grouped_sctg2 %in% scen1_comm_list1 & 
               year_selected == 2050 & 
               parameter_sel == 'value',
@@ -79,7 +77,7 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
             
             ifelse(
               origin %in% curr & 
-                !(destination %in% curr ) &
+                destination != curr  &
                 Grouped_sctg2 %in% scen1_comm_list2 & 
                 year_selected == 2050 & 
                 parameter_sel == 'value',
@@ -147,28 +145,28 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
       
         temp =  case_when(
           destination %in% curr &
-            !(origin %in% curr ) &  # import
+            origin != curr  &  # import
             year_selected == 2050 & parameter_sel == 'tons' ~
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^year_diff,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group3_new_rate/group3_base_rate) ^year_diff),
 
           origin %in% curr &
-            !(destination %in% curr ) & #export
+            destination != curr  & #export
             year_selected == 2050 & parameter_sel == 'tons' ~
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group4_new_rate/group4_base_rate) ^year_diff),
 
           destination %in% curr &
-            !(origin %in% curr) &
+            origin != curr &
             year_selected == 2050 & parameter_sel == 'value' ~
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^year_diff *ratio_2017,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group3_new_rate/group3_base_rate) ^year_diff *ratio_2017),
 
           origin %in% curr &
-            !(destination %in% curr ) &
+            destination != curr  &
             year_selected == 2050 & parameter_sel == 'value' ~
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff *ratio_2017,
@@ -216,7 +214,8 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
           dat_temp_cs[[Value_opts_cs]] # if not matching any, equals the default
         )
       )
-      )%>%
+      )
+      dat_temp_cs <- dat_temp_cs %>%
       mutate(temp = ifelse(temp < 0, 0 , temp)) %>% # avoid negative numbers. 
       group_by(across(all_of(col_list)))%>%
       summarise(tons_2022 = sum(tons_2022),

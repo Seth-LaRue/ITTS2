@@ -913,7 +913,6 @@ output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
   SETTS_ss_cs<-SETTS_ss_cs %>%
          rename('State'='NAME')
-  
   SETTS_tbl_cs=datatable(SETTS_ss_cs,
                          filter = list(position = 'top', clear = FALSE),
                          extensions = 'Buttons',

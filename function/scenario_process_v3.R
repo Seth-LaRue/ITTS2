@@ -17,23 +17,23 @@ scen3_comm_list2 <- c('Machinery, Electric, and Precision Instruments','Transpor
 
 process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
                                 Scenario_opt_cs, #scenario selection
-                                curr, #select which are the basis of imports and exports
-                                all_flag #not sure which one
+                                curr#, #select which are the basis of imports and exports
+                                #all_flag #not sure which one
                                 ){
   #browser()
-  if(all_flag == 0){
-    
-    dat_temp_cs = dat_temp_cs %>%
-      mutate(dms_imp_exp = ifelse(origin %in% curr, destination, origin),
-             GEOID = dms_imp_exp,
-             ratio_2017 = value_2017/tons_2017) 
-    
-    } else {
+  # if(all_flag == 0){
+  #   
+  #   dat_temp_cs = dat_temp_cs %>%
+  #     mutate(dms_imp_exp = ifelse(origin %in% curr, destination, origin),
+  #            GEOID = dms_imp_exp,
+  #            ratio_2017 = value_2017/tons_2017) 
+  #   
+  #   } else {
     
     dat_temp_cs = dat_temp_cs %>% 
       mutate(ratio_2017 = value_2017/tons_2017)
-    
-  }
+  #   
+  # }
     
   if('_s1' %in% Scenario_opt_cs){
     
@@ -47,26 +47,26 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
     dat_temp_cs <- dat_temp_cs %>%
       mutate(tons_2050_s1 = ifelse(
         #conditions
-        origin %in% curr & !(destination %in% curr) & # to avoid any internal flow in any case
+        origin %in% curr & destination != curr & # to avoid any internal flow in any case
           Grouped_sctg2 %in% scen1_comm_list1,
         # Condition 1
         tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^ year_diff,
         ifelse(
-          origin %in% curr & !(destination %in% curr) &
+          origin %in% curr & destination != curr &
             Grouped_sctg2 %in% scen1_comm_list2,
           # Condition 2
           # tons_2022 * (1+0.013)^year_diff,
           tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^ year_diff,
           tons_2050))) %>%
       mutate(value_2050_s1 = ifelse(
-            origin %in% curr & !(destination %in% curr) &
+            origin %in% curr & destination != curr &
               Grouped_sctg2 %in% scen1_comm_list1,
             
             # Condition 3
             tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^ year_diff * ratio_2017,
           
             ifelse(
-              origin %in% curr & !(destination %in% curr) &
+              origin %in% curr & destination != curr &
                 Grouped_sctg2 %in% scen1_comm_list2,
               # Condition 4
               tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^ year_diff*ratio_2017,
@@ -108,12 +108,12 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
         #         tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group4_new_rate/group4_base_rate) ^ year_diff,
         #         tons_2050)))),
         tons_2050_s2 = case_when(
-          destination %in% curr & !(origin %in% curr)  ~ # import
+          destination %in% curr & origin != curr  ~ # import
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group1_new_rate/group1_base_rate) ^ year_diff,
                    tons_2022 * (1 + ((tons_2050/tons_2022)^(1/year_diff) - 1) * group3_new_rate/group3_base_rate) ^ year_diff),
 
-          origin %in% curr & !(destination %in% curr) ~ #export
+          origin %in% curr & destination != curr ~ #export
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group4_new_rate/group4_base_rate) ^year_diff),
@@ -134,12 +134,12 @@ process_scenario_v3 <- function(dat_temp_cs, #the filtered datatable
         #         value_2050))))) %>%
     
         value_2050_s2 = case_when(
-          destination %in% curr & !(origin %in% curr) ~ # import
+          destination %in% curr & origin != curr ~ # import
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group1_new_rate/group1_base_rate) ^year_diff *ratio_2017,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group3_new_rate/group3_base_rate) ^year_diff *ratio_2017),
 
-          origin %in% curr & !(destination %in% curr) ~ #export
+          origin %in% curr & destination != curr ~ #export
             ifelse(!(Grouped_sctg2 %in% scen2_comm_list),
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group2_new_rate/group2_base_rate) ^year_diff *ratio_2017,
                    tons_2022 *(1 + ((tons_2050/tons_2022)^(1/year_diff)-1)* group4_new_rate/group4_base_rate) ^year_diff *ratio_2017),
