@@ -280,35 +280,53 @@ stop_check_page <- reactiveVal(NA)
 stab2_data <- eventReactive(input$stab2_mainbutt,{
   print("RUNNING: stab2_data_creation")
   #browser()
-return<-dat_ss %>% 
-    #select(-c(tons_2017, value_2017)) %>%
-    #state filter
-    #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>% 
+  if(input$stab2_states == '99'){
+    return<-dat_ss %>% 
+      filter(origin != '99'& destination != '99') %>%
+      mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51"),'99',origin),
+             destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51"), '99',destination))
+    
+  } else {
+    return<-dat_ss %>%
+      filter(origin != '99'& destination != '99')
+    
+  }
+  # return<-dat_ss %>% 
+  # filter(origin != '99'& destination != '99') %>%
+  # mutate(origin = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51"),'99',origin),
+  #        destination = ifelse(destination %in% c("05", "12","13","21","22","28","29","45","48","51"), '99',destination)) %>%
+  #select(-c(tons_2017, value_2017)) %>%
+  #state filter
+  #mutate(state = ifelse(nchar(origin)==5, str_sub(origin,1,2), str_sub(destination,1,2))) %>% 
+  return <- return %>%
     filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>% 
     
     #inbound, outbound, within ITTS
-    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99") & destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99"), "Within ITTS",
-                                     ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99") & !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99")),"Outbound","Inbound"))) %>%
+    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","99") &
+                                destination %in% c("05", "12","13","21","22","28","29","45","48","51","99"), "Within ITTS",
+                              ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","99") &
+                                       !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","99")),"Outbound","Inbound"))) %>%
     filter(direction %in% input$stab2_OD) %>%
     #filter the simple ones
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
     filter(dms_mode %in% input$stab2_mode)
     #browser()
 #add scenarios
-curr = c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99")
+#curr = c("05", "12","13","21","22","28","29","45","48","51","01","47","37","99")
 return <- process_scenario_v3(dat_temp_cs = return, #the filtered datatable
                     Scenario_opt_cs = input$stab2_comps, #scenario selection
-                    curr = curr, #select which are the basis of imports and exports
-                    all_flag = 1 #not sure which one
+                    curr = input$stab2_states #, #select which are the basis of imports and exports
+                    #all_flag = 1 #not sure which one
                     )
 
 return <- return %>% 
-  rename(tons_2017_s0 = tons_2017,
+  rename(tons_2022_s0 = tons_2022,
          tons_2022_s0 = tons_2022,
          tons_2050_s0 = tons_2050,
-         value_2017_s0 = value_2017,
+         value_2022_s0 = value_2022,
          value_2022_s0 = value_2022,
          value_2050_s0 = value_2050)
+
   return(return)
   }) #%>% 
   #bindCache(input$stab2_states, input$stab2_OD, input$stab2_commodity, input$stab2_mode)
@@ -552,7 +570,7 @@ observeEvent(input$stab2_mainbutt, {
                    names_to = c("measure","year", "scenario"),
                    values_to = "value") %>% 
       filter(measure == "tons") %>%
-      filter(year != 2017) %>%
+      filter(year != 2022) %>%
       group_by(scenario, year) %>%
       summarise(value = sum(value,na.rm = T)) %>% ungroup()
     
@@ -585,12 +603,12 @@ observeEvent(input$stab2_mainbutt, {
     print("RUNNING SCEN_COMP: tonnage state dot")
     #browser()
     df_temp <- stab2_data() %>%
-      mutate(tons_2017_s1 = tons_2017_s0,
-             tons_2017_s2 = tons_2017_s0,
-             tons_2017_s3 = tons_2017_s0,
-             value_2017_s1 = value_2017_s0,
-             value_2017_s2 = value_2017_s0,
-             value_2017_s3 = value_2017_s0)  %>%
+      mutate(tons_2022_s1 = tons_2022_s0,
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0)  %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
       select(-name) %>% 
@@ -605,11 +623,11 @@ observeEvent(input$stab2_mainbutt, {
       values_to = "value") %>%
       pivot_wider(id_cols = c(state,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(state, measure, scenario) %>% 
-      summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+      summarise(value = (sum(y2050) - sum(y2022))/sum(y2022)) %>%
       filter(measure == "tons") %>%
       left_join(state_join) %>%
       rename(label = state_lab)
-    
+    browser()
     dot_plot(df_temp) 
     })
 
@@ -618,12 +636,12 @@ observeEvent(input$stab2_mainbutt, {
     print("RUNNING SCEN_COMP: tonnage value state dot")
     
     df_temp <- stab2_data() %>%
-      mutate(tons_2017_s1 = tons_2017_s0,
-             tons_2017_s2 = tons_2017_s0,
-             tons_2017_s3 = tons_2017_s0,
-             value_2017_s1 = value_2017_s0,
-             value_2017_s2 = value_2017_s0,
-             value_2017_s3 = value_2017_s0)  %>%
+      mutate(tons_2022_s1 = tons_2022_s0,
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0)  %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       pivot_longer(cols = c(origin, destination), values_to = "state") %>% 
       select(-name) %>% 
@@ -640,7 +658,7 @@ observeEvent(input$stab2_mainbutt, {
       values_to = "value") %>%
       pivot_wider(id_cols = c(state,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(state, measure, scenario) %>%
-      summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+      summarise(value = (sum(y2050) - sum(y2022))/sum(y2022)) %>%
       filter(measure == "value") %>%
       left_join(state_join)%>%
       rename(label = state_lab)
@@ -653,12 +671,12 @@ observeEvent(input$stab2_mainbutt, {
     print("RUNNING SCEN_COMP: tonnage mode dot")
     
     df_temp <- stab2_data() %>%
-      mutate(tons_2017_s1 = tons_2017_s0,
-             tons_2017_s2 = tons_2017_s0,
-             tons_2017_s3 = tons_2017_s0,
-             value_2017_s1 = value_2017_s0,
-             value_2017_s2 = value_2017_s0,
-             value_2017_s3 = value_2017_s0)  %>%
+      mutate(tons_2022_s1 = tons_2022_s0,
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0)  %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
@@ -670,7 +688,7 @@ observeEvent(input$stab2_mainbutt, {
       values_to = "value") %>%
       pivot_wider(id_cols = c(dms_mode,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(dms_mode, measure, scenario) %>%
-      summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+      summarise(value = (sum(y2050) - sum(y2022))/sum(y2022)) %>%
       filter(measure == "tons") %>%
       left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
       rename(label = mode_group)
@@ -684,12 +702,12 @@ observeEvent(input$stab2_mainbutt, {
     print("RUNNING SCEN_COMP: tonnage value dot")
     
     df_temp <- stab2_data() %>%
-      mutate(tons_2017_s1 = tons_2017_s0,
-             tons_2017_s2 = tons_2017_s0,
-             tons_2017_s3 = tons_2017_s0,
-             value_2017_s1 = value_2017_s0,
-             value_2017_s2 = value_2017_s0,
-             value_2017_s3 = value_2017_s0)  %>%
+      mutate(tons_2022_s1 = tons_2022_s0,
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0)  %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
@@ -701,7 +719,7 @@ observeEvent(input$stab2_mainbutt, {
       values_to = "value") %>%
       pivot_wider(id_cols = c(dms_mode,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(dms_mode, measure, scenario) %>%
-      summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+      summarise(value = (sum(y2050) - sum(y2022))/sum(y2022)) %>%
       filter(measure == "value") %>%
       left_join(ini_modecolors %>% mutate(dms_mode = as.character(dms_mode))) %>%
       rename(label = mode_group)
@@ -715,12 +733,12 @@ observeEvent(input$stab2_mainbutt, {
     print("RUNNING SCEN_COMP: tonnage com dot")
     #browser()
     df_temp <- stab2_data() %>% 
-      mutate(tons_2017_s1 = tons_2017_s0,
-             tons_2017_s2 = tons_2017_s0,
-             tons_2017_s3 = tons_2017_s0,
-             value_2017_s1 = value_2017_s0,
-             value_2017_s2 = value_2017_s0,
-             value_2017_s3 = value_2017_s0)  %>%
+      mutate(tons_2022_s1 = tons_2022_s0,
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0)  %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
@@ -732,7 +750,7 @@ observeEvent(input$stab2_mainbutt, {
       values_to = "value") %>%
       pivot_wider(id_cols = c(Grouped_sctg2,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(Grouped_sctg2, measure, scenario) %>%
-      summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+      summarise(value = (sum(y2050) - sum(y2022))/sum(y2022)) %>%
       filter(measure == "tons") %>%
       rename(label = Grouped_sctg2)
     
@@ -746,12 +764,12 @@ observeEvent(input$stab2_mainbutt, {
     
     #browser()
     df_temp <- stab2_data() %>%
-      mutate(tons_2017_s1 = tons_2017_s0,
-             tons_2017_s2 = tons_2017_s0,
-             tons_2017_s3 = tons_2017_s0,
-             value_2017_s1 = value_2017_s0,
-             value_2017_s2 = value_2017_s0,
-             value_2017_s3 = value_2017_s0)  %>%
+      mutate(tons_2022_s1 = tons_2022_s0,
+             tons_2022_s2 = tons_2022_s0,
+             tons_2022_s3 = tons_2022_s0,
+             value_2022_s1 = value_2022_s0,
+             value_2022_s2 = value_2022_s0,
+             value_2022_s3 = value_2022_s0)  %>%
       select(matches(paste(input$stab2_comps, collapse="|")), c(origin, destination, dms_mode, Grouped_sctg2, direction)) %>%
       #filter(nchar(origin) == 5) %>%
       #mutate(state = str_sub(origin,1,2)) %>%
@@ -763,7 +781,7 @@ observeEvent(input$stab2_mainbutt, {
       values_to = "value") %>%
       pivot_wider(id_cols = c(Grouped_sctg2,measure,scenario), names_from = year, names_prefix = "y", values_from = value) %>%
       group_by(Grouped_sctg2, measure, scenario) %>%
-      summarise(value = (sum(y2050) - sum(y2017))/sum(y2017)) %>%
+      summarise(value = (sum(y2050) - sum(y2022))/sum(y2022)) %>%
       filter(measure == "value") %>%
       rename(label = Grouped_sctg2)
     #df$label = sapply(df$label, FUN = function(x){paste(strwrap(x, width = 16))})
