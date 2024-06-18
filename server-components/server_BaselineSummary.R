@@ -14,7 +14,7 @@ top_importing_county <- function(df_in, tons_value_selection = "tons_2022",
     ungroup() %>%
     mutate(rank = rank(desc(factor_lab))) %>% 
     filter(rank <= 10) %>%
-    left_join(county_selected, by=c("origin"="GEOID")) # Qi: changed from county_selected to al_selected, to apply for all geographic level.
+    left_join(county_choices, by=c("origin"="GEOID")) # Qi: changed from county_choices to al_selected, to apply for all geographic level.
     
   
   #rank_keep = df_temp$rank[df_temp$destination == county]
@@ -62,7 +62,7 @@ top_importing_all <- function(df_in, tons_value_selection = "tons_2022",
     ungroup() %>%
     mutate(rank = rank(desc(factor_lab))) %>% 
     filter(rank <= 10) %>%
-    left_join(all_selected, by=c("origin"="GEOID")) # Qi: changed from county_selected to al_selected, to apply for all geographic level.
+    left_join(all_selected, by=c("origin"="GEOID")) # Qi: changed from county_choices to al_selected, to apply for all geographic level.
   
   if(grepl("value",tons_value_selection)){
     unit = " $Million"
@@ -113,7 +113,7 @@ top_exporting_county <- function(df_in, tons_value_selection = "tons_2022",
     ungroup() %>%
     mutate(rank = rank(desc(factor_lab))) %>% 
     filter(rank <= 10) %>%
-    left_join(county_selected, by=c("destination"="GEOID")) 
+    left_join(county_choices, by=c("destination"="GEOID")) 
   
   if(grepl("value",tons_value_selection)){
     unit = " $Million"

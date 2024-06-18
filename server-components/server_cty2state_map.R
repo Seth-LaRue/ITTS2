@@ -1,4 +1,4 @@
-click_counties_cs <- reactiveValues(curr=NULL,prev=NULL)
+click_counties_cs <- reactiveValues(curr='ITTS',prev=NULL)
 
 
 #initial datatables -----------------------------------------------------------------------
@@ -536,7 +536,7 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
     pal_factor_labs <- paste(scales::comma(lag(pal_factor_labs)), scales::comma(pal_factor_labs), sep = " - ")[-1]
     
     if(input$cors_opts=="c2c"){
-      pulse_name = county_selected$county_lab[county_selected$GEOID == click_counties_cs$curr]
+      pulse_name = county_choices$county_lab[county_choices$GEOID == click_counties_cs$curr]
       
       all_counties_centr_sel=all_counties_centr %>% 
         filter(GEOID==click_counties_cs$curr)
@@ -557,7 +557,7 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
                     fillOpacity  =  ~tranp#,#~rank/max(rank),
                     #popup = lines_labs
         ) %>% 
-        addPolygons(data = county_selected,
+        addPolygons(data = county_choices,
                     layerId = ~GEOID,
                     color = cty_border_color,
                     weight = .5,
@@ -786,7 +786,7 @@ output$subtitle_1_cs <- output$subtitle_2_cs <- output$subtitle_3_cs <- output$s
   }else if (input$Scenario_opt_cs == '_s2'){
     sencario = paste0("Scenario 2")
   }else if (input$Scenario_opt_cs == '_s3'){
-    sencario = paste0("'Scenario 3")
+    sencario = paste0("Scenario 3")
   }else{
     sencario = paste0("Baseline Scenario")}
   return(sencario)
@@ -855,6 +855,7 @@ output$scenario_text_output_cs <- renderText({
 
 output$subsetSETTS_cs<-renderDataTable({#server = FALSE,{
   
+  #browser()
   print("RENDERING: subsetSETTS_cs")
   
   if(!is.null(data_ss_click_cs())){

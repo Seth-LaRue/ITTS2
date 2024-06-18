@@ -1,8 +1,5 @@
 #Initialize Data ----
 source("init.R")
-#rm(tostate1)
-#rm(objects_new)
-#rm(objects_old)
 
 #Load Libraries ----
 library(shiny)
@@ -27,12 +24,14 @@ library(waiter)
 library(shinyalert)
 
 #Source scripts ----
+print("Sourcing scripts")
 source("gral_parameters.R")
 source("ini_map_load.R")
 source('function/scenario_process_v3.R')
 source('function/scenario_process_v2.R')
 
 #Load modules ----
+print("Loading UI components")
 source('ui-components/ui_welcome.R', encoding = "utf8")
 source('ui-components/ui_maps.R', encoding = "utf8")
 source('ui-components/ui_summary.R', encoding = "utf8")

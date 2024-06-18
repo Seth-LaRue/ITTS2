@@ -270,9 +270,8 @@ domestic_tab <-
                                                     multiple = F,
                                                     selected = '48453',
                                                     options = list(
-                                                      maxOptions = 9999,
-                                                      placeholder = 'Select County',
-                                                      searchField = c('NAME','county_lab','statename', 'GEOID')
+                                                      maxOptions = 1375,
+                                                      placeholder = 'Select County'
                                                     )
                                      )),
                             
@@ -426,7 +425,7 @@ domestic_tab <-
                                                 By default the map displays the combined outbound and inbound freight movements
                                                 by all modes for the selected state to international trade regions.
                                                 The freight movements summarized can be refined further using the 'Import/Export' and 'Commodity' drop down boxes.
-                                                These freight movements are available in two vintages 2019, and 2050 by tonnage or value. The base year for international trade is 2019.
+                                                These freight movements are available for 2022 by tonnage or value,
                                                 any of which can be selected from the 'Freight Measure' drop down box.
                                                 Additionally, the 'Top Partners' slide selector can be used to show only the top X trade partners."
                                                     #)
@@ -468,7 +467,7 @@ domestic_tab <-
                                                                      multiple = F,
                                                                      selected = 'Select State',
                                                                      #selected = NULL,
-                                                                     options = list(
+                                                                     options = list(maxOptions = 1375,
                                                                        placeholder = 'Select State',
                                                                        searchField = c('NAME','county_lab','statename', 'GEOID')
                                                                      )
@@ -495,13 +494,9 @@ domestic_tab <-
 
                                              tags$div(
                                                title = "Select a measurement of freight movement to display on the map",
-                                               selectInput(inputId = "Value_opts_in",label = "Freight Measure", choices = c("Tons 2019"="tons_2019",
-                                                                                                                            #"Tons 2021" = "tons_2021",
-                                                                                                                            "Tons 2022"  = "tons_2022",
-                                                                                                                            "Value 2019" = "value_2019",
-                                                                                                                            #"Value 2021" = "value_2021",
+                                               selectInput(inputId = "Value_opts_in",label = "Freight Measure", choices = c("Tons 2022"  = "tons_2022",
                                                                                                                             "Value 2022" = "value_2022"),
-                                                           selected ='value_2019')),
+                                                           selected ='value_2022')),
                                              # tags$div(
                                              #   title = "Select a scenario for freight movement to display on the map",
                                              #   selectInput(inputId = "Scenario_opt_in", label = "Scenario Options", choices = c('Baseline',

@@ -20,7 +20,7 @@ dat_ini <- dat %>%
   ungroup() %>%
   mutate(rank = rank(desc(value_2022)))
 
-ln_select_ini <- county_selected %>%
+ln_select_ini <- county_choices %>%
   select(GEOID,county_lab) %>%
   inner_join(dat_ini,by = "GEOID")
 
@@ -28,7 +28,7 @@ ln_select_ini <- county_selected %>%
 
 observeEvent(input$county_opts, {
   req(input$county_opts)
-  cnty = county_selected$GEOID[county_selected$GEOID == input$county_opts]
+  cnty = county_choices$GEOID[county_choices$GEOID == input$county_opts]
   
   click_counties$curr <- cnty
 })
@@ -41,7 +41,7 @@ observeEvent(input$odmap_shape_click, {
   click_counties$prev=click_counties$curr
   click_counties$curr=input$odmap_shape_click$id
   
-  cnty = county_selected$county_lab[county_selected$GEOID == click_counties$curr]
+  cnty = county_choices$county_lab[county_choices$GEOID == click_counties$curr]
   val = click_counties$curr
   
   updateSelectizeInput(session, 'county_opts', choices = cty_ch, selected = c(cnty, value = val), server = TRUE, options = list(maxOptions = 1377))
@@ -78,7 +78,7 @@ output$odmap <- renderLeaflet({
   pal_factor_labs_ini <- round(quantile(round(ln_select_ini$value_2022, 1), probs = seq(0, 1, .2)), 1)
   pal_factor_labs_ini <- paste(scales::comma(lag(pal_factor_labs_ini)), scales::comma(pal_factor_labs_ini), sep = " - ")[-1]
   
-  con_name_ini=county_selected$county_lab[county_selected$GEOID == '48453']
+  con_name_ini=county_choices$county_lab[county_choices$GEOID == '48453']
   titl_ini = paste0("Inbound & Outbound to </br>", con_name_ini, " county </br>", str_replace(str_to_title('value_2022'),'_',' '), " ($Million)")
   
   
@@ -252,7 +252,7 @@ data_ss_click<- reactive({
     mutate(rank = rank(desc(factor_lab))) 
   
   if(nrow(dat_temp)>0){
-    ln_select <- county_selected %>%
+    ln_select <- county_choices %>%
       select(GEOID,county_lab) %>%
       inner_join(dat_temp,by = "GEOID") %>%
       mutate(tranp=ifelse(rank <= input$n_top, 1,.25))
@@ -287,8 +287,8 @@ observeEvent(eventExpr = map_update(), {
   
   #do we have to use the entire line file to remove?
   leafletProxy(mapId = "odmap",session = session) %>%
-    removeShape(layerId = paste(county_selected$GEOID)) %>%
-    removeShape(layerId = paste("data",county_selected$GEOID)) %>%
+    removeShape(layerId = paste(county_choices$GEOID)) %>%
+    removeShape(layerId = paste("data",county_choices$GEOID)) %>%
     #removeShape(layerId = 'leg') %>% 
     clearControls() %>%
     removeShape(layerId = 'pulsemarker')
@@ -297,7 +297,7 @@ observeEvent(eventExpr = map_update(), {
   
   
   
-  con_name = county_selected$county_lab[county_selected$GEOID == click_counties$curr]
+  con_name = county_choices$county_lab[county_choices$GEOID == click_counties$curr]
   
   #this should be removed
   if(input$OD_opts == "Both"){
@@ -372,7 +372,7 @@ observeEvent(eventExpr = map_update(), {
                     style = list("front-weight" = "normal", padding = "3px 8px"),
                     textsize = "15px",
                     direction = "auto")) %>%
-      addPolygons(data = county_selected,
+      addPolygons(data = county_choices,
                   layerId = ~GEOID,
                   color = cty_border_color,
                   weight = .5,
@@ -418,7 +418,7 @@ observeEvent(eventExpr = map_update(), {
       filter(GEOID==click_counties$curr)
     
     leafletProxy(mapId = "odmap",session = session) %>%
-      addPolygons(data = county_selected,
+      addPolygons(data = county_choices,
                   layerId = ~GEOID,
                   color = cty_border_color,
                   weight = .5,
@@ -458,13 +458,13 @@ output$table_title <- renderText({
   
   if(input$OD_opts != "Both"){
     if(input$OD_opts == "dms_orig"){
-      title = paste0("Origin County: ", county_selected$county_lab[county_selected$GEOID == click_counties$curr])
+      title = paste0("Origin County: ", county_choices$county_lab[county_choices$GEOID == click_counties$curr])
       
     } else {
-      title = paste0("Destination County: ", county_selected$county_lab[county_selected$GEOID == click_counties$curr])
+      title = paste0("Destination County: ", county_choices$county_lab[county_choices$GEOID == click_counties$curr])
     }
   } else {
-    title = paste0("Selected County: ", county_selected$county_lab[county_selected$GEOID == click_counties$curr])
+    title = paste0("Selected County: ", county_choices$county_lab[county_choices$GEOID == click_counties$curr])
   }
   
   return(title)
@@ -521,7 +521,7 @@ output$subtitle_1_cc <- output$subtitle_2_cc <- output$subtitle_3_cc <- output$s
   }else if (input$Scenario_opt == '_s2'){
     sencario = paste0("Scenario 2")
   }else if (input$Scenario_opt == '_s3'){
-    sencario = paste0("'Scenario 3")
+    sencario = paste0("Scenario 3")
   }else{
     sencario = paste0("Baseline Scenario")}
   return(sencario)
@@ -553,17 +553,17 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   
   if(input$OD_opts == "Both"){
     SETTS_ss<-SETTS_ss %>% 
-      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
+      left_join(st_drop_geometry(select(county_choices, GEOID)), by = c("dms_imp_exp" = "GEOID"))
   } else {
     SETTS_ss<-SETTS_ss %>%
-      left_join(st_drop_geometry(select(county_selected, GEOID)), by = "GEOID")
+      left_join(st_drop_geometry(select(county_choices, GEOID)), by = "GEOID")
   }
   # else if(input$OD_opts == "dms_orig"){
   #   SETTS_ss<-SETTS_ss %>%
-  #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
+  #     left_join(st_drop_geometry(select(county_choices, GEOID)), by = c("destination" = "GEOID"))
   # } else if(input$OD_opts == "dms_dest"){
   #   SETTS_ss<-SETTS_ss %>%
-  #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
+  #     left_join(st_drop_geometry(select(county_choices, GEOID)), by = c("origin" = "GEOID"))
   # }
   
   SETTS_ss<-SETTS_ss %>%
@@ -644,18 +644,18 @@ observe({
     # browser()
     if(input$OD_opts == "Both"){
       SETTS_ss<-SETTS_ss %>% 
-        left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("dms_imp_exp" = "GEOID"))
+        left_join(st_drop_geometry(select(county_choices, GEOID)), by = c("dms_imp_exp" = "GEOID"))
     } else {
       SETTS_ss<-SETTS_ss %>% 
-      left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("GEOID" = "GEOID"))
+      left_join(st_drop_geometry(select(county_choices, GEOID)), by = c("GEOID" = "GEOID"))
     }
     
     # else if(input$OD_opts == "dms_orig"){
     #   SETTS_ss<-SETTS_ss %>%
-    #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("destination" = "GEOID"))
+    #     left_join(st_drop_geometry(select(county_choices, GEOID)), by = c("destination" = "GEOID"))
     # } else if(input$OD_opts == "dms_dest"){
     #   SETTS_ss<-SETTS_ss %>%
-    #     left_join(st_drop_geometry(select(county_selected, GEOID)), by = c("origin" = "GEOID"))
+    #     left_join(st_drop_geometry(select(county_choices, GEOID)), by = c("origin" = "GEOID"))
     # }
     
     SETTS_ss<-SETTS_ss %>%

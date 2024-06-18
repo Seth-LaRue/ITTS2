@@ -3,7 +3,7 @@ m<-leaflet() %>%
   addProviderTiles(providers$CartoDB.Positron,#providers$CartoDB.DarkMatter,
                    options = providerTileOptions(opacity = .85)) %>%
   addFullscreenControl() %>% 
-  addPolygons(data = county_selected,
+  addPolygons(data = county_choices,
               layerId = ~paste(GEOID),
               color = cty_border_color,
               weight = .5,
@@ -37,7 +37,7 @@ m_cs<-leaflet() %>%
                 style = list("front-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
                  direction = "auto")) #%>%
-  # addPolygons(data = county_selected,
+  # addPolygons(data = county_choices,
   #             layerId = 'base_county',
   #             color = cty_border_color,
   #             weight = .5,
@@ -114,5 +114,3 @@ m_pin<-leaflet() %>%
                textsize = "15px",
                direction = "auto"),
              icon = ~map_icons[type])
-
-
