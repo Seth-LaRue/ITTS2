@@ -1,5 +1,5 @@
 #Initialize Data ----
-source("init.R")
+#source("init.R")
 
 #Load Libraries ----
 library(shiny)
@@ -237,7 +237,7 @@ server <- function(input, output, session) {
   #main_tables <- reactiveValues(table = NULL)#What is this for?
   onFlushed(function() {
     runjs('
-          //document.querySelector("#tabset_maps-ITTSInternationalTrade").classList.remove("active");
+          document.querySelector("#tabset_maps-ITTSInternationalTrade").classList.remove("active");
           document.querySelector("#tabset_maps-ITTSCountyStatetoStateTrade").classList.remove("active");
           $("#tab-welcome_tab").click();
           $("body").css("overflow", "auto");

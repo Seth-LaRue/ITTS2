@@ -7,12 +7,12 @@ all_states_centr_sel_ini_in=all_states_centr %>%
   filter(GEOID=='48')
 
 port_pulse_pini=ports_base %>% 
-  filter(GEOID=='4026') %>%
+  filter(GEOID=='4035') %>%
   mutate(long = sf::st_coordinates(.)[,1],
          lat = sf::st_coordinates(.)[,2])
 # all_state_centr_sel_ini_in=all_state_centr %>% 
 #   filter(GEOID=='48453')
-pulse_name_pini = ports_base$NAME[ports_base$GEOID == '4026']
+pulse_name_pini = ports_base$NAME[ports_base$GEOID == '4035']
 
 dat_ini_in <- dat_sin %>%
   filter(origin == '48'|destination == '48') %>%
@@ -25,8 +25,8 @@ dat_ini_in <- dat_sin %>%
   mutate(rank = rank(desc(value_2022)))
 
 dat_pini_in <- dat_pin %>%
-  filter(origin == '4026'|destination == '4026') %>%
-  mutate(dms_imp_exp = if_else(origin == '4026', destination, origin),
+  filter(origin == '4035'|destination == '4035') %>%
+  mutate(dms_imp_exp = if_else(origin == '4035', destination, origin),
          GEOID = dms_imp_exp) %>% 
   group_by(dms_imp_exp, GEOID)%>% 
   summarise(tons_2022 = sum(tons_2022),
@@ -135,15 +135,20 @@ observeEvent(input$county_opts_in, {
 
 #update select inputs when mode changes
 observeEvent(input$dms_mode_opts_in, {
-  
+  #browser()
   if(input$cors_opts_in == "p2n"&input$dms_mode_opts_in != "All"){
+    
     pb_temp<- ports_base[ports_base$mode_nm == input$dms_mode_opts_in,]
     port_ch_tmp = pb_temp$GEOID
     names(port_ch_tmp) = pb_temp$NAME
+    
     if(!(input$county_opts_in %in% pb_temp$GEOID)){
-      p_val <- int_ports_mode_no_selelect$use[int_ports_mode_no_selelect$mode == input$dms_mode_opts_in]
+      
+      p_val <- int_ports_mode_no_select$use[int_ports_mode_no_select$mode == input$dms_mode_opts_in]
       p_nm <- pb_temp$NAME[pb_temp$GEOID == p_val]
+      
       updateSelectizeInput(session, 'county_opts_in', choices = port_ch_tmp, selected = c(p_nm, value = p_val), server = TRUE)
+      
     } else {
       updateSelectizeInput(session, 'county_opts_in', choices = port_ch_tmp, server = TRUE)
     }

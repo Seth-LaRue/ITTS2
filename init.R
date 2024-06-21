@@ -1,6 +1,7 @@
 #load("/srv/shiny-server/.RData")
-load(file = "ITTS_Initial_Data_06182024.RData")
-# load(file = "ITTS_Initial_Data_06132024.RData")
+load(file = "ITTS_Initial_Data_06202024.RData")
+
+# load(file = "ITTS_Initial_Data_06182024.RData")
 # 
 # 
 # #this is just for editing r data if needed
@@ -33,8 +34,7 @@ load(file = "ITTS_Initial_Data_06182024.RData")
 # #rm(ITTS_states)
 # #rm(ITTS_states_choices)
 # 
-# ports_base <- st_read("USA_Trade_Data/downloads_06172024/ports_base.shp")
-# 
+# ports_base <- st_read("USA_Trade_Data/downloads_06172024/ports_base_v1.shp")
 # # Function to transform all sf objects in the environment
 # transform_sf_objects <- function(target_crs, env_objects) {
 #   # Get a list of all objects in the environment
@@ -65,16 +65,15 @@ load(file = "ITTS_Initial_Data_06182024.RData")
 # rm(transform_sf_objects)
 # 
 # port_ch <- set_names(ports_base$GEOID, ports_base$NAME)
-# all_counties_centr<-all_counties_centr |>
-#   select(-c(AFFGEOID, LSAD, ALAND, AWATER))
+# # all_counties_centr<-all_counties_centr |>
+# #   select(-c(AFFGEOID, LSAD, ALAND, AWATER))
 # 
 # all_selected<-all_selected|>
 #   filter(!(type %in% c('waterport','airport','border_crossing'))) |>
-#   rbind(ports_base |>
-#           mutate(mode_nm = case_when(type=='waterport'~3,
-#                                      type=='airport'~4,
-#                                      type=='border_crossing'~99)))
+#   rbind(ports_base)
 # 
-# county_choices <- left_join(county_choices, county_selected|>st_drop_geometry())
+# #county_choices <- left_join(county_choices, county_selected|>st_drop_geometry())
 # rm(county_selected)
-# save.image(file = 'ITTS_Initial_Data_06182024.RData')
+#int_ports_mode_no_select <- data.frame(mode = c("3","4","99"), use = c("3077","4006","99045"))
+#rm(int_ports_mode_no_selelect)
+#save.image(file = 'ITTS_Initial_Data_06202024.RData')
