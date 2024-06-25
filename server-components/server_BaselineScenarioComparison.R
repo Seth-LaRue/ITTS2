@@ -627,7 +627,6 @@ observeEvent(input$stab2_mainbutt, {
       filter(measure == "tons") %>%
       left_join(state_join) %>%
       rename(label = state_lab)
-    browser()
     dot_plot(df_temp) 
     })
 
