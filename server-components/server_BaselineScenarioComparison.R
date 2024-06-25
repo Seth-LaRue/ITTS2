@@ -274,7 +274,7 @@ sankey_diagram <- function(df_in, meas = "Tonnage"){
   return(snkey)
 }
 #dataframe reactive----------------
-#withProgress(message = "Running Data Processing",{
+
 stop_check_page <- reactiveVal(NA)
 
 stab2_data <- eventReactive(input$stab2_mainbutt,{
@@ -302,10 +302,13 @@ stab2_data <- eventReactive(input$stab2_mainbutt,{
     filter(origin %in% input$stab2_states|destination %in% input$stab2_states) %>% 
     
     #inbound, outbound, within ITTS
-    mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","99") &
-                                destination %in% c("05", "12","13","21","22","28","29","45","48","51","99"), "Within ITTS",
-                              ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","99") &
-                                       !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","99")),"Outbound","Inbound"))) %>%
+    #mutate(direction = ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","99") &
+    #                            destination %in% c("05", "12","13","21","22","28","29","45","48","51","99"), "Within ITTS",
+    #                          ifelse(origin %in% c("05", "12","13","21","22","28","29","45","48","51","99") &
+    #                                   !(destination %in% c("05", "12","13","21","22","28","29","45","48","51","99")),"Outbound","Inbound"))) %>%
+    mutate(direction = ifelse(origin %in% input$stab2_states & destination %in%input$stab2_states, "Within",
+                              ifelse(origin %in% input$stab2_states & !(destination %in% input$stab2_states), "Outbound", 
+                                     ifelse(!(origin %in% input$stab2_states) & destination %in% input$stab2_states, "Inbound", "non-valid direction"))))|>
     filter(direction %in% input$stab2_OD) %>%
     #filter the simple ones
     filter(Grouped_sctg2 %in% input$stab2_commodity) %>% 
@@ -321,9 +324,9 @@ return <- process_scenario_v3(dat_temp_cs = return, #the filtered datatable
 
 return <- return %>% 
   rename(tons_2022_s0 = tons_2022,
-         tons_2022_s0 = tons_2022,
+         #tons_2022_s0 = tons_2022,
          tons_2050_s0 = tons_2050,
-         value_2022_s0 = value_2022,
+         #value_2022_s0 = value_2022,
          value_2022_s0 = value_2022,
          value_2050_s0 = value_2050)
 
@@ -570,7 +573,7 @@ observeEvent(input$stab2_mainbutt, {
                    names_to = c("measure","year", "scenario"),
                    values_to = "value") %>% 
       filter(measure == "tons") %>%
-      filter(year != 2022) %>%
+      #filter(year != 2022) %>%
       group_by(scenario, year) %>%
       summarise(value = sum(value,na.rm = T)) %>% ungroup()
     
@@ -627,6 +630,7 @@ observeEvent(input$stab2_mainbutt, {
       filter(measure == "tons") %>%
       left_join(state_join) %>%
       rename(label = state_lab)
+
     dot_plot(df_temp) 
     })
 

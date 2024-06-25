@@ -94,7 +94,7 @@
                                            #title = "Select whether the analysis is inbound, outbound, or within ITTS trades",
                                            pickerInput(inputId = "stab2_OD", 
                                                        label = "Inbound/Outbound", 
-                                                       choices = c("Inbound","Outbound","Within ITTS"), multiple = TRUE, 
+                                                       choices = c("Inbound","Outbound","Within"), multiple = TRUE, 
                                                        options = list(
                                                          size = 7,
                                                          title = "Please select the Direction(s) to include",
