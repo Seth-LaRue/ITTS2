@@ -531,14 +531,7 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
   
   ln_select = data_ss_click()
   if(!is.null(ln_select)){
-  if(input$Scenario_opt == 'Baseline' &
-     grepl('2022',input$Value_opts) &
-     input$dms_mode_opts == 'All' &
-     input$sctg2_opts == 'All' &
-     input$OD_opts == 'Both'){
-    ln_select=ln_select_ini
-    names(ln_select)[names(ln_select)=='factor_lab']=input$Value_opts}
-  else if(input$Scenario_opt == 'Baseline' ){
+  if (input$Scenario_opt == 'Baseline' ){
     ln_select=data_ss_click()
     names(ln_select)[names(ln_select)=='factor_lab']=input$Value_opts
   }else{
@@ -669,8 +662,7 @@ observe({
              'Value 2022</br>($Million)'='value_2022',
              'Value 2050</br>($Million)'='value_2050')
     
-    SETTS_ss <- SETTS_ss %>% rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.)) 
-    
+    names(SETTS_ss)[grepl('_',names(SETTS_ss))] <- str_to_title(gsub("_"," ",names(SETTS_ss)[grepl('_',names(SETTS_ss))]))     
     
     SETTS_ss_r$SETTS_ss=SETTS_ss
     
