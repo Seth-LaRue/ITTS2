@@ -1002,7 +1002,6 @@ observeEvent(eventExpr = data_ss_click_cs(), {
     #rename_all(~str_replace_all(.,'_',' ') %>% str_to_title(.))
     SETTS_ss_cs_r$SETTS_ss_cs=SETTS_ss_cs
     replaceData(proxy_cty2state_tbl, SETTS_ss_cs, rownames = FALSE)
-    
   } else {
     SETTS_ss_cs <- data.frame('EmptyData'=c(),
                               'Tons 2022</br>(K Tons)'=c(),
@@ -1021,12 +1020,13 @@ observeEvent(eventExpr = data_ss_click_cs(), {
 
 outputOptions(output, 'subsetSETTS_cs', suspendWhenHidden = FALSE)
 
+
 output$download_cs <- downloadHandler(
   filename = function(){
     paste("data_export",Sys.Date(), ".csv", sep="")},
   content = function(file) {
-    tbl_out=SETTS_ss_cs_r$SETTS_ss_cs %>% 
-      rename()
+    
+    tbl_out= rename_tbl_columns(SETTS_ss_cs_r$SETTS_ss_cs)
     write.csv(tbl_out, file,row.names = F)
   })
 

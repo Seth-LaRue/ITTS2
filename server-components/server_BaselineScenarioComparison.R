@@ -49,18 +49,24 @@ dot_plot <- function(df_in, meas = "Tonnage"){
               marker = list(size = 20),
               hovertemplate = ~paste0(label,"<br>",
                                       meas,": ",formatC(100*value, format = "f",digits = 2),"%")) %>%
-    layout(xaxis = list(title = 'Percent Growth',
-                        tickformat = '0%'#,
-                        #tickvals = 0:(length(df_temp$label |> unique())-1)+0.99
-                        ),
+    layout(xaxis = list(title = '',
+                        tickformat = '0%',
+                        showticklabels = FALSE),
            yaxis = list(title = ''),
-           margin = list(l = 100),
-           height = 175+35*(length(df_temp$label |> unique())),
-           legend = list(orientation = "h",   # show entries horizontally
-                         xanchor = "center",  # use center of legend as anchor
+           margin = list(l = 100, r = 100),  # Adjust left and right margins
+           height = 175 + 35 * (length(unique(df_temp$label))),
+           legend = list(orientation = "h",
+                         xanchor = "center",
                          x = 0.5,
                          y = -0.2)) %>%
-    config(displayModeBar = FALSE)
+    add_annotations(
+      text = "Percent Growth",
+      xref = "paper",
+      yref = "paper",
+      x = 1,  # Position the label at the far right end of the x-axis
+      y = -0.1,
+      showarrow = FALSE
+    )
   #dplot
   return(dplot)
 }
@@ -94,7 +100,7 @@ bar_plot_singleyear <- function(df_in, measure = 'tons_2022', sourceName = sourc
            legend = list(orientation = "h",   # show entries horizontally
                          xanchor = "center",  # use center of legend as anchor
                          x = 0.5,
-                         y = -0.2)) %>%
+                         y = -0.4)) %>%
     config(displayModeBar = FALSE)
   
   if(meas == "Value USD"){
@@ -108,7 +114,7 @@ bar_plot_yearaxis <- function(df_in, meas = 'Tonnage'){
   #browser()
   if(meas == "Value USD"){
     unit_pre = "$"
-    unit = ""
+    unit = " M"
   } else {
     unit_pre = ""
     unit = "K tons"
@@ -413,7 +419,7 @@ observeEvent(input$stab2_mainbutt, {
                          argonColumn(width = 10, p(textOutput("mode_select_pw"))),
                          argonColumn(width = 10, p(textOutput("comm_select_pw")))
                 ),
-                argonRow(width = 12,h2("Percent Growth by State")),
+                argonRow(width = 12,h2("Percent Growth For Selected State")),
                 argonRow(width = 12,
                          argonColumn(width = 6,plotlyOutput("stab2_tons_state_growth_dotplot", width = "auto", height = "100%")),
                          argonColumn(width = 6,plotlyOutput("stab2_value_state_growth_dotplot", width = "auto", height = "auto"))
