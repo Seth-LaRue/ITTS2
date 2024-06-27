@@ -685,8 +685,7 @@ output$download_cc <- downloadHandler(
   filename = function(){
     paste("data_export",Sys.Date(), ".csv", sep="")},
   content = function(file) {
-    tbl_out=SETTS_ss_r$SETTS_ss %>% 
-      rename()
+    tbl_out= rename_tbl_columns(SETTS_ss_r$SETTS_ss)
     write.csv(tbl_out, file,row.names = F)
   })
 

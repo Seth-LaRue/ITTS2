@@ -228,3 +228,33 @@ process_scenario <- function(dat_temp_cs,Value_opts_cs,Scenario_opt_cs, curr,col
     
   }
 }
+
+## process scenario columns
+rename_tbl_columns <- function(df) {
+  # optional oclumns
+  scen_col_list <- list(
+    "value_2050_s1" = "Value 2050 Scenario 1 ($Million)",
+    "value_2050_s2" = "Value 2050 Scenario 2 ($Million)",
+    "value_2050_s3" = "Value 2050 Scenario 3 ($Million)",
+    "tons_2050_s1" = "Tons 2050 Scenario 1 (K Tons)",
+    "tons_2050_s2" = "Tons 2050 Scenario 2 (K Tons)",
+    "tons_2050_s3" = "Tons 2050 Scenario 3 (K Tons)"
+  )
+  # Default columns
+  df <- df %>%
+    rename('Tons 2022 (K Tons)' = 'tons_2022',
+           'Tons 2050 (K Tons)' = 'tons_2050',
+           'Value 2022 ($Million)' = 'value_2022',
+           'Value 2050 ($Million)' = 'value_2050')
+  
+  selected_Scen <- intersect(names(df), names(scen_col_list))
+  
+  if (length(selected_Scen) > 0) {
+    df <- df %>%
+      rename_with(~ sapply(.x, function(col) scen_col_list[[col]]), 
+                  all_of(selected_Scen))
+  }
+  
+  return(df)
+}
+
