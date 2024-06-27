@@ -4,13 +4,13 @@ m<-leaflet() %>%
                    options = providerTileOptions(opacity = .85)) %>%
   addFullscreenControl() %>% 
   addPolygons(data = county_choices,
-              layerId = ~paste(GEOID),
+              layerId = ~(GEOID),
               color = cty_border_color,
               weight = .5,
               smoothFactor = 0.3,
               opacity = 0.4,
               fillOpacity = 0.1,
-              label = cty_labels,
+              label = ~county_lab,
               labelOptions = labelOptions(
                 style = list("front-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",

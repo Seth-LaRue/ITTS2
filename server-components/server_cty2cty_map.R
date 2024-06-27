@@ -81,11 +81,9 @@ output$odmap <- renderLeaflet({
   con_name_ini=county_choices$county_lab[county_choices$GEOID == '48453']
   titl_ini = paste0("Inbound & Outbound to </br>", con_name_ini, " county </br>", str_replace(str_to_title('value_2022'),'_',' '), " ($Million)")
   
-  
-  
   m %>%
     addPolygons(data = ln_select_ini,
-                layerId = ~paste(ln_select_ini$GEOID),
+                layerId = ~(GEOID),
                 fillColor = ~pal_factor_ini(value_2022),
                 stroke=TRUE,
                 smoothFactor = 0.3,
@@ -121,7 +119,7 @@ output$odmap <- renderLeaflet({
 
 SETTS_ss_r <- reactiveValues(SETTS_ss=ln_select_ini %>% st_drop_geometry())
 
-data_ss_click<- reactive({
+data_ss_click <- reactive({
   #req(n_lines_disp$curr)
   req(click_counties$curr)
   req(input$dms_mode_opts)
@@ -131,7 +129,7 @@ data_ss_click<- reactive({
   req(input$OD_opts)
   #req(input$county_opts)
   req(input$n_top)
-  
+  #browser()
   #additional filtering can go here
   
   #filter direction
@@ -379,7 +377,7 @@ observeEvent(eventExpr = map_update(), {
                   smoothFactor = 0.3,
                   opacity = 0.4,
                   fillOpacity = 0.1,
-                  label = cty_labels,
+                  label = ~county_lab,
                   labelOptions = labelOptions(
                     style = list("front-weight" = "normal", padding = "3px 8px"),
                     textsize = "15px",
@@ -617,7 +615,7 @@ output$subsetSETTS<-renderDataTable({#server = FALSE,{
 
 
 
-proxy_cty2cty_tbl = dataTableProxy('subsetSETTS')
+proxy_cty2cty_tbl =dataTableProxy('subsetSETTS')
 
 
 observe({
