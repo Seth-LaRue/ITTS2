@@ -1,6 +1,6 @@
 #load("/srv/shiny-server/.RData")
-load(file = "ITTS_Initial_Data_06202024.RData")
-
+load(file = "ITTS_Initial_Data_06272024.RData")
+#options(scipen = '999')
 # load(file = "ITTS_Initial_Data_06182024.RData")
 # 
 # 
@@ -76,4 +76,20 @@ load(file = "ITTS_Initial_Data_06202024.RData")
 # rm(county_selected)
 #int_ports_mode_no_select <- data.frame(mode = c("3","4","99"), use = c("3077","4006","99045"))
 #rm(int_ports_mode_no_selelect)
-#save.image(file = 'ITTS_Initial_Data_06202024.RData')
+# dat_cs <- read.csv("data/cnty2state_06272024.csv", colClasses = c("character","character",
+#                                                                   "character","character","character",
+#                                                                   "numeric", "numeric","numeric","numeric",
+#                                                                   "numeric","numeric")) |> 
+#   select(-trade_type, -tons_2020, -value_2020) |> 
+#   mutate(tons_2022 = ((tons_2050-tons_2017)/(2050-2017))*(2022 - 2017)+tons_2017) |> 
+#   mutate(value_2022 = ((value_2050-value_2017)/(2050-2017))*(2022 - 2017)+value_2017) 
+# 
+# dat_ss <- read.csv("data/state2state_06272024.csv", colClasses = c("character","character","character",
+#                                                                    "character","character","character",
+#                                                                    "numeric", "numeric","numeric","numeric",
+#                                                                    "numeric","numeric")) |> 
+#   select(-X, -trade_type, -tons_2020, -value_2020) |> 
+#   mutate(tons_2022 = ((tons_2050-tons_2017)/(2050-2017))*(2022 - 2017)+tons_2017) |> 
+#   mutate(value_2022 = ((value_2050-value_2017)/(2050-2017))*(2022 - 2017)+value_2017) 
+# 
+# save.image(file = 'ITTS_Initial_Data_06272024.RData')

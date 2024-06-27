@@ -14,7 +14,7 @@ library(leaflet)
 # base_path = "C:/Users/slarue/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Documents/003 ITTS SETTS/Task 5 Scenario Tool/Removed ITTS Files/"
 # base_path = "C:/Users/slarue/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Documents/3. Regional Profile/3.4 Commodity Flow and Performance/Commodity Flow/"
 ### load the aggregated commodity groups 
-commodity_group <- read_excel("SETTS_sandbox/GroupedCommodities.xlsx")
+commodity_group <- read_excel("SETTS_sandbox/GroupedCommodities_New.xlsx") |> select(STCGCode, Alternate_Group)
 
 state_code <- read_excel("SETTS_sandbox/ZoneLookup.xlsx")
 
@@ -35,20 +35,23 @@ state_code <- read_excel("SETTS_sandbox/ZoneLookup.xlsx")
 
 
 
-moth <- fread(paste0(base_path, 'disaggregatedITTS-20172050-withHeaders',sep =""),
+moth <- fread(paste0('C:/Users/slarue/Cambridge Systematics/PROJ 190103.002 ITTS LATTS - Documents/3. Regional Profile/3.4 Commodity Flow and Performance/Commodity Flow/disaggregatedITTS-20172050-withHeaders',sep =""),
                        colClasses = c(dms_orig = "character",dms_dest ="character",
                                       fr_dest = "character", fr_orig = "character")
               ) %>%
   left_join(.,commodity_group, by = c("sctg2" = "STCGCode")) %>%
-  rename(Grouped_sctg2 = Grouped) %>%
+  rename(Grouped_sctg2 = Alternate_Group) %>%
   mutate(Foreign = ifelse(!is.na(fr_orig)|!is.na(fr_dest),1,0)) %>%
   select(-c("tons_2022","tons_2023","tons_2025","tons_2030","tons_2035","tons_2040","tons_2045",
-            "value_2022","value_2023","value_2025","value_2030","value_2035","value_2040","value_2045",
-            "STCGDescription")) 
+            "value_2022","value_2023","value_2025","value_2030","value_2035","value_2040","value_2045")) 
 gc()
 rm(commodity_group)
 
 #check moth ----
+blah <- moth |> filter(stringr::str_sub(dms_orig, 1,2)=='48' & stringr::str_sub(dms_dest, 1,2)=='48') |> filter(sctg2 == 15)
+blah <- moth |> filter(stringr::str_sub(dms_orig, 1,2)=='48' & stringr::str_sub(dms_dest, 1,2)=='12') |> filter(is.na(fr_orig),is.na(fr_dest))
+blah$tons_2017|> sum(na.rm = T)
+
 moth$dms_orig %>% stringr::str_sub(1,2) %>% unique() %>% length()
 moth$dms_dest %>% stringr::str_sub(1,2) %>% unique() %>% length()
 moth$dms_dest[str_sub(moth$dms_dest,1,2) == "23"] %>% nchar() %>% unique()
@@ -198,14 +201,16 @@ gc()
 
 #### destination state
 cnty2State_ToState <- moth %>%
-  filter(str_sub(dms_orig,1,2) == "23"|str_sub(dms_dest,1,2)=="23") %>% 
-  left_join(.,state_code, by = c("dms_dest" = "ZoneNum")) %>% #should we even be using this?
+  #filter(str_sub(dms_orig,1,2) == "23"|str_sub(dms_dest,1,2)=="23") %>% 
+  filter(is.na(fr_orig),is.na(fr_dest))|>
+  left_join(state_code, by = c("dms_dest" = "ZoneNum")) %>% #should we even be using this?
   rename(dms_dest_state = StateCode) %>% 
   select(-c("ZoneName","StateAbbrev","fr_orig","fr_dest",
             "fr_inmode","fr_outmode")) %>%
   #filter(nchar(dms_dest_state)==2) %>%  # what does this filter here mean? all the states are two digits.
   filter(nchar(dms_orig)==5) %>%
-  filter(str_sub(dms_orig, 1,2) %in% c("05","12","13","21","22","28","29","45","48","51")) %>%#these are an essential step to filter only itts counties and states 
+  filter(str_sub(dms_orig, 1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")) %>% #these are an essential step to filter only itts counties and states 
+  filter(str_sub(dms_orig,1,2) != str_sub(dms_dest,1,2)) |> 
   group_by(dms_dest_state,dms_orig,Grouped_sctg2,dms_mode,trade_type) %>%
   summarise(tons_2017 = sum(tons_2017),
             tons_2020 = sum(tons_2020),
@@ -219,13 +224,36 @@ cnty2State_ToState <- moth %>%
 gc()
 #### origin state
 cnty2State_FromState <- moth %>%
-  left_join(.,state_code, by = c("dms_orig" = "ZoneNum")) %>%
+  filter(is.na(fr_orig),is.na(fr_dest))|>
+  left_join(state_code, by = c("dms_orig" = "ZoneNum")) %>%
   rename(dms_orig_state = StateCode) %>%
   select(-c("ZoneName","StateAbbrev","fr_orig","fr_dest",
             "fr_inmode","fr_outmode")) %>%
   #filter(nchar(dms_orig_state)==2) %>%  # what does this filter here mean? all the states are two digits. 
   filter(nchar(dms_dest)==5) %>%
-  filter(str_sub(dms_dest, 1,2) %in% c("05","12","13","21","22","28","29","45","48","51")) %>%
+  filter(str_sub(dms_dest, 1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")) %>%
+  group_by(dms_orig_state,dms_dest,Grouped_sctg2,dms_mode,trade_type) %>%
+  summarise(tons_2017 = sum(tons_2017),
+            tons_2020 = sum(tons_2020),
+            tons_2050 = sum(tons_2050),
+            value_2017 = sum(value_2017),
+            value_2020 = sum(value_2020),
+            value_2050 = sum(value_2050)) %>% 
+  ungroup() %>%
+  rename(origin = dms_orig_state,
+         destination = dms_dest)
+
+gc()
+#### all at once
+cnty2State_FromState <- moth %>%
+  filter(is.na(fr_orig),is.na(fr_dest))|>
+  left_join(state_code, by = c("dms_orig" = "ZoneNum")) %>%
+  rename(dms_orig_state = StateCode) %>%
+  select(-c("ZoneName","StateAbbrev","fr_orig","fr_dest",
+            "fr_inmode","fr_outmode")) %>%
+  #filter(nchar(dms_orig_state)==2) %>%  # what does this filter here mean? all the states are two digits. 
+  filter(nchar(dms_dest)==5) %>%
+  filter(str_sub(dms_dest, 1,2) %in% c("05", "12","13","21","22","28","29","45","48","51","01","47","37")) %>%
   group_by(dms_orig_state,dms_dest,Grouped_sctg2,dms_mode,trade_type) %>%
   summarise(tons_2017 = sum(tons_2017),
             tons_2020 = sum(tons_2020),
@@ -239,16 +267,32 @@ cnty2State_FromState <- moth %>%
 
 gc()
 
-
-  cnty2state_feature <- rbind(cnty2State_ToState,cnty2State_FromState) %>%
-    filter(origin == "23"|destination == "23") %>%
-    write.csv("data/cnty2state_maine_only.csv", row.names = F)
+rbind(cnty2State_ToState,cnty2State_FromState) %>%
+    #filter(origin == "23"|destination == "23") %>%
+    write.csv("data/cnty2state_06272024.csv", row.names = F)
     #mutate(lineid = paste0(pmin(origin, destination), pmax(origin, destination))
     #left_join(.,Mode, by = c("dms_mode"= "mode_code")) %>%
     #left_join(.,trade_type, by = c("trade_type" = "trade_code"))
+gc()
+c2c <- rbind(cnty2State_ToState,cnty2State_FromState)
+s2s<-c2c |> mutate(origin = str_sub(origin,1,2),
+              destination = str_sub(destination,1,2)) |> 
+  group_by(origin,destination,Grouped_sctg2,dms_mode,trade_type) %>%
+  summarise(tons_2017 = sum(tons_2017),
+            tons_2020 = sum(tons_2020),
+            tons_2050 = sum(tons_2050),
+            value_2017 = sum(value_2017),
+            value_2020 = sum(value_2020),
+            value_2050 = sum(value_2050))
+write.csv(s2s, "data/state2state_06272024.csv")
+blah<-c2c |> filter(stringr::str_sub(origin, 1,2)=='48' & stringr::str_sub(destination, 1,2)=='12') # #|> filter(is.na(fr_orig),is.na(fr_dest))
+sum(blah$tons_2017)
+blah<-s2s |> filter(stringr::str_sub(origin, 1,2)=='48' & stringr::str_sub(destination, 1,2)=='12') # #|> filter(is.na(fr_orig),is.na(fr_dest))
+sum(blah$tons_2017)
 
 ##Process State to State datasetf
 state2state_feature <- moth %>%
+  filter(is.na(fr_orig),is.na(fr_dest))|>
   left_join(state_code, by = c("dms_orig" = "ZoneNum")) %>%
   rename(dms_orig_state = StateCode) %>%
   select(-c("ZoneName","StateAbbrev","fr_orig","fr_dest",
@@ -268,7 +312,7 @@ state2state_feature <- moth %>%
   ungroup() %>%
   rename(origin = dms_orig_state,
          destination = dms_dest_state)
-write.csv(state2state_feature, "state2state_feature.csv", row.names = F)
+write.csv(state2state_feature, "state2state_feature_06272024.csv", row.names = F)
 
 state2state_feature %>% filter(origin == "23"|destination == "23") %>% write.csv("data/state2state_feature_maine_only.csv", row.names = F)
 ## Process ITTS Features International trading ----
