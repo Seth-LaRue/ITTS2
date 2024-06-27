@@ -564,7 +564,7 @@ observeEvent(eventExpr = map_update_cs(), #ignoreInit=T,
                     smoothFactor = 0.3,
                     opacity = 0.4,
                     fillOpacity = 0.1,
-                    label = cty_labels,
+                    label = ~county_lab,
                     labelOptions = labelOptions(
                       style = list("front-weight" = "normal", padding = "3px 8px"),
                       textsize = "15px",

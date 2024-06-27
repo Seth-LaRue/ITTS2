@@ -32,7 +32,7 @@ m_cs<-leaflet() %>%
               smoothFactor = 0.3,
               opacity=0.4,
               fillOpacity = .1,
-              label = state_base_labels,
+              label = ~state_lab,
               labelOptions = labelOptions(
                 style = list("front-weight" = "normal", padding = "3px 8px"),
                 textsize = "15px",
