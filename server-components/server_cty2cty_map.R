@@ -612,10 +612,10 @@ proxy_cty2cty_tbl =dataTableProxy('subsetSETTS')
 
 
 observe({
-  
-  req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
+  #browser()
+  req(click_counties$curr,input$dms_mode_opts,input$n_top,
       input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
-  ln_select=data_ss_click()
+  ln_select=data_ss_click() |> st_drop_geometry()
   
   # validate(need(!is.null(ln_select),
   #               'There is no data for the selected subset.'),
@@ -630,8 +630,7 @@ observe({
     }
     
     
-    SETTS_ss<-ln_select %>% 
-      st_drop_geometry() 
+    SETTS_ss<-ln_select
     # browser()
     if(input$OD_opts == "Both"){
       SETTS_ss<-SETTS_ss %>% 
@@ -667,6 +666,7 @@ observe({
     SETTS_ss_r$SETTS_ss=SETTS_ss
     
     replaceData(proxy_cty2cty_tbl, SETTS_ss, rownames = FALSE)} else {
+      print('data_ss_click returned null creating empty table')
       SETTS_ss <- data.frame('County'=c(),
                              'Tons 2022</br>(K Tons)'=c(),
                              'Tons 2050</br>(K Tons)'=c(),
@@ -692,24 +692,24 @@ output$download_cc <- downloadHandler(
 
 
 observe({
-  req(click_counties$curr,input$dms_mode_opts,input$county_opts,input$n_top,
+  req(click_counties$curr,input$dms_mode_opts,input$n_top,
       input$OD_opts, input$sctg2_opts, input$Value_opts, input$Scenario_opt)
   print("Observe: cnty2cnty")
   #browser()
   if (input$OD_opts == 'Both'){
-    dat_in <- dat %>% filter(origin %in% input$county_opts | destination %in% input$county_opts)
+    dat_in <- dat %>% filter(origin %in% click_counties$curr | destination %in% click_counties$curr)
   } else if (input$OD_opts == 'dms_orig'){
-    dat_in <- dat %>% filter(origin %in% input$county_opts)
+    dat_in <- dat %>% filter(origin %in% click_counties$curr)
   }else if (input$OD_opts == 'dms_dest'){
-    dat_in <- dat %>% filter(destination %in% input$county_opts)}
+    dat_in <- dat %>% filter(destination %in% click_counties$curr)}
   
   #filter for mode
   if(input$dms_mode_opts != "All" & nrow(dat_in) >=1) {
-    dat_in = dat_in %>%
+    dat_in <- dat_in %>%
       filter(dms_mode == input$dms_mode_opts)}
   #filter for commodity
   if(input$sctg2_opts != "All" & nrow(dat_in) >=1) {
-    dat_in = dat_in %>%
+    dat_in <- dat_in %>%
       filter(Grouped_sctg2==input$sctg2_opts)}
   
   selected_value = input$Value_opts
@@ -729,7 +729,7 @@ observe({
   
   output$c2c_flowDirection <- renderPlotly({
     direction_pie_graph_countyselected(dat_in,
-                                       county = input$county_opts,
+                                       county = click_counties$curr,
                                        tons_value_selection = selected_value,
                                        commcolors = init_commcolors,
                                        sourceName = "c2c_flowDirection")
